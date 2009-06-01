@@ -1,0 +1,143 @@
+{\rtf1\ansi\ansicpg1252\cocoartf949\cocoasubrtf460
+{\fonttbl\f0\fswiss\fcharset0 ArialMT;}
+{\colortbl;\red255\green255\blue255;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc2\leveljcn2\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid0\'02\'05.;}{\levelnumbers\'01;}}{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc2\leveljcn2\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid0\'02\'05.;}{\levelnumbers\'01;}}{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc2\leveljcn2\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid0\'02\'05.;}{\levelnumbers\'01;}}{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc2\leveljcn2\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid0\'02\'05.;}{\levelnumbers\'01;}}{\listname ;}\listid4}
+{\list\listtemplateid5\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc2\leveljcn2\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid0\'02\'05.;}{\levelnumbers\'01;}}{\listname ;}\listid5}
+{\list\listtemplateid6\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc2\leveljcn2\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid0\'02\'05.;}{\levelnumbers\'01;}}{\listname ;}\listid6}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}{\listoverride\listid5\listoverridecount0\ls5}{\listoverride\listid6\listoverridecount0\ls6}}
+\margl1440\margr1440\vieww11040\viewh11660\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\fs22 \cf0 \
+
+\i This document is slightly out of sync with the code. It does describe the overall idea, though.
+\i0 \
+\
+\pard\pardeftab720\ql\qnatural
+
+\b \cf0 ParSets NG Local Database Model
+\b0 \
+ParSets's local db is stored in a single SQLite database file called local.db. This document describes the layout of this database and the Java classes used to interact with it.\
+\
+The overall structure of the db is similar to the OLAP star model. There are two kinds of tables: administration tables and data tables. Each data set has entries in the administration tables, and one or two data tables.\
+\
+
+\b Administration Tables
+\b0 \
+\
+
+\b Admin_DataSets
+\b0 \
+Contains a list of all data sets in the data base, their names, etc.\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\ql\qnatural
+\ls1\ilvl0\cf0 {\listtext	\'95	}
+\i Name
+\i0  - human-readable name of the data set\
+{\listtext	\'95	}
+\i Handle
+\i0  - internal name of the data set, derived from the filename or the human-readable name. Can only contain lowercase a-z and 0-9, no punctuation or spaces\
+{\listtext	\'95	}
+\i Section
+\i0  - text field that can contain the name of a section the dataset is to be listed in. Not currently used in the ParSets program.\
+{\listtext	\'95	}
+\i DateAdded
+\i0  - date and time the data set was added to the data base\
+\pard\tx560\pardeftab720\ql\qnatural
+\cf0 \
+
+\b Admin_Dimensions
+\b0 \
+List all dimensions in all data sets. The handle of the data set is the foreign key to get the list of dimensions.\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\ql\qnatural
+\ls2\ilvl0\cf0 {\listtext	\'95	}
+\i DataSet
+\i0  - handle of the data set the dimension belongs to\
+{\listtext	\'95	}Name - human-readable name of the dimension\
+{\listtext	\'95	}Handle - internal name of the dimension, perhaps taken from the column header of the imported file. Follows the same rules as data set handle. Has to be unique within the data set.\
+{\listtext	\'95	}Type - type of the dimension. Dimensions that are considered dimensions in the OLAP model are called "categorical" here. See list of types for measures below.\
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b Admin_Categories
+\b0 \
+List all categories in all data sets. The handles of the data set and the dimension are the foreign keys here.\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\ql\qnatural
+\ls3\ilvl0\cf0 {\listtext	\'95	}DataSet - handle of the data set the category belongs to\
+{\listtext	\'95	}Dimension - handle of the dimension the category belongs to\
+{\listtext	\'95	}Name - human-readable name of the category\
+{\listtext	\'95	}Handle - handle of the category, either from the file or derived from name. Same rules as data set handle.\
+{\listtext	\'95	}Number - number of the category within the dimension. This number has to be greater than 0 and is used for all internal calculations, as well as for indexing into the dimensions and data tables\
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b Admin_DerivedDimensions
+\b0 \
+Table for specifying user-defined derived dimensions. Not currently implemented.\
+\
+
+\b Data Tables
+\b0 \
+Each data set has one or two data tables associated with it, named 
+\i handle
+\i0 _dims and 
+\i handle
+\i0 _measures. The dims table has to exist for each data set, the measures table is optional.\
+\
+\pard\pardeftab720\ql\qnatural
+
+\i\b \cf0 handle
+\i0 _dims
+\b0 \
+This table contains all the categorical dimensions as dimensions, and has an entry for each combination of categories that exists in the data set. In addition to the dimensions, the table has one column for the key of that combination (stored as a hexadecimal string because it can be larger than 64 bits) and the count of how many times each combination of categories exists.\
+There are also pre-aggregated entries that use 0 for each combination of categories, including one entry with all zeros giving the size of the entire data set.\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\ql\qnatural
+\ls4\ilvl0\cf0 {\listtext	\'95	}Key - the key value combining the numerical category values for all categories. Also used to connect to the measures.\
+{\listtext	\'95	}Count - the number of times that combination of values occurs in the data set\
+{\listtext	\'95	}Dimensions - one column for each dimension, using the dimension's handle as its name. The type of these columns is numerical.\
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+\pard\pardeftab720\ql\qnatural
+
+\i\b \cf0 handle
+\i0 _measures
+\b0 \
+This table contains all numerical data dimensions, or measures. The only column all these tables have in common is the key, which is the same as in the 
+\i handle
+\i0 _dims table. All other columns represent numerical data dimensions, as specified in the Admin_Dimensions table. The type of the column depends on the numerical type (see below).\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\ql\qnatural
+\ls5\ilvl0\cf0 {\listtext	\'95	}Key - the key from 
+\i handle
+\i0 _dims specifying which combination of categories the row belongs to. This does not have to be unique, many numerical rows can correspond to the same combination of categorical values. Also includes the pre-aggregatd keys, values in each dimension are summed up.\
+{\listtext	\'95	}Measures - one column for each numerical dimension in the data set.\
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+\
+
+\b Measure Data Types
+\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\ql\qnatural
+\ls6\ilvl0\cf0 {\listtext	\'95	}Integer - whole numbers, using the range of a 32-bit integer (Java type int)\
+{\listtext	\'95	}Real - floating-point numbers, stored as single-precision floats (Java type float)\
+{\listtext	\'95	}Date - Dates (potentially including time) stored as a string, using SQLIte's "native" time format, which mostly conforms to RFC 3339, e.g. "1990-12-31T23:59:60Z" - time zone information is ignored (Java type Calendar)\
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+\
+
+\b Useful Resources
+\b0 \
+\
+SQLite, {\field{\*\fldinst{HYPERLINK "http://sqlite.org/"}}{\fldrslt http://sqlite.org/}}\
+\
+Good description of OLAP Star Schema,\
+\pard\pardeftab720\ql\qnatural
+{\field{\*\fldinst{HYPERLINK "http://ciobriefings.com/Publications/WhitePapers/DesigningtheStarSchemaDatabase/tabid/101/Default.aspx"}}{\fldrslt \cf0 http://ciobriefings.com/Publications/WhitePapers/DesigningtheStarSchemaDatabase/tabid/101/Default.aspx}}\
+\
+SQLite Date and Time Functions, {\field{\*\fldinst{HYPERLINK "http://sqlite.org/lang_datefunc.html"}}{\fldrslt http://sqlite.org/lang_datefunc.html}}\
+\
+RFC 3339, Date and Time on the Internet: Timestamps\
+\pard\pardeftab720\ql\qnatural
+{\field{\*\fldinst{HYPERLINK "http://www.faqs.org/rfcs/rfc3339.html"}}{\fldrslt \cf0 http://www.faqs.org/rfcs/rfc3339.html}}\
+}

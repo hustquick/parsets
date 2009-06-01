@@ -1,0 +1,23 @@
+Packaging
+=========
+
+Mac OS X
+--------
+1.) Export "Runnable jar file"
+2.) In Jar Bundler, create app, including all *.jnilib files and local.db
+3.) Set property: parsets.use_installed_db = true
+4.) Set vm parameter -Xmx1G
+5.) Create app
+
+Windows
+-------
+
+1.) Unpack the file "Parallel Sets Installation.zip" to drive C:
+2.) Export "Runnable jar file."  Save it as C:\Parallel Sets Installation\parallel_sets.jar
+3.) In Launch4j, open the file "parsets launch config.xml" 
+4.) Hit the "Build wrapper" button (the gear icon) to export Parallel Sets.exe
+5.) Make sure the most recent local.db is in the folder C:\Parallel Sets Installation\Parallel Sets Application Data
+6.) Run the script "setup.nsi" in either NSIS or the NSIS Eclipse plugin to generate Parallel Sets 2.0 Setup.exe
+
+Linux
+-----
