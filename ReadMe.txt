@@ -12,7 +12,7 @@ Dependencies
 ------------
 
 The source code packages do not contain all the libraries anymore. To get the
-complete package, check out the source using Mercurial from
+complete project, check out the source using Mercurial from
 http://code.google.com/p/parsets/source/checkout
 
 This is an Eclipse project, so you should be able to import it directly
