@@ -43,14 +43,14 @@ public class Linux extends AbstractOS {
 	 * run from anywhere on the system.
 	 */
 	@Override
-	public void install(File dbFile) {
+	protected void installRegular(File dbFile) {
 		ParallelSets.logger.info("Installing new database at "
 				+ dbFile.getAbsolutePath());
 		File parentDir = dbFile.getParentFile();
 		if (!parentDir.exists())
 			if (parentDir.mkdir() == false)
 				ParallelSets.logger.fatal("Could not create parent directory");
-		copyFile(new File(LocalDB.LOCALDBFILENAME), dbFile);
+		copyFileNIO(new File(LocalDB.LOCALDBFILENAME), dbFile);
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class Linux extends AbstractOS {
 				+ File.separatorChar + dbFileName;
 		File dbFile = new File(dbPath);
 		if (!dbFile.exists())
-			install(dbFile);
+			installRegular(dbFile);
 		return dbPath;
 	}
 

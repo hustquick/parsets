@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.FileChannel;
 
 import javax.swing.JFileChooser;
@@ -13,6 +14,7 @@ import javax.swing.JFileChooser;
 import com.sun.jna.Platform;
 
 import edu.uncc.parsets.ParallelSets;
+import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.gui.DBTab.CSVFileFilter;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -46,20 +48,76 @@ import edu.uncc.parsets.gui.DBTab.CSVFileFilter;
 
 public abstract class AbstractOS {
 
+	protected static boolean javaStore = false;
+	
+	static {
+		javaStore = System.getProperty("parsets.javastore", "false").equalsIgnoreCase("true");
+	}
+
+	
 	private static AbstractOS currentOS;
 
 	protected AbstractOS() {
 	}	
 	
-	public void install(File dbFile) {
+	/**
+	 * Install the DB when running as a regular application.
+	 * @param dbFile the location where to install the database
+	 */
+	protected void installRegular(File dbFile) {
 		
+	}
+
+	/**
+	 * Install the DB when running from the JavaStore. The difference is that
+	 * NIO classes can't be used, since the db is read from the jar file.
+	 * @param dbFile the location where to install the database
+	 */
+	protected void installJavaStore(File dbFile) {
+		ParallelSets.logger.info("Installing new database at " + dbFile.getAbsolutePath());
+		File parentDir = dbFile.getParentFile();
+		if (!parentDir.exists())
+			if (parentDir.mkdir() == false)
+				ParallelSets.logger.fatal("Could not create parent directory");
+		
+		ParallelSets.logger.info("Source file: " + this.getClass().getResource("/"+LocalDB.LOCALDBFILENAME));
+	    InputStream fromStream = null;
+	    FileOutputStream toStream = null;
+		try {
+			fromStream = this.getClass().getResourceAsStream("/"+LocalDB.LOCALDBFILENAME);
+			toStream = new FileOutputStream(dbFile);
+		    byte[] buffer = new byte[4096*4];
+		    int bytesRead;
+
+		    while ((bytesRead = fromStream.read(buffer)) != -1)
+		    	toStream.write(buffer, 0, bytesRead);
+		} catch (Exception e) {
+			ParallelSets.logger.error("Error installing DB", e);
+		} finally {
+			if (fromStream != null) {
+				try {
+					fromStream.close();
+				} catch (IOException e) {
+				}
+			}
+			if (toStream != null) {
+				try {
+					toStream.close();
+				} catch (IOException e) {
+				}
+			}
+		}
 	}
 	
 	public String getLocalDBPath(String dbFileName) {
 		String dbPath = getLocalDBDir()+File.separatorChar+ParallelSets.PROGRAMNAME+File.separatorChar+dbFileName;
 		File dbFile = new File(dbPath);
-		if (!dbFile.exists())
-			install(dbFile);
+		if (!dbFile.exists()) {
+			if (javaStore)
+				installJavaStore(dbFile);
+			else
+				installRegular(dbFile);
+		}
 		return dbPath;
 	}
 	
@@ -88,7 +146,7 @@ public abstract class AbstractOS {
 	
 	// Based on code from
 	// http://stackoverflow.com/questions/106770/standard-concise-way-to-copy-a-file-in-java
-	public static void copyFile(File sourceFile, File destFile) {
+	public static void copyFileNIO(File sourceFile, File destFile) {
 		ParallelSets.logger.info("Copying "+sourceFile.getAbsolutePath()+" to "+destFile.getAbsolutePath());
 		if (!destFile.exists()) {
 			try {

@@ -94,7 +94,7 @@ public class MacOSX extends AbstractOS {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void install(File dbFile) {
+	protected void installRegular(File dbFile) {
 		ParallelSets.logger.info("Installing new database at "
 				+ dbFile.getAbsolutePath());
 		try {
@@ -110,7 +110,7 @@ public class MacOSX extends AbstractOS {
 							.fatal("Could not create parent directory");
 			ParallelSets.logger.info("Source file: " + srcPath);
 			File localDBFile = new File(srcPath);
-			copyFile(localDBFile, dbFile);
+			copyFileNIO(localDBFile, dbFile);
 		} catch (Exception e) {
 			ParallelSets.logger.fatal("Could not locate source DB file.", e);
 		}
