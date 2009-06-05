@@ -197,5 +197,12 @@ public abstract class AbstractOS {
 	}
 
 	public abstract String shortName();
+
+	/**
+	 * Shortcut, because we need to check in a few places.
+	 */
+	public boolean isMacOSX() {
+		return false;
+	}
 	
 }

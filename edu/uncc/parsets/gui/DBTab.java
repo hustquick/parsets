@@ -2,6 +2,8 @@ package edu.uncc.parsets.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -78,24 +80,32 @@ public class DBTab extends JPanel implements ActionListener {
 	private JButton deleteButton;
 	private Controller controller;
 	
-	public DBTab(JFrame frame, Controller controller) {
+	public DBTab(final MainWindow mainWindow, Controller controller) {
 		super(new MigLayout("fillx, wrap 2, insets 0", "[]0[]", "[grow, fill]r[]r[]r[]r"));
 		this.controller = controller;
 		
 		setOpaque(false);
-		add(makeDataSetList(), "span 2, growx");
-		addButtons(frame);
+		add(makeDataSetList(mainWindow), "span 2, growx");
+//		addButtons(mainWindow);
 		LocalDB.getDefaultDB().addRescanListener(this);
+		addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentShown(ComponentEvent e) {
+				mainWindow.setDSMenuItemsEnabled(localDBList.getSelectedDataSet() != null);
+				super.componentShown(e);
+			}
+		});
 	}
 
-	private JComponent makeDataSetList() {
+	private JComponent makeDataSetList(final MainWindow mainWindow) {
 		Box b = new Box(BoxLayout.Y_AXIS);
 		b.setBorder(BorderFactory.createTitledBorder("Local Data Sets"));
 		localDBList = new GroupedDataSetList(LocalDB.getDefaultDB().getSections());
 		localDBList.addDSListener(new GroupedDataSetList.DSListener() {
 			public void selectDataSet(DataSet ds) {
-				openButton.setEnabled(ds != null);
-				deleteButton.setEnabled(ds != null);
+//				openButton.setEnabled(ds != null);
+//				deleteButton.setEnabled(ds != null);
+				mainWindow.setDSMenuItemsEnabled(ds != null);
 			}
 
 			public void openDataSet(DataSet ds) {

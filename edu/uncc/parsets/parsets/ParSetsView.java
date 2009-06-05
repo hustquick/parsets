@@ -99,6 +99,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 	private boolean needsLayout = true;
 	
 	private String screenShotFileName = null;
+	private boolean showTooltips = true;
 
 	public ParSetsView(Component canvas, Controller controller) {
 		this.canvas = canvas;
@@ -138,7 +139,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 			for (VisualAxis axis : axes)
 				axis.display(gl, dimensionTextRenderer, dimensionFontMetrics, categoryTextRenderer, categoryFontMetrics);
 			
-			if (tooltip != null) 
+			if (tooltip != null && showTooltips) 
 				tooltip.display(gl, categoryTextRenderer, categoryFontMetrics);
 			
 			
@@ -484,6 +485,11 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 		tooltip = null;	
 	}
 
+	public void setShowTooltips(boolean show) {
+		showTooltips  = show;
+		repaint();
+	}
+	
 	public CategoryTree getDataTree() {
 		return dataTree;
 	}

@@ -23,11 +23,12 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -37,7 +38,6 @@ import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
-import edu.uncc.parsets.util.osabstraction.MacOSX;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -158,7 +158,7 @@ public class SideBar extends JPanel implements DataSetListener {
 
 
 	
-	public SideBar(JFrame mainFrame, Controller mainController) {
+	public SideBar(final MainWindow mainWin, Controller mainController) {
 		super(new BorderLayout());
 
 		controller = mainController;
@@ -168,15 +168,15 @@ public class SideBar extends JPanel implements DataSetListener {
 		tabs.setTabPlacement(JTabbedPane.LEFT);
 		add(tabs, BorderLayout.CENTER);
 
-		onlineDataTab = new OnlineDataTab(mainFrame);
+		onlineDataTab = new OnlineDataTab(mainWin);
 		tabs.addTab(OnlineDataTab.TABTITLE, onlineDataTab);
 		makeRotatedLabel(tabs, 0, OnlineDataTab.TABTITLE);
 		
-		dbTab = new DBTab(mainFrame, controller);
+		dbTab = new DBTab(mainWin, controller);
 		tabs.addTab(DBTab.TABTITLE, dbTab);
 		makeRotatedLabel(tabs, 1, DBTab.TABTITLE);
 
-		dataSetTab = makeDataSetTab();
+		dataSetTab = makeDataSetTab(mainWin);
 
 		tabs.addTab(DATASETTABTITLE, dataSetTab);
 		dsLabel = makeRotatedLabel(tabs, 2, DATASETTABTITLE);
@@ -184,9 +184,16 @@ public class SideBar extends JPanel implements DataSetListener {
 			dsLabel.setEnabled(false);
 		tabs.setEnabledAt(DATASETTABNUM, false);
 		tabs.setSelectedIndex(1);
+		
+		tabs.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				mainWin.setDSMenuItemsEnabled(false);
+			}
+		});
 	}
 
-	private JPanel makeDataSetTab() {
+	private JPanel makeDataSetTab(MainWindow mainWin) {
 		JPanel p = new JPanel(new MigLayout("wrap 1,fillx,insets 0", "[]", "[grow,fill]r[]r"));
 		p.setOpaque(false);
 		
@@ -209,7 +216,7 @@ public class SideBar extends JPanel implements DataSetListener {
 	}
 
 	private JLabel makeRotatedLabel(JTabbedPane tabs, int index, String tabtitle) {
-		if (!(AbstractOS.getCurrentOS() instanceof MacOSX)) {
+		if (!AbstractOS.getCurrentOS().isMacOSX()) {
 			JLabel label = new JLabel(tabtitle);
 			label.setUI(new VerticalLabelUI());
 			tabs.setTabComponentAt(index, label);

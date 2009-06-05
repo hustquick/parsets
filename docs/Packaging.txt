@@ -5,9 +5,13 @@ Mac OS X
 --------
 1.) Export "Runnable jar file"
 2.) In Jar Bundler, create app, including all *.jnilib files and local.db
-3.) Set property: parsets.use_installed_db = true
+3.) Set properties:
+	- parsets.use_installed_db = true
+	- dock:name = "Parallel Sets"
+	- com.apple.mrj.application.apple.menu.about.name = ParallelSets 
 4.) Set vm parameter -Xmx1G
 5.) Create app
+6.) Use DropDMG to create "Internet-enabled" disk image with license
 
 Windows
 -------

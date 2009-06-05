@@ -75,6 +75,7 @@ public class MacOSX extends AbstractOS {
 //		} catch (Exception e) {
 //			// bite me
 //		}
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		try {
 			Class lc = Class.forName("com.apple.eawt.ApplicationListener");
 			Object listener = Proxy.newProxyInstance(this.getClass().getClassLoader(),
@@ -168,5 +169,10 @@ public class MacOSX extends AbstractOS {
 	@Override
 	public String shortName() {
 		return "mac";
+	}
+	
+	@Override
+	public boolean isMacOSX() {
+		return true;
 	}
 }

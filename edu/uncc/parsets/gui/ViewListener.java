@@ -42,4 +42,6 @@ public interface ViewListener {
 	public void removeCategory(DimensionHandle dimension, CategoryHandle category);
 	public void addCategory(DimensionHandle dimension, CategoryHandle category);
 	public void clearScreen();
+
+	public void setShowTooltips(boolean show);
 }

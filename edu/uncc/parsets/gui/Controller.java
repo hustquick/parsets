@@ -85,6 +85,10 @@ public class Controller {
 	public void clearScreen() {
 		viewListener.clearScreen();
 	}
+
+	public void setShowTooltips(boolean show) {
+		viewListener.setShowTooltips(show);
+	}
 	
 	
 }
