@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 
+import com.sun.opengl.util.Screenshot;
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
@@ -32,6 +34,7 @@ import edu.uncc.parsets.gui.Controller;
 import edu.uncc.parsets.gui.DataSetListener;
 import edu.uncc.parsets.gui.ViewListener;
 import edu.uncc.parsets.util.AnimationListener;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -95,6 +98,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 	
 	private boolean needsLayout = true;
 	
+	private String screenShotFileName = null;
 
 	public ParSetsView(Component canvas, Controller controller) {
 		this.canvas = canvas;
@@ -110,7 +114,11 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 	
 	public final void display(GLAutoDrawable glDrawable) {
 
-		GL gl = new DebugGL(glDrawable.getGL());
+		GL gl = null;
+		if (ParallelSets.isInstalled())
+			gl = glDrawable.getGL();
+		else
+			gl = new DebugGL(glDrawable.getGL());
 
 		gl.glClearColor(1, 1, 1, 0);
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
@@ -135,7 +143,16 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 			
 			
 			gl.glDisable(GL.GL_BLEND);
-		}		
+		}
+		
+		if (screenShotFileName != null) {
+			try {
+				Screenshot.writeToFile(new File(screenShotFileName), width, height);
+			} catch (Exception e) {
+				PSLogging.logger.error("Error taking screenshot", e);
+			}
+			screenShotFileName = null;
+		}
 	}
 
 	private void renderSplashScreen(GL gl) {
@@ -156,9 +173,9 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 				logoTexture.setTexParameteri(GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
 				gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
 			} catch (IOException e) {
-				ParallelSets.logger.warn("Could not open logo image.", e);
+				PSLogging.logger.warn("Could not open logo image.", e);
 			} catch (IllegalArgumentException e) {
-				ParallelSets.logger.warn("Could not open logo image.", e);
+				PSLogging.logger.warn("Could not open logo image.", e);
 			}
 		}
 		// another if to check if we were able to load the texture
@@ -430,6 +447,11 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 	
 	public void repaint() {
 		canvas.repaint();
+	}
+	
+	public void takeScreenShot(String filename) {
+		screenShotFileName = filename;
+		repaint();
 	}
 	
 	public int getHeight() {
