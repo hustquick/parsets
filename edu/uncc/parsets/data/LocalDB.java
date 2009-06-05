@@ -26,6 +26,8 @@ import javax.swing.SwingUtilities;
 import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.old.CSVDataSet;
 import edu.uncc.parsets.data.old.DataDimension;
+import edu.uncc.parsets.gui.MainWindow;
+import edu.uncc.parsets.util.PSLogging;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -120,7 +122,7 @@ public class LocalDB {
 
 			String dbFileName = null;
 
-//			ParallelSets.logger.fatal("test");
+//			PSLogging.logger.fatal("test");
 			
 			boolean initialized = true;
 
@@ -136,7 +138,7 @@ public class LocalDB {
 					dbFileName = (new File(dbURL.toURI())).getAbsolutePath();
 			}
 			
-			ParallelSets.logger.info("Opening local DB file '"+dbFileName+"'");
+			PSLogging.logger.info("Opening local DB file '"+dbFileName+"'");
 
 	    	db = DriverManager.getConnection("jdbc:sqlite:"+dbFileName);
 
@@ -144,11 +146,11 @@ public class LocalDB {
 	    		initializeDB();
 	    	
 		} catch (ClassNotFoundException e) {
-			ParallelSets.logger.fatal("SQLite could not be initialized.", e);
+			PSLogging.logger.fatal("SQLite could not be initialized.", e);
 		} catch (SQLException e) {
-			ParallelSets.logger.fatal("Error connecting to local DB.", e);
+			PSLogging.logger.fatal("Error connecting to local DB.", e);
 		} catch (URISyntaxException e) {
-			ParallelSets.logger.fatal("Unable to locate local DB file.", e);
+			PSLogging.logger.fatal("Unable to locate local DB file.", e);
 		}
 	}
 	
@@ -191,13 +193,13 @@ public class LocalDB {
 	}
 	
 	private void initializeDB() {
-		ParallelSets.logger.info("Initializing local DB file.");
+		PSLogging.logger.info("Initializing local DB file.");
 		Statement statement;
 		try {
 			statement = createStatement(DBAccess.FORWRITING);
 			statement.execute("begin transaction;");
 			statement.execute("create table Admin_Settings (key TEXT PRIMARY KEY, value TEXT);");
-			statement.execute("insert into Admin_Settings values ('creator', '"+ParallelSets.WINDOWTITLE+"');");
+			statement.execute("insert into Admin_Settings values ('creator', '"+MainWindow.WINDOWTITLE+"');");
 			statement.execute("insert into Admin_Settings values ('schema_version', '"+SCHEMA_VERSION+"');");
 			statement.execute("insert into Admin_Settings values ('"+LAST_VERSION_SEEN_KEY+"', '"+ParallelSets.VERSION+"');");
 			statement.execute("create table Admin_Datasets (name TEXT, handle TEXT PRIMARY KEY, type TEXT, numDimensions INTEGER, numRecords INTEGER, section TEXT, dateAdded TEXT, lastOpened TEXT, dataURL TEXT, source TEXT, srcURL TEXT);");
@@ -208,7 +210,7 @@ public class LocalDB {
 	        statement.execute("commit;");
 	        statement.close();
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Error initializing local DB.", e);
+			PSLogging.logger.error("Error initializing local DB.", e);
 		} finally {
 			releaseWriteLock();
 		}
@@ -284,7 +286,7 @@ public class LocalDB {
 				}
         	});
 		} catch(SQLException e) {
-        	ParallelSets.logger.error("Error reading list of datasets.", e);
+        	PSLogging.logger.error("Error reading list of datasets.", e);
         } finally {
         	releaseReadLock();
         }
@@ -305,13 +307,13 @@ public class LocalDB {
 			} else
 				numDims.add(d);
 		
-		ParallelSets.logger.info("Storing data set " + dataSet.getName());
-		ParallelSets.logger.info(dataSet.getNumRecords(0) + " records");
-		ParallelSets.logger.info(catDims.size() + " (categorical) dimensions");
-		ParallelSets.logger.info(numDims.size() + " measures");
-		ParallelSets.logger.info(combinations + " potential combinations ("
+		PSLogging.logger.info("Storing data set " + dataSet.getName());
+		PSLogging.logger.info(dataSet.getNumRecords(0) + " records");
+		PSLogging.logger.info(catDims.size() + " (categorical) dimensions");
+		PSLogging.logger.info(numDims.size() + " measures");
+		PSLogging.logger.info(combinations + " potential combinations ("
 				+ combinations.bitLength() + " bits)");
-		ParallelSets.logger.info("Key length: " + bits + " bits");
+		PSLogging.logger.info("Key length: " + bits + " bits");
 
 		// where is map() when I need it?
 		int categories[] = new int[catDims.size()];
@@ -332,24 +334,24 @@ public class LocalDB {
 			writeData(dataSet.getNumRecords(0), handle, catDims, numDims, keyDef);
 			stmt.execute("commit;");
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Could not write dataset to local DB.", e);
+			PSLogging.logger.error("Could not write dataset to local DB.", e);
 			try {
 				stmt.execute("rollback;");
 			} catch (SQLException e1) {
-				ParallelSets.logger.error("Could not roll back changes.", e1);
+				PSLogging.logger.error("Could not roll back changes.", e1);
 			}
 		} finally {
 			releaseWriteLock();
 			try {
 				stmt.close();
 			} catch (SQLException e) {
-				ParallelSets.logger.warn("Could not release DB statement.", e);
+				PSLogging.logger.warn("Could not release DB statement.", e);
 			}
 		}
 
 		rescanDB();
 		
-		ParallelSets.logger.info("Done.");
+		PSLogging.logger.info("Done.");
 		
 		return handle;
 	}
@@ -433,31 +435,31 @@ public class LocalDB {
 			}
 		
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Error writing admin data.", e);
+			PSLogging.logger.error("Error writing admin data.", e);
 		} finally {
 			try {
 				if (dsStmt != null)
 					dsStmt.close();
 			} catch (SQLException e) {
-				ParallelSets.logger.error("Error closing DB statement 'dsStmt'.", e);
+				PSLogging.logger.error("Error closing DB statement 'dsStmt'.", e);
 			}
 			try {
 				if (dimStmt != null)
 					dimStmt.close();
 			} catch (SQLException e) {
-				ParallelSets.logger.error("Error closing DB statement 'dimStmt'.", e);
+				PSLogging.logger.error("Error closing DB statement 'dimStmt'.", e);
 			}
 			try {
 				if (catStmt != null)
 					catStmt.close();
 			} catch (SQLException e) {
-				ParallelSets.logger.error("Error closing DB statement 'catStmt'.", e);
+				PSLogging.logger.error("Error closing DB statement 'catStmt'.", e);
 			}
 			try {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				ParallelSets.logger.error("Error closing DB statement 'stmt'.", e);
+				PSLogging.logger.error("Error closing DB statement 'stmt'.", e);
 			}
 		}
 		return dsHandle;
@@ -476,7 +478,7 @@ public class LocalDB {
 			}
 			stmt.close();
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Error creating unique DB handle.", e);
+			PSLogging.logger.error("Error creating unique DB handle.", e);
 		}
 		if (num == 0)
 			return handle;
@@ -547,13 +549,13 @@ public class LocalDB {
 			if (numDims.size() > 0)
 				measureStmt.executeBatch();
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Error writing measures.", e);
+			PSLogging.logger.error("Error writing measures.", e);
 		} finally {
 			try {
 				if (measureStmt != null)
 					measureStmt.close();
 			} catch (SQLException e) {
-				ParallelSets.logger.error("Error closing DB statement 'measureStmt'.", e);
+				PSLogging.logger.error("Error closing DB statement 'measureStmt'.", e);
 			}
 		}
 
@@ -574,19 +576,19 @@ public class LocalDB {
 			}
 			dimsStmt.executeBatch();
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Error writing measures.", e);
+			PSLogging.logger.error("Error writing measures.", e);
 		} finally {
 			try {
 				if (dimsStmt != null)
 					dimsStmt.close();
 			} catch (SQLException e) {
-				ParallelSets.logger.error("Error closing DB statement 'dimsStmt'.", e);
+				PSLogging.logger.error("Error closing DB statement 'dimsStmt'.", e);
 			}
 		}
 	}
 
 	protected void deleteFromDB(String dbHandle) {
-		ParallelSets.logger.info("Deleting dataset '"+dbHandle+"' from local DB.");
+		PSLogging.logger.info("Deleting dataset '"+dbHandle+"' from local DB.");
 		try {
 			Statement stmt = db.createStatement();
 			stmt.execute("begin transaction;");
@@ -599,7 +601,7 @@ public class LocalDB {
 			stmt.execute("vacuum;");
 			stmt.close();
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Could not delete dataset.", e);
+			PSLogging.logger.error("Could not delete dataset.", e);
 		}
 		rescanDB();
 	}
@@ -613,7 +615,7 @@ public class LocalDB {
 			stmt.close();
 			return value;
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Could not retrieve setting for "+key, e);
+			PSLogging.logger.error("Could not retrieve setting for "+key, e);
 		} finally {
 			releaseReadLock();
 		}
@@ -636,7 +638,7 @@ public class LocalDB {
 			}
 			stmt.close();
 		} catch (Exception e) {
-			ParallelSets.logger.error("Could not update setting "+key+" to "+value, e);
+			PSLogging.logger.error("Could not update setting "+key+" to "+value, e);
 		} finally {
 			releaseWriteLock();
 		}

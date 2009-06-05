@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.LocalDB.DBAccess;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -126,7 +126,7 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 			return categories;
 		
 		else {
-			ParallelSets.logger.error("Trying to get categories for numerical dimension" + getName());
+			PSLogging.logger.error("Trying to get categories for numerical dimension" + getName());
 			return null;
 		}
 			

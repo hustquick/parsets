@@ -16,6 +16,7 @@ import com.sun.jna.Platform;
 import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.gui.DBTab.CSVFileFilter;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -74,13 +75,13 @@ public abstract class AbstractOS {
 	 * @param dbFile the location where to install the database
 	 */
 	protected void installJavaStore(File dbFile) {
-		ParallelSets.logger.info("Installing new database at " + dbFile.getAbsolutePath());
+		PSLogging.logger.info("Installing new database at " + dbFile.getAbsolutePath());
 		File parentDir = dbFile.getParentFile();
 		if (!parentDir.exists())
 			if (parentDir.mkdir() == false)
-				ParallelSets.logger.fatal("Could not create parent directory");
+				PSLogging.logger.fatal("Could not create parent directory");
 		
-		ParallelSets.logger.info("Source file: " + this.getClass().getResource("/"+LocalDB.LOCALDBFILENAME));
+		PSLogging.logger.info("Source file: " + this.getClass().getResource("/"+LocalDB.LOCALDBFILENAME));
 	    InputStream fromStream = null;
 	    FileOutputStream toStream = null;
 		try {
@@ -92,7 +93,7 @@ public abstract class AbstractOS {
 		    while ((bytesRead = fromStream.read(buffer)) != -1)
 		    	toStream.write(buffer, 0, bytesRead);
 		} catch (Exception e) {
-			ParallelSets.logger.error("Error installing DB", e);
+			PSLogging.logger.error("Error installing DB", e);
 		} finally {
 			if (fromStream != null) {
 				try {
@@ -140,19 +141,19 @@ public abstract class AbstractOS {
 		else if (Platform.isLinux()) // may eventually include more Unices
 			currentOS = new Linux();
 		else {
-			ParallelSets.logger.fatal("OS not supported.");
+			PSLogging.logger.fatal("OS not supported.");
 		}
 	}
 	
 	// Based on code from
 	// http://stackoverflow.com/questions/106770/standard-concise-way-to-copy-a-file-in-java
 	public static void copyFileNIO(File sourceFile, File destFile) {
-		ParallelSets.logger.info("Copying "+sourceFile.getAbsolutePath()+" to "+destFile.getAbsolutePath());
+		PSLogging.logger.info("Copying "+sourceFile.getAbsolutePath()+" to "+destFile.getAbsolutePath());
 		if (!destFile.exists()) {
 			try {
 				destFile.createNewFile();
 			} catch (IOException e) {
-				ParallelSets.logger.error("Could not create destination file.", e);
+				PSLogging.logger.error("Could not create destination file.", e);
 			}
 		}
 
@@ -163,22 +164,22 @@ public abstract class AbstractOS {
 			destination = new FileOutputStream(destFile).getChannel();
 			destination.transferFrom(source, 0, source.size());
 		} catch (FileNotFoundException e) {
-			ParallelSets.logger.error("Source file not found.", e);
+			PSLogging.logger.error("Source file not found.", e);
 		} catch (IOException e) {
-			ParallelSets.logger.error("IO Error during copy.", e);
+			PSLogging.logger.error("IO Error during copy.", e);
 		} finally {
 			if (source != null) {
 				try {
 					source.close();
 				} catch (IOException e) {
-					ParallelSets.logger.error("Error closing source file.", e);
+					PSLogging.logger.error("Error closing source file.", e);
 				}
 			}
 			if (destination != null) {
 				try {
 					destination.close();
 				} catch (IOException e) {
-					ParallelSets.logger.error("Error closing destination file.", e);
+					PSLogging.logger.error("Error closing destination file.", e);
 				}
 			}
 		}

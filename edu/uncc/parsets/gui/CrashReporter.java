@@ -18,7 +18,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
-import edu.uncc.parsets.ParallelSets;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -79,7 +79,7 @@ public class CrashReporter extends AppenderSkeleton {
 			int choice = JOptionPane.showConfirmDialog(frame, MESSAGE,
 					TITLE, JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
 			if (choice == 0) {
-				String logFile = ParallelSets.getLogFileAsString();
+				String logFile = PSLogging.getLogFileAsString();
 				HashMap<String, String> data = new HashMap<String, String>();
 				data.put("data", logFile);
 				String result[] = postRequest(REPORTURL, data);
@@ -120,7 +120,7 @@ public class CrashReporter extends AppenderSkeleton {
 			String result[] = new String[lines.size()];
 			return lines.toArray(result);
 		} catch (Exception e) {
-			ParallelSets.logger.error("Error submitting POST request.", e);
+			PSLogging.logger.error("Error submitting POST request.", e);
 			return null;
 		}
 	}

@@ -16,8 +16,8 @@ import java.util.zip.GZIPOutputStream;
 
 import org.json.simple.JSONValue;
 
-import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.LocalDB.DBAccess;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -97,7 +97,7 @@ public class JSONExport {
 			}
 			return writeGZIPFile(fileName, dataset);
 		} catch (Exception e) {
-			ParallelSets.logger.error("Could not export dataset as JSON file.", e);
+			PSLogging.logger.error("Could not export dataset as JSON file.", e);
 		} finally {
 			ds.getDB().releaseReadLock();
 		}
@@ -133,7 +133,7 @@ public class JSONExport {
 							row.add("TEXT");
 							break;
 						default:
-							ParallelSets.logger.error("Encountered unknown column type: "+rs.getMetaData().getColumnType(column)+" in table "+tableName);
+							PSLogging.logger.error("Encountered unknown column type: "+rs.getMetaData().getColumnType(column)+" in table "+tableName);
 						}
 					}
 					data.add(row);
@@ -160,7 +160,7 @@ public class JSONExport {
 			}
 			container.put(tableName, data);
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Could not query table "+tableName+".", e);
+			PSLogging.logger.error("Could not query table "+tableName+".", e);
 		} finally {
 			db.releaseReadLock();
 		}
@@ -247,7 +247,7 @@ public class JSONExport {
 			outWriter.close();
 			return fileName;
 		} catch (Exception e) {
-			ParallelSets.logger.error("Error writing to gzipped file "+fileName+".", e);
+			PSLogging.logger.error("Error writing to gzipped file "+fileName+".", e);
 		}
 		return null;
 	}

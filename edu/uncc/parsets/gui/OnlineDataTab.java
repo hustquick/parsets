@@ -37,6 +37,7 @@ import edu.uncc.parsets.data.JSONExport;
 import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.data.OnlineDataSet;
 import edu.uncc.parsets.util.BatchConvert;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -160,13 +161,13 @@ public class OnlineDataTab extends JPanel implements Runnable, ComponentListener
 				}
 			});
 		} catch (Exception e) {
-			ParallelSets.logger.info("Could not download online data index.", e);
+			PSLogging.logger.info("Could not download online data index.", e);
 		} finally {
 			if (reader != null)
 				try {
 					reader.close();
 				} catch (IOException e) {
-					ParallelSets.logger.warn("Error closing stream.", e);
+					PSLogging.logger.warn("Error closing stream.", e);
 				}
 		}
 

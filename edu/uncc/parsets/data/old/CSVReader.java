@@ -12,10 +12,9 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 
-
-import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.DataType;
 import edu.uncc.parsets.data.old.MetaData.DimensionMetaData;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -157,14 +156,14 @@ public class CSVReader implements Runnable {
 			numLinesEstimate /= 100f; // pre-divide so we don't have to
 			// multiply by 100 on every line
 		} catch (FileNotFoundException e) {
-			ParallelSets.logger.error("File not found: "+fileName, e);
+			PSLogging.logger.error("File not found: "+fileName, e);
 		} catch (IOException e) {
-			ParallelSets.logger.error("IOException while reading file: "+fileName, e);
+			PSLogging.logger.error("IOException while reading file: "+fileName, e);
 		} finally {
 			try {
 				file.close();
 			} catch (IOException e) {
-				ParallelSets.logger.error("IOException while closing file: "+fileName, e);
+				PSLogging.logger.error("IOException while closing file: "+fileName, e);
 			}
 		}
 
@@ -251,9 +250,9 @@ public class CSVReader implements Runnable {
 				progressDialog.setVisible(false);
 
 		} catch (FileNotFoundException e) {
-			ParallelSets.logger.error("File not found: "+fileName, e);
+			PSLogging.logger.error("File not found: "+fileName, e);
 		} catch (IOException e) {
-			ParallelSets.logger.error("IOException while reading file: "+fileName, e);
+			PSLogging.logger.error("IOException while reading file: "+fileName, e);
 		}
 	}
 

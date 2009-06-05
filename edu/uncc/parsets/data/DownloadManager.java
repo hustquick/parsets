@@ -10,8 +10,8 @@ import java.net.URL;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.zip.GZIPInputStream;
 
-import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.gui.OnlineDataTab;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -71,7 +71,7 @@ public class DownloadManager extends Thread {
 				currentDS = queue.take();
 				if (tab != null)
 					tab.activateProgressBar(true);
-				ParallelSets.logger.info("Downloading dataset from "+currentDS.getURL());
+				PSLogging.logger.info("Downloading dataset from "+currentDS.getURL());
 				InputStream stream = (new URL(currentDS.getURL())).openStream();
 				File tmpFile = File.createTempFile(currentDS.getHandle(), ".json.gz");
 				tmpFile.deleteOnExit();
@@ -89,7 +89,7 @@ public class DownloadManager extends Thread {
 				
 				Reader fileReader = new InputStreamReader(new GZIPInputStream(new FileInputStream(tmpFile)));
 				if (!tmpFile.delete())
-					ParallelSets.logger.warn("Could not delete temp file "+tmpFile.getAbsolutePath());
+					PSLogging.logger.warn("Could not delete temp file "+tmpFile.getAbsolutePath());
 
 				JSONImport.importDataSet(LocalDB.getDefaultDB(), fileReader);
 				LocalDB.getDefaultDB().rescanDB();
@@ -100,7 +100,7 @@ public class DownloadManager extends Thread {
 			} catch (InterruptedException e) {
 				// ignore
 			} catch (Exception e) {
-				ParallelSets.logger.error("Error downloading dataset", e);
+				PSLogging.logger.error("Error downloading dataset", e);
 			}
 		}
 	}

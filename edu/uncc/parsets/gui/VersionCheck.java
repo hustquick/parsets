@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 
 import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.LocalDB;
+import edu.uncc.parsets.util.PSLogging;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -83,13 +84,13 @@ public class VersionCheck extends Thread {
 				}
 			}
 		} catch (Exception e) {
-			ParallelSets.logger.info("Could not check for new version.", e);
+			PSLogging.logger.info("Could not check for new version.", e);
 		} finally {
 			if (reader != null)
 				try {
 					reader.close();
 				} catch (IOException e) {
-					ParallelSets.logger.warn("Error closing stream.", e);
+					PSLogging.logger.warn("Error closing stream.", e);
 				}
 		}
 	}

@@ -12,7 +12,7 @@ import com.sun.jna.PointerType;
 import com.sun.jna.win32.W32APIFunctionMapper;
 import com.sun.jna.win32.W32APITypeMapper;
 
-import edu.uncc.parsets.ParallelSets;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -49,7 +49,7 @@ public class Windows extends AbstractOS {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e) {
-			ParallelSets.logger.info("Could not set Windows look and feel", e);
+			PSLogging.logger.info("Could not set Windows look and feel", e);
 		}
 	}
 	
@@ -70,7 +70,7 @@ public class Windows extends AbstractOS {
 				path = path.substring(0, len);
 				return path;
 			} else {
-				ParallelSets.logger.fatal("Error determining Application Data directory: "+hResult);
+				PSLogging.logger.fatal("Error determining Application Data directory: "+hResult);
 				return null;
 			}
 		} else

@@ -9,8 +9,8 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.LocalDB.DBAccess;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -165,7 +165,7 @@ public class LocalDBDataSet extends DataSet {
 			}
 			rs.close();			
 		} catch (SQLException e) {
-			ParallelSets.logger.error("SQL error while creating tree.", e);
+			PSLogging.logger.error("SQL error while creating tree.", e);
 		} finally {
 			db.releaseReadLock();
 		}
@@ -219,7 +219,7 @@ public class LocalDBDataSet extends DataSet {
 			if (RECORDOPENTIMES)
 				stmt.executeUpdate("update Admin_DataSets set lastOpened=datetime('now') where handle='"+dbHandle+"';");
 		} catch (SQLException e) {
-			ParallelSets.logger.error("SQL error while loading dimensions.", e);
+			PSLogging.logger.error("SQL error while loading dimensions.", e);
 		} finally {
 			db.releaseReadLock();
 		}
@@ -258,7 +258,7 @@ public class LocalDBDataSet extends DataSet {
 			rs.close();
 			return count;
 		} catch (SQLException e) {
-			ParallelSets.logger.error("SQL error while getting dimension count.", e);
+			PSLogging.logger.error("SQL error while getting dimension count.", e);
 		} finally {
 			db.releaseReadLock();
 		}

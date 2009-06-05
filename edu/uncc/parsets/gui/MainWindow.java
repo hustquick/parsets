@@ -1,8 +1,13 @@
-package edu.uncc.parsets.util.osabstraction;
+package edu.uncc.parsets.gui;
 
-import java.io.File;
+import java.awt.BorderLayout;
 
-import edu.uncc.parsets.data.LocalDB;
+import javax.media.opengl.GLCanvas;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+
+import edu.uncc.parsets.ParallelSets;
+import edu.uncc.parsets.parsets.ParSetsView;
 import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -34,42 +39,43 @@ import edu.uncc.parsets.util.PSLogging;
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-public class Linux extends AbstractOS {
+@SuppressWarnings("serial")
+public class MainWindow extends JFrame {
 
-	private static final String DOTDIRNAME = ".parsets";
+	private static final int WINDOWHEIGHT = 600;
 
-	/**
-	 * Installs into .parsets in the user's home directory. The program can be
-	 * run from anywhere on the system.
-	 */
-	@Override
-	protected void installRegular(File dbFile) {
-		PSLogging.logger.info("Installing new database at "
-				+ dbFile.getAbsolutePath());
-		File parentDir = dbFile.getParentFile();
-		if (!parentDir.exists())
-			if (parentDir.mkdir() == false)
-				PSLogging.logger.fatal("Could not create parent directory");
-		copyFileNIO(new File(LocalDB.LOCALDBFILENAME), dbFile);
-	}
+	private static final int WINDOWWIDTH = 900;
 
-	@Override
-	public String getLocalDBPath(String dbFileName) {
-		String dbPath = getLocalDBDir() + File.separatorChar + DOTDIRNAME
-				+ File.separatorChar + dbFileName;
-		File dbFile = new File(dbPath);
-		if (!dbFile.exists())
-			installRegular(dbFile);
-		return dbPath;
-	}
+	public static final String WINDOWTITLE = ParallelSets.PROGRAMNAME+" V"+ParallelSets.VERSION;
 
-	@Override
-	public String getLocalDBDir() {
-		return System.getProperty("user.home");
-	}
+	private static final String ICONFILE = "/support/parsets-512.gif";
 
-	@Override
-	public String shortName() {
-		return "lnx";
+	private Controller controller;
+
+	public MainWindow() {
+		controller = new Controller();
+
+		JFrame f = new JFrame(WINDOWTITLE);
+		f.setSize(WINDOWWIDTH, WINDOWHEIGHT);		
+		f.setIconImage(new ImageIcon(ICONFILE).getImage());
+		//f.setLayout(new MigLayout("insets 0,fill", "[min!]0[grow,fill]", "[grow,fill]"));
+		f.setLayout(new BorderLayout());
+		
+		PSLogging.init(f, PSLogging.DEFAULTLOGLEVEL);
+		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+			public void uncaughtException(Thread t, Throwable e) {
+				PSLogging.logger.fatal("Uncaught exception, program terminating.", e);
+			}
+		});
+		
+		SideBar sideBar = new SideBar(f, controller);
+		f.add(sideBar, BorderLayout.WEST);
+
+		GLCanvas glCanvas = new GLCanvas();
+		glCanvas.addGLEventListener(new ParSetsView(glCanvas, controller));
+		f.add(glCanvas, BorderLayout.CENTER);
+		
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.setVisible(true);
 	}
 }

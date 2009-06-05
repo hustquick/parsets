@@ -13,8 +13,8 @@ import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.LocalDB.DBAccess;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -211,7 +211,7 @@ public class JSONImport {
 			case type:
 				type = (String) o;
 				if (!type.equals("cube") || version > JSONExport.JSONMAXCOMPATIBLEVERSION)
-					ParallelSets.logger.error("Cannot import type "+type+", version "+version);
+					PSLogging.logger.error("Cannot import type "+type+", version "+version);
 				break;
 			case data:
 				columns.add(o);
@@ -235,11 +235,11 @@ public class JSONImport {
 			else
 				stmt.executeUpdate("COMMIT");
 		} catch (Exception e) {
-			ParallelSets.logger.error("Error importing dataset", e);
+			PSLogging.logger.error("Error importing dataset", e);
 			try {
 				stmt.executeUpdate("ROLLBACK");
 			} catch (SQLException e1) {
-				ParallelSets.logger.error("Error rolling back changes after error", e1);
+				PSLogging.logger.error("Error rolling back changes after error", e1);
 			}
 		} finally {
 			if (stmt != null)
@@ -265,7 +265,7 @@ public class JSONImport {
 			else if (type.equals("TEXT"))
 				meta.types[columnNum] = Types.VARCHAR;
 			else
-				ParallelSets.logger.error("Unknown column type "+type);
+				PSLogging.logger.error("Unknown column type "+type);
 			columnNum++;
 
 			if (c.hasNext())
@@ -276,7 +276,7 @@ public class JSONImport {
 		try {
 			meta.stmt = db.prepareStatement(sql.toString(), DBAccess.FORWRITING);
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Error creating prepared statement for table "+tableName+": "+sql, e);
+			PSLogging.logger.error("Error creating prepared statement for table "+tableName+": "+sql, e);
 			meta.rollback = true;
 		}
 		return meta;
@@ -300,7 +300,7 @@ public class JSONImport {
 			}
 			meta.stmt.addBatch();
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Error adding data to prepared statement", e);
+			PSLogging.logger.error("Error adding data to prepared statement", e);
 			meta.rollback = true;
 		}
 	}
@@ -309,13 +309,13 @@ public class JSONImport {
 		try {
 			meta.stmt.executeBatch();
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Error writing data", e);
+			PSLogging.logger.error("Error writing data", e);
 			meta.rollback = true;
 		} finally {
 			try {
 				meta.stmt.close();
 			} catch (SQLException e) {
-				ParallelSets.logger.error("Error releasing statement", e);
+				PSLogging.logger.error("Error releasing statement", e);
 			}
 			db.releaseWriteLock();
 		}
@@ -332,7 +332,7 @@ public class JSONImport {
 		try {
 			stmt.executeUpdate(sql.toString());
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Failed to create index "+info.name+" on "+info.tableName, e);
+			PSLogging.logger.error("Failed to create index "+info.name+" on "+info.tableName, e);
 		}
 	}
 
@@ -349,7 +349,7 @@ public class JSONImport {
 		try {
 			stmt.executeUpdate(sql.toString());
 		} catch (SQLException e) {
-			ParallelSets.logger.error("Failed to create table "+info.name, e);
+			PSLogging.logger.error("Failed to create table "+info.name, e);
 		}
 	}
 		

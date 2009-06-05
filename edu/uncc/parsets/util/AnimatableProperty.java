@@ -9,8 +9,6 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.uncc.parsets.ParallelSets;
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
  *                     and others (see Authors.txt for full list)
@@ -384,7 +382,7 @@ class StepTask extends TimerTask {
 		if ((tardiness < MAX_TARDINESS) || (stepNum == AnimatableProperty.getNumSteps()-1)) {
 			AnimatableProperty.takeStep(stepNum);
 		} else
-			ParallelSets.logger.info("Skipping animation step "+stepNum+", tardiness = "+tardiness);
+			PSLogging.logger.info("Skipping animation step "+stepNum+", tardiness = "+tardiness);
 		stepNum++;
 	}
 

@@ -1,29 +1,12 @@
 package edu.uncc.parsets;
 
-import java.awt.BorderLayout;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.Date;
-
-import javax.media.opengl.GLCanvas;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 
-import edu.uncc.parsets.gui.Controller;
-import edu.uncc.parsets.gui.CrashReporter;
-import edu.uncc.parsets.gui.SideBar;
-import edu.uncc.parsets.parsets.ParSetsView;
+import edu.uncc.parsets.gui.MainWindow;
 import edu.uncc.parsets.util.BatchConvert;
+import edu.uncc.parsets.util.PSLogging;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -67,22 +50,10 @@ public class ParallelSets {
 
 	public static final String VERSION = MAJOR_VERSION+"."+MINOR_VERSION;
 	
-	private static final int WINDOWHEIGHT = 600;
-
-	private static final int WINDOWWIDTH = 900;
-
 	public static final String PROGRAMNAME = "Parallel Sets";
 	
-	public static final String WINDOWTITLE = PROGRAMNAME+" V"+VERSION;
-
 	public static final String WEBSITE = "http://eagereyes.org/parsets/";	
 	
-	protected static final String LOGFILEBASE = "parsets";
-
-	protected static final String LOGFILEEXTENSION = ".log";
-	
-	protected static final String ICONFILE = "/support/parsets-512.gif";
-
 	/** If true, the program is run installed by a user, and needs to act like that. That includes accessing
 	 * the installed version of the database, showing a crash reporter dialog when the program crashes, etc.
 	 * If false, it's the development version using its local database.
@@ -93,17 +64,6 @@ public class ParallelSets {
 	 */
 	protected static boolean installed = false;
 	
-	private static Controller controller;
-
-	public static Logger logger = Logger.getLogger("ParSets");
-
-	// the default level is DEBUG, which is the second-lowest level (only TRACE is lower)
-	// may consider setting it to WARN for later release builds
-	// Set to Level.OFF to turn logging off.
-	private static Level DEFAULTLOGLEVEL = Level.DEBUG;
-
-	private static File logFile;
-
 	static {
 		installed = System.getProperty("parsets.use_installed_db", "false").equalsIgnoreCase("true") ||
 				System.getProperty("parsets.installed", "false").equalsIgnoreCase("true");
@@ -116,115 +76,17 @@ public class ParallelSets {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					interactiveModeSetup();
+					new MainWindow();
 				}
 			});
 		else {
 			installed = false;
-			DEFAULTLOGLEVEL = Level.ERROR;
-			initLogging(null);
+			PSLogging.init(null, Level.ERROR);
 			BatchConvert.batchConvert(args);
 		}
 			
 	}
 
-	private static void interactiveModeSetup() {
-		controller = new Controller();
-
-		JFrame f = new JFrame(WINDOWTITLE);
-		f.setSize(WINDOWWIDTH, WINDOWHEIGHT);		
-		f.setIconImage(new ImageIcon(ICONFILE).getImage());
-		//f.setLayout(new MigLayout("insets 0,fill", "[min!]0[grow,fill]", "[grow,fill]"));
-		f.setLayout(new BorderLayout());
-		
-		initLogging(f);
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-			public void uncaughtException(Thread t, Throwable e) {
-				logger.fatal("Uncaught exception, program terminating.", e);
-			}
-		});
-		
-		SideBar sideBar = new SideBar(f, controller);
-		f.add(sideBar, BorderLayout.WEST);
-
-		GLCanvas glCanvas = new GLCanvas();
-		glCanvas.addGLEventListener(new ParSetsView(glCanvas, controller));
-		f.add(glCanvas, BorderLayout.CENTER);
-		
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setVisible(true);
-	}
-
-	private static void initLogging(JFrame frame) {
-		BasicConfigurator.configure();
-		try {
-			logFile = File.createTempFile(LOGFILEBASE, LOGFILEEXTENSION);
-			BasicConfigurator.configure(new FileAppender(new SimpleLayout(), logFile.getAbsolutePath()));
-		} catch (IOException e) {
-			// probably won't be seen, only other logging outlet is console
-			logger.error("Could not open log file.", e);
-		}
-
-		if (isInstalled() && frame != null)
-			BasicConfigurator.configure(new CrashReporter(frame));
-		
-		logger.setLevel(DEFAULTLOGLEVEL);
-		
-		// delete log files from previous runs
-		// deletes files that are more than 24 hours old
-		File oldLogFiles[] = logFile.getParentFile().listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return name.startsWith(LOGFILEBASE) && name.endsWith(LOGFILEEXTENSION);
-			}
-		});
-		for (File f : oldLogFiles)
-			if (logFile.lastModified()-f.lastModified() > 24*3600*1000)
-				if (!f.delete())
-					logger.info("Old logfile "+f.getAbsolutePath()+" could not be deleted.");
-
-		logSystemInfo();
-		
-//		logger.info("Current directory: "+new File(".").getAbsolutePath());
-	}
-	
-	private static void logSystemInfo() {
-		logger.info(WINDOWTITLE);
-		logger.info(new Date());
-		logProperty("java.vendor");
-		logProperty("java.version");
-		logProperty("java.vm.info");
-		logProperty("java.vm.name");
-		logProperty("java.vm.specification.name");
-		logProperty("java.vm.specification.vendor");
-		logProperty("java.vm.specification.version");
-		logProperty("java.vm.vendor");
-		logProperty("java.vm.version");
-		logProperty("os.arch");
-		logProperty("os.name");
-		logProperty("os.version");
-	}
-	
-	private static void logProperty(String propertyKey) {
-		logger.info(propertyKey+" = "+System.getProperty(propertyKey));
-	}
-	
-	public static Controller getController() {
-		return controller;
-	}
-	
-	public static String getLogFileAsString() {
-		try {
-			final BufferedInputStream bis = new BufferedInputStream( 
-					new FileInputStream(logFile));
-			final byte [] bytes = new byte[(int) logFile.length()];
-			bis.read(bytes);
-			bis.close();
-			return new String(bytes);
-		} catch (Exception e) {
-			logger.error("Error reading in log file.", e);
-		}
-		return null;
-	}
 	
 	public static boolean isInstalled() {
 		return installed;

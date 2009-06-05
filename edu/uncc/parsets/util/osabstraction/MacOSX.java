@@ -7,9 +7,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.gui.DBTab.CSVFileFilter;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -85,7 +85,7 @@ public class MacOSX extends AbstractOS {
 			Method m = appc.getMethod("addApplicationListener", lc);
 			m.invoke(app, listener);
 		} catch (Exception e) {
-			ParallelSets.logger.warn("Could not register Mac OS X application event handler", e);
+			PSLogging.logger.warn("Could not register Mac OS X application event handler", e);
 		}
 	}
 
@@ -95,7 +95,7 @@ public class MacOSX extends AbstractOS {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void installRegular(File dbFile) {
-		ParallelSets.logger.info("Installing new database at "
+		PSLogging.logger.info("Installing new database at "
 				+ dbFile.getAbsolutePath());
 		try {
 			Class fileManagerClass = Class.forName("com.apple.eio.FileManager");
@@ -106,13 +106,13 @@ public class MacOSX extends AbstractOS {
 			File parentDir = dbFile.getParentFile();
 			if (!parentDir.exists())
 				if (parentDir.mkdir() == false)
-					ParallelSets.logger
+					PSLogging.logger
 							.fatal("Could not create parent directory");
-			ParallelSets.logger.info("Source file: " + srcPath);
+			PSLogging.logger.info("Source file: " + srcPath);
 			File localDBFile = new File(srcPath);
 			copyFileNIO(localDBFile, dbFile);
 		} catch (Exception e) {
-			ParallelSets.logger.fatal("Could not locate source DB file.", e);
+			PSLogging.logger.fatal("Could not locate source DB file.", e);
 		}
 	}
 
@@ -159,7 +159,7 @@ public class MacOSX extends AbstractOS {
 			int kDDInt = (Integer) oSTypeToInt.invoke(null, type);
 			path = (String) findFolder.invoke(null, kUserDomain, kDDInt);
 		} catch (Exception e) {
-			ParallelSets.logger.fatal("Error determining user folder " + type,
+			PSLogging.logger.fatal("Error determining user folder " + type,
 					e);
 		}
 		return path;
