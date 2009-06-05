@@ -1,0 +1,11 @@
+
+Version history for Parallel Sets
+Ticket numbers refer to issues at http://code.google.com/p/parsets/issues/list
+
+V2.1, 2009-06-
+	* Added menu
+	* Added screenshot function, issue #9
+
+
+V2.0, 2009-06-01
+	* Original release
