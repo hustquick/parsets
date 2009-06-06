@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import edu.uncc.parsets.data.LocalDB;
-import edu.uncc.parsets.gui.DBTab.CSVFileFilter;
+import edu.uncc.parsets.gui.CombinedFileNameFilter;
 import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -118,15 +118,19 @@ public class MacOSX extends AbstractOS {
 	}
 
 	@Override
-	public String openDialog(Frame frame, CSVFileFilter fileFilter) {
+	public String showDialog(Frame frame, CombinedFileNameFilter fileFilter, int mode) {
 		FileDialog fd = new FileDialog(frame);
+		fd.setMode(mode);
 		if (fileFilter != null)
 			fd.setFilenameFilter(fileFilter);
 		fd.setDirectory(getDocsDir());
 		fd.setVisible(true);
-		if (fd.getFile() != null)
-			return fd.getDirectory() + fd.getFile();
-		else
+		if (fd.getFile() != null) {
+			if (fileFilter.accept(new File(fd.getDirectory()), fd.getFile()))
+				return fd.getDirectory() + fd.getFile();
+			else
+				return fd.getDirectory() + fd.getFile() + fileFilter.getExtension();
+		} else
 			return null;
 	}
 

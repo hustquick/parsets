@@ -2,6 +2,7 @@ package edu.uncc.parsets.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -211,7 +212,7 @@ public class DataWizard implements DataSetReceiver {
 
 		wizardFrame.setVisible(true);
 		
-		fileName = AbstractOS.getCurrentOS().openDialog(wizardFrame, new CSVFileFilter());
+		fileName = AbstractOS.getCurrentOS().showDialog(wizardFrame, new CSVFileFilter(), FileDialog.LOAD);
 	    if (fileName != null) {
 	    	progressBar.setIndeterminate(true);
 	    	parseCSVFile(fileName, this);

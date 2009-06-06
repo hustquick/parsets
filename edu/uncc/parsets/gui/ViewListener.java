@@ -44,4 +44,5 @@ public interface ViewListener {
 	public void clearScreen();
 
 	public void setShowTooltips(boolean show);
+	public void takeScreenShot(String filename);
 }

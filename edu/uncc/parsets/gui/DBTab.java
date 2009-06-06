@@ -4,24 +4,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.io.File;
-import java.io.FilenameFilter;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.filechooser.FileFilter;
 
 import net.miginfocom.swing.MigLayout;
-import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.DataSet;
-import edu.uncc.parsets.data.JSONExport;
 import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.data.LocalDBDataSet;
 
@@ -59,19 +53,15 @@ public class DBTab extends JPanel implements ActionListener {
 
 	public static final String TABTITLE = "Database";
 
-	public static class CSVFileFilter extends FileFilter implements FilenameFilter {
-		@Override
-		public boolean accept(File f) {
-			return f.getName().endsWith(".csv") || f.isDirectory();
-		}
-
+	public static class CSVFileFilter extends CombinedFileNameFilter {
 		@Override
 		public String getDescription() {
 			return "CSV Files";
 		}
 
-		public boolean accept(File dir, String name) {
-			return name.endsWith(".csv");
+		@Override
+		public String getExtension() {
+			return ".csv";
 		}
 	}
 	
@@ -86,7 +76,7 @@ public class DBTab extends JPanel implements ActionListener {
 		
 		setOpaque(false);
 		add(makeDataSetList(mainWindow), "span 2, growx");
-//		addButtons(mainWindow);
+		addButtons(mainWindow);
 		LocalDB.getDefaultDB().addRescanListener(this);
 		addComponentListener(new ComponentAdapter() {
 			@Override
@@ -103,8 +93,8 @@ public class DBTab extends JPanel implements ActionListener {
 		localDBList = new GroupedDataSetList(LocalDB.getDefaultDB().getSections());
 		localDBList.addDSListener(new GroupedDataSetList.DSListener() {
 			public void selectDataSet(DataSet ds) {
-//				openButton.setEnabled(ds != null);
-//				deleteButton.setEnabled(ds != null);
+				openButton.setEnabled(ds != null);
+				deleteButton.setEnabled(ds != null);
 				mainWindow.setDSMenuItemsEnabled(ds != null);
 			}
 
@@ -136,33 +126,6 @@ public class DBTab extends JPanel implements ActionListener {
 			}
 		});
 		add(openButton, "center");
-
-		JButton importFileButton = new JButton("Import CSV File ...");
-		importFileButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-		    	new DataWizard();
-			}
-		});
-		add(importFileButton, "span 2, center");
-
-		if (!ParallelSets.isInstalled()) {
-			JButton exportJSONButton = new JButton(">JSON");
-			exportJSONButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					JFileChooser fileChooser = new JFileChooser(new File("."));
-					if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION)
-						JSONExport.exportDataSet((LocalDBDataSet) localDBList.getSelectedDataSet(), fileChooser.getSelectedFile().getAbsolutePath());
-				}
-			});
-			add(exportJSONButton, "center");
-			JButton exportIndexButton = new JButton(">Index");
-			exportIndexButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					JSONExport.exportDBIndex(LocalDB.getDefaultDB(), "index");
-				}
-			});
-			add(exportIndexButton, "center");
-		}
 	}
 
 	public void actionPerformed(ActionEvent e) {

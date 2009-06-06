@@ -1,5 +1,6 @@
 package edu.uncc.parsets.util.osabstraction;
 
+import java.awt.FileDialog;
 import java.awt.Frame;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +16,7 @@ import com.sun.jna.Platform;
 
 import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.LocalDB;
-import edu.uncc.parsets.gui.DBTab.CSVFileFilter;
+import edu.uncc.parsets.gui.CombinedFileNameFilter;
 import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -185,14 +186,29 @@ public abstract class AbstractOS {
 		}
 	}
 
-	public String openDialog(Frame frame, CSVFileFilter fileFilter) {
+	/**
+	 * 
+	 * @param frame the window to block
+	 * @param fileFilter The {@link CombinedFileNameFilter} to use
+	 * @param mode Either {@link FileDialog#LOAD} or {@link FileDialog#SAVE}
+	 * @return
+	 */
+	public String showDialog(Frame frame, CombinedFileNameFilter fileFilter, int mode) {
 		// TODO: start in user's home directory
 	    JFileChooser fileChooser = new JFileChooser(new File("."));
 	    if (fileFilter != null)
 	    	fileChooser.setFileFilter(fileFilter);
-	    if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
-	    	return fileChooser.getSelectedFile().getAbsolutePath();
+	    int result = 0;
+	    if (mode == FileDialog.LOAD)
+	    	result = fileChooser.showOpenDialog(frame);
 	    else
+	    	result = fileChooser.showSaveDialog(frame);
+	    if (result == JFileChooser.APPROVE_OPTION) {
+	    	if (fileFilter.accept(fileChooser.getSelectedFile()))
+		    	return fileChooser.getSelectedFile().getAbsolutePath();
+	    	else
+	    		return fileChooser.getSelectedFile().getAbsolutePath()+fileFilter.getExtension();
+	    } else
 	    	return null;
 	}
 

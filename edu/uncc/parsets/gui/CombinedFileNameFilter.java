@@ -1,11 +1,9 @@
 package edu.uncc.parsets.gui;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FilenameFilter;
 
-import edu.uncc.parsets.data.CategoryHandle;
-import edu.uncc.parsets.data.DataSet;
-import edu.uncc.parsets.data.DimensionHandle;
-import edu.uncc.parsets.parsets.RibbonLayoutStyle;
+import javax.swing.filechooser.FileFilter;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -36,63 +34,26 @@ import edu.uncc.parsets.parsets.RibbonLayoutStyle;
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-public class Controller {
+/**
+ * Combine {@link FileFilter} and {@link FilenameFilter} for universal use in
+ * Swing and AWT file dialogs. Subclasses only need to override
+ * {@link #getDescription()} and {@link #getExtension()} to accept only
+ * files.
+ */
+public abstract class CombinedFileNameFilter extends FileFilter implements FilenameFilter {
 
-	private ArrayList<DataSetListener> dsListeners = new ArrayList<DataSetListener>();
-	private ViewListener viewListener;
-	
-	public Controller() {
-		
-	}
-	
-	public void addDataSetListener(DataSetListener l) {
-		dsListeners.add(l);
-	}
-
-	public void removeDataSetListener(DataSetListener l) {
-		dsListeners.remove(l);
+	@Override
+	public boolean accept(File f) {
+		return accept(f.getParentFile(), f.getName()) || f.isDirectory();
 	}
 
-	public void setDataSet(DataSet data) {
-		for (DataSetListener l : dsListeners)
-			l.setDataSet(data);
+	@Override
+	public boolean accept(File dir, String name) {
+		return name.endsWith(getExtension());
 	}
 
-	public void setViewListener(ViewListener viewListener) {
-		this.viewListener = viewListener;
-	}
-	
-	public void setRibbonStyle(RibbonLayoutStyle ribbonStyle) {
-		viewListener.setRibbonStyle(ribbonStyle);
-	}
-	
-	public void addAxis(DimensionHandle dimension) {
-		viewListener.addAxis(dimension);
-	}
-	
-	public void removeAxis(DimensionHandle dimension) {
-		viewListener.removeAxis(dimension);
-	}
-	
-	public void removeCategory(DimensionHandle dimension, CategoryHandle category) {
-		viewListener.removeCategory(dimension, category);
-	}
-	
-	public void addCategory(DimensionHandle dimension, CategoryHandle category) {
-		viewListener.addCategory(dimension, category);
-	}
+	@Override
+	public abstract String getDescription();
 
-	public void clearScreen() {
-		viewListener.clearScreen();
-	}
-
-	public void setShowTooltips(boolean show) {
-		viewListener.setShowTooltips(show);
-	}
-
-	public void screenShot(String fileName) {
-		viewListener.takeScreenShot(fileName);
-	}
-	
-	
+	public abstract String getExtension();
 }

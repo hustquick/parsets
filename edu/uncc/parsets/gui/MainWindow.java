@@ -2,6 +2,7 @@ package edu.uncc.parsets.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,9 +17,11 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import edu.uncc.parsets.ParallelSets;
+import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.parsets.ParSetsView;
 import edu.uncc.parsets.util.PSLogging;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
@@ -63,6 +66,10 @@ public class MainWindow extends JFrame {
 
 	private static final String ICONFILE = "/support/parsets-512.gif";
 
+	protected static final String MESSAGE = "Reinitializing the database will delete all datasets.";
+
+	protected static final String TITLE = "Reinitialize DB";
+
 	private Controller controller;
 
 	private JMenuItem openDataSet;
@@ -71,6 +78,18 @@ public class MainWindow extends JFrame {
 
 	private JMenuItem deleteDataSet;
 
+	private static class PNGFileNameFilter extends CombinedFileNameFilter {
+		@Override
+		public String getDescription() {
+			return "PNG Files";
+		}
+
+		@Override
+		public String getExtension() {
+			return ".png";
+		}
+	}
+	
 	public MainWindow() {
 		super(WINDOWTITLE);
 		
@@ -104,22 +123,66 @@ public class MainWindow extends JFrame {
 	private JMenuBar makeMenu(final Controller controller) {
 		JMenuBar menuBar = new JMenuBar();
 		
-		JMenu database = new JMenu("Database");
+		JMenu dataset = new JMenu("Data Set");
+		openDataSet = new JMenuItem("Open");
+		openDataSet.setEnabled(false);
+		dataset.add(openDataSet);
+		
+		JMenuItem closeDataSet = new JMenuItem("Close");
+		closeDataSet.setEnabled(false);
+		closeDataSet.setAccelerator(KeyStroke.getKeyStroke('W', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		dataset.add(closeDataSet);
+
+		editDataSet = new JMenuItem("Edit");
+		editDataSet.setEnabled(false);
+		dataset.add(editDataSet);
+		
+		deleteDataSet = new JMenuItem("Delete");
+		deleteDataSet.setEnabled(false);
+		deleteDataSet.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		dataset.add(deleteDataSet);
+		
+		dataset.addSeparator();
+
 		JMenuItem importcsv = new JMenuItem("Import CSV File");
 		importcsv.setAccelerator(KeyStroke.getKeyStroke('O', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		database.add(importcsv);
+		importcsv.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new DataWizard();
+			}
+		});
+		dataset.add(importcsv);
 
-		JMenuItem reinit = new JMenuItem("Reinitialize");
-		database.add(reinit);
+		JMenuItem reinit = new JMenuItem("Reinitialize DB");
+		reinit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int choice = JOptionPane.showConfirmDialog(MainWindow.this, MESSAGE,
+						TITLE, JOptionPane.WARNING_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+				if (choice == 0) {
+					LocalDB.getDefaultDB().initializeDB();
+				}
+			}
+		});
+		dataset.add(reinit);
 		
-		database.addSeparator();
+		dataset.addSeparator();
 
 		JMenuItem savepng = new JMenuItem("Export PNG");
 		savepng.setAccelerator(KeyStroke.getKeyStroke('P', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
-		database.add(savepng);
+		savepng.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String fileName = AbstractOS.getCurrentOS().showDialog(MainWindow.this, new PNGFileNameFilter(), FileDialog.SAVE);
+				if (fileName != null)
+					controller.screenShot(fileName);
+			}
+		});
+		dataset.add(savepng);
 
 		if (!AbstractOS.getCurrentOS().isMacOSX()) {
-			database.addSeparator();
+			dataset.addSeparator();
 			JMenuItem quit = new JMenuItem("Quit");
 			quit.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			quit.addActionListener(new ActionListener() {
@@ -129,34 +192,11 @@ public class MainWindow extends JFrame {
 					dispose();
 				}
 			});
-			database.add(quit);
+			dataset.add(quit);
 		}
 		
-		menuBar.add(database);
-		
-		JMenu dataset = new JMenu("Data Set");
-		openDataSet = new JMenuItem("Open");
-		openDataSet.setEnabled(false);
-		dataset.add(openDataSet);
-		
-		editDataSet = new JMenuItem("Edit");
-		editDataSet.setEnabled(false);
-		dataset.add(editDataSet);
-		
-		deleteDataSet = new JMenuItem("Delete");
-		deleteDataSet.setEnabled(false);
-		deleteDataSet.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		dataset.add(deleteDataSet);
-
-		dataset.addSeparator();
-		
-		JMenuItem closeDataSet = new JMenuItem("Close");
-		closeDataSet.setEnabled(false);
-		closeDataSet.setAccelerator(KeyStroke.getKeyStroke('W', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		dataset.add(closeDataSet);
-		
 		menuBar.add(dataset);
-		
+				
 		JMenu view = new JMenu("View");
 		final JMenuItem tooltips = new JCheckBoxMenuItem("Show tooltips", true);
 		tooltips.addActionListener(new ActionListener() {

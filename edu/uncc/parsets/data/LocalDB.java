@@ -192,11 +192,18 @@ public class LocalDB {
 		return db.prepareStatement(statement);
 	}
 	
-	private void initializeDB() {
+	public void initializeDB() {
 		PSLogging.logger.info("Initializing local DB file.");
 		Statement statement;
 		try {
 			statement = createStatement(DBAccess.FORWRITING);
+			ResultSet rs = statement.executeQuery("select name from sqlite_master where type=\"table\";");
+			// make list of tables first, as dropping invalidates query result
+			List<String> dropTables = new ArrayList<String>();
+			while (rs.next()) 
+				dropTables.add(rs.getString(1));
+			for (String tableName : dropTables)
+				statement.executeUpdate("drop table "+tableName+";");
 			statement.execute("begin transaction;");
 			statement.execute("create table Admin_Settings (key TEXT PRIMARY KEY, value TEXT);");
 			statement.execute("insert into Admin_Settings values ('creator', '"+MainWindow.WINDOWTITLE+"');");
@@ -214,6 +221,7 @@ public class LocalDB {
 		} finally {
 			releaseWriteLock();
 		}
+		rescanDB();
 	}
 
 	public LocalDBDataSet[] getDataSets() {
