@@ -101,6 +101,8 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 	private String screenShotFileName = null;
 	private boolean showTooltips = true;
 
+	boolean antialias = true;
+	
 	public ParSetsView(Component canvas, Controller controller) {
 		this.canvas = canvas;
 		this.controller = controller;
@@ -121,6 +123,20 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 		else
 			gl = new DebugGL(glDrawable.getGL());
 
+		if (antialias) {
+			gl.glEnable(GL.GL_LINE_SMOOTH);
+			gl.glEnable(GL.GL_POLYGON_SMOOTH);
+//			gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
+//			gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
+			gl.glEnable(GL.GL_MULTISAMPLE);
+		} else {
+			gl.glDisable(GL.GL_LINE_SMOOTH);
+			gl.glDisable(GL.GL_POLYGON_SMOOTH);
+//			gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_FASTEST);
+//			gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_FASTEST);
+			gl.glDisable(GL.GL_MULTISAMPLE);
+		}
+		
 		gl.glClearColor(1, 1, 1, 0);
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 
@@ -487,6 +503,11 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 
 	public void setShowTooltips(boolean show) {
 		showTooltips  = show;
+		repaint();
+	}
+	
+	public void setAntiAlias(boolean aa) {
+		antialias = aa;
 		repaint();
 	}
 	

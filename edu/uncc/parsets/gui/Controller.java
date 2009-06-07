@@ -93,6 +93,9 @@ public class Controller {
 	public void screenShot(String fileName) {
 		viewListener.takeScreenShot(fileName);
 	}
-	
+
+	public void antiAlias(boolean aa) {
+		viewListener.setAntiAlias(aa);
+	}
 	
 }

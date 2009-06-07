@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.net.URI;
 
 import javax.media.opengl.GLCanvas;
+import javax.media.opengl.GLCapabilities;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -112,7 +113,10 @@ public class MainWindow extends JFrame {
 		SideBar sideBar = new SideBar(this, controller);
 		add(sideBar, BorderLayout.WEST);
 
-		GLCanvas glCanvas = new GLCanvas();
+		GLCapabilities caps = new GLCapabilities();
+		caps.setSampleBuffers(true);
+		caps.setNumSamples(2);
+		GLCanvas glCanvas = new GLCanvas(caps);
 		glCanvas.addGLEventListener(new ParSetsView(glCanvas, controller));
 		add(glCanvas, BorderLayout.CENTER);
 		
@@ -209,6 +213,16 @@ public class MainWindow extends JFrame {
 
 		JCheckBoxMenuItem strong = new JCheckBoxMenuItem("Stronger highlights", false);
 		view.add(strong);
+		
+		final JCheckBoxMenuItem antialiasing = new JCheckBoxMenuItem("Anti-Aliasing", true);
+		antialiasing.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.antiAlias(antialiasing.isSelected());
+			}
+		});
+		view.add(antialiasing);
+		
 		
 		menuBar.add(view);
 		

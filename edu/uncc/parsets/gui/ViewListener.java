@@ -45,4 +45,5 @@ public interface ViewListener {
 
 	public void setShowTooltips(boolean show);
 	public void takeScreenShot(String filename);
+	public void setAntiAlias(boolean aa);
 }
