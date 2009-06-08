@@ -2,10 +2,8 @@ package edu.uncc.parsets.gui;
 
 import java.util.ArrayList;
 
-import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.DataSet;
-import edu.uncc.parsets.data.DimensionHandle;
-import edu.uncc.parsets.parsets.RibbonLayoutStyle;
+import edu.uncc.parsets.parsets.ParSetsView;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -36,10 +34,18 @@ import edu.uncc.parsets.parsets.RibbonLayoutStyle;
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/**
+ * The controller mostly notifies a variety of listeners of changes to the
+ * database, also lets other objects talk to the view. This will need to be
+ * re-thought when we have multiple views, especially when those can be of
+ * different types.
+ */
 public class Controller {
 
 	private ArrayList<DataSetListener> dsListeners = new ArrayList<DataSetListener>();
-	private ViewListener viewListener;
+	public ParSetsView parSetsView;
+	
+	public DBTab dbTab;
 	
 	public Controller() {
 		
@@ -57,45 +63,4 @@ public class Controller {
 		for (DataSetListener l : dsListeners)
 			l.setDataSet(data);
 	}
-
-	public void setViewListener(ViewListener viewListener) {
-		this.viewListener = viewListener;
-	}
-	
-	public void setRibbonStyle(RibbonLayoutStyle ribbonStyle) {
-		viewListener.setRibbonStyle(ribbonStyle);
-	}
-	
-	public void addAxis(DimensionHandle dimension) {
-		viewListener.addAxis(dimension);
-	}
-	
-	public void removeAxis(DimensionHandle dimension) {
-		viewListener.removeAxis(dimension);
-	}
-	
-	public void removeCategory(DimensionHandle dimension, CategoryHandle category) {
-		viewListener.removeCategory(dimension, category);
-	}
-	
-	public void addCategory(DimensionHandle dimension, CategoryHandle category) {
-		viewListener.addCategory(dimension, category);
-	}
-
-	public void clearScreen() {
-		viewListener.clearScreen();
-	}
-
-	public void setShowTooltips(boolean show) {
-		viewListener.setShowTooltips(show);
-	}
-
-	public void screenShot(String fileName) {
-		viewListener.takeScreenShot(fileName);
-	}
-
-	public void antiAlias(boolean aa) {
-		viewListener.setAntiAlias(aa);
-	}
-	
 }

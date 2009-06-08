@@ -76,8 +76,10 @@ public class VersionCheck extends Thread {
 			if (version != null && !version.equals(LocalDB.getDefaultDB().getSetting(LocalDB.LAST_VERSION_SEEN_KEY))) {
 				LocalDB.getDefaultDB().storeSetting(LocalDB.LAST_VERSION_SEEN_KEY, version);
 				String versionParts[] = version.split("\\.");
-				if (Integer.parseInt(versionParts[0]) > ParallelSets.MAJOR_VERSION ||
-						versionParts[1].compareTo(ParallelSets.MINOR_VERSION) > 0) {
+				int majorVersion = Integer.parseInt(versionParts[0]);
+				int minorVersion = Integer.parseInt(versionParts[1]);
+				if (majorVersion > ParallelSets.MAJOR_VERSION ||
+					(majorVersion == ParallelSets.MAJOR_VERSION && minorVersion > ParallelSets.MINOR_VERSION)) {
 					int response = JOptionPane.showConfirmDialog(frame, MESSAGE1+version+MESSAGE2, TITLE, JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 					if (response == 0)
 						Desktop.getDesktop().browse(new URI(ParallelSets.WEBSITE));

@@ -73,6 +73,7 @@ public class DBTab extends JPanel implements ActionListener {
 	public DBTab(final MainWindow mainWindow, Controller controller) {
 		super(new MigLayout("fillx, wrap 2, insets 0", "[]0[]", "[grow, fill]r[]r[]r[]r"));
 		this.controller = controller;
+		controller.dbTab = this;
 		
 		setOpaque(false);
 		add(makeDataSetList(mainWindow), "span 2, growx");
@@ -112,7 +113,7 @@ public class DBTab extends JPanel implements ActionListener {
 		deleteButton.setEnabled(false);
 		deleteButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				((LocalDBDataSet)localDBList.getSelectedDataSet()).deleteFromDB();
+				deleteSelectedDataSet();
 			}
 		});
 		add(deleteButton, "center");
@@ -121,8 +122,7 @@ public class DBTab extends JPanel implements ActionListener {
 		openButton.setEnabled(false);
 		openButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (localDBList.getSelectedDataSet() != null)
-					openDBDataSet(localDBList.getSelectedDataSet());
+				openSelectedDataSet();
 			}
 		});
 		add(openButton, "center");
@@ -134,5 +134,15 @@ public class DBTab extends JPanel implements ActionListener {
 	
 	public void openDBDataSet(DataSet dataSet) {
 		controller.setDataSet(dataSet);
+	}
+	
+	public void deleteSelectedDataSet() {
+		if (localDBList.getSelectedDataSet() != null)
+			((LocalDBDataSet)localDBList.getSelectedDataSet()).deleteFromDB();
+	}
+	
+	public void openSelectedDataSet() {
+		if (localDBList.getSelectedDataSet() != null)
+			openDBDataSet(localDBList.getSelectedDataSet());
 	}
 }

@@ -32,7 +32,6 @@ import edu.uncc.parsets.data.DataType;
 import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.gui.Controller;
 import edu.uncc.parsets.gui.DataSetListener;
-import edu.uncc.parsets.gui.ViewListener;
 import edu.uncc.parsets.util.AnimationListener;
 import edu.uncc.parsets.util.PSLogging;
 
@@ -65,7 +64,7 @@ import edu.uncc.parsets.util.PSLogging;
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-public class ParSetsView implements GLEventListener, DataSetListener, ViewListener, AnimationListener {
+public class ParSetsView implements GLEventListener, DataSetListener, AnimationListener {
 
 	private static final GLU glu = new GLU();
 	private int width;
@@ -103,11 +102,11 @@ public class ParSetsView implements GLEventListener, DataSetListener, ViewListen
 
 	boolean antialias = true;
 	
-	public ParSetsView(Component canvas, Controller controller) {
-		this.canvas = canvas;
-		this.controller = controller;
-		this.controller.addDataSetListener(this);
-		this.controller.setViewListener(this);
+	public ParSetsView(Component canv, Controller ctrl) {
+		canvas = canv;
+		controller = ctrl;
+		controller.addDataSetListener(this);
+		controller.parSetsView = this;
 		ParSetsInteraction interaction = new ParSetsInteraction(this);
 		canvas.addMouseListener(interaction);
 		canvas.addMouseMotionListener(interaction);

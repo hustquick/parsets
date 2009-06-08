@@ -130,6 +130,12 @@ public class MainWindow extends JFrame {
 		JMenu dataset = new JMenu("Data Set");
 		openDataSet = new JMenuItem("Open");
 		openDataSet.setEnabled(false);
+		openDataSet.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.dbTab.openSelectedDataSet();
+			}
+		});
 		dataset.add(openDataSet);
 		
 		JMenuItem closeDataSet = new JMenuItem("Close");
@@ -143,6 +149,12 @@ public class MainWindow extends JFrame {
 		
 		deleteDataSet = new JMenuItem("Delete");
 		deleteDataSet.setEnabled(false);
+		deleteDataSet.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.dbTab.deleteSelectedDataSet();
+			}
+		});
 		deleteDataSet.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		dataset.add(deleteDataSet);
 		
@@ -180,7 +192,7 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String fileName = AbstractOS.getCurrentOS().showDialog(MainWindow.this, new PNGFileNameFilter(), FileDialog.SAVE);
 				if (fileName != null)
-					controller.screenShot(fileName);
+					controller.parSetsView.takeScreenShot(fileName);
 			}
 		});
 		dataset.add(savepng);
@@ -206,7 +218,7 @@ public class MainWindow extends JFrame {
 		tooltips.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				controller.setShowTooltips(tooltips.isSelected());
+				controller.parSetsView.setShowTooltips(tooltips.isSelected());
 			}
 		});
 		view.add(tooltips);
@@ -218,7 +230,7 @@ public class MainWindow extends JFrame {
 		antialiasing.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				controller.antiAlias(antialiasing.isSelected());
+				controller.parSetsView.setAntiAlias(antialiasing.isSelected());
 			}
 		});
 		view.add(antialiasing);

@@ -207,7 +207,7 @@ public class SideBar extends JPanel implements DataSetListener {
 		JButton clearButton = new JButton("Clear Canvas");
 		clearButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				controller.clearScreen();
+				controller.parSetsView.clearScreen();
 				dimTree.clearChecking();
 			}
 		});
@@ -262,21 +262,21 @@ public class SideBar extends JPanel implements DataSetListener {
 
 				if (node.isLeaf()) {
 					if (event.isCheckedPath()) {
-						controller.addCategory((DimensionHandle)((DefaultMutableTreeNode) node.getParent()).getUserObject(),
+						controller.parSetsView.addCategory((DimensionHandle)((DefaultMutableTreeNode) node.getParent()).getUserObject(),
 												(CategoryHandle)node.getUserObject());
 					}					
 					else {
-						controller.removeCategory((DimensionHandle)((DefaultMutableTreeNode) node.getParent()).getUserObject(),
+						controller.parSetsView.removeCategory((DimensionHandle)((DefaultMutableTreeNode) node.getParent()).getUserObject(),
 												(CategoryHandle)node.getUserObject());
 					}
 				}
 
 				else if (!node.isRoot()) {
 					if (event.isCheckedPath()) {
-						controller.addAxis((DimensionHandle)node.getUserObject());
+						controller.parSetsView.addAxis((DimensionHandle)node.getUserObject());
 					}
 					else {
-						controller.removeAxis((DimensionHandle)node.getUserObject());
+						controller.parSetsView.removeAxis((DimensionHandle)node.getUserObject());
 					}
 				}
 			}
