@@ -73,6 +73,10 @@ public class CSVDataSet implements Iterable<DataDimension> {
 		return filename;
 	}
 
+	public String getFileBaseName() {
+		return (new File(filename)).getName();
+	}
+
 	public String getName() {
 		return name;
 	}

@@ -67,11 +67,11 @@ public class BatchConvert {
 		for (File f : csvFiles) {
 			CSVDataSet csvData = DataWizard.parseCSVFile(f.getPath(), null);
 			String newPath = rebase(f.getPath(), dstDir.getPath())+".json.gz";
-			csvData.getMetaData().setURL(BASEURL+newPath);
-			String handle = tempDB.addLocalDBDataSet(csvData);
-			DataSet localDS = tempDB.getDataSet(handle);
-			JSONExport.exportDataSet((LocalDBDataSet)localDS, newPath);
-			System.out.println(f.getPath()+" => "+localDS.getURL());
+			csvData.setURL(BASEURL+newPath);
+//			String handle = tempDB.addLocalDBDataSet(csvData);
+//			DataSet localDS = tempDB.getDataSet(handle);
+//			JSONExport.exportDataSet((LocalDBDataSet)localDS, newPath);
+//			System.out.println(f.getPath()+" => "+localDS.getURL());
 		}
 		
 		String indexName = JSONExport.exportDBIndex(tempDB, dstDir.getPath()+File.separatorChar+"index");
