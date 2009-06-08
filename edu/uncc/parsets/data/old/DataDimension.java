@@ -1,10 +1,9 @@
 package edu.uncc.parsets.data.old;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 
@@ -39,8 +38,10 @@ public class DataDimension {
 
 	private ArrayList<String> categories = new ArrayList<String>();
 
-	private Set<String> uniqueValues = new TreeSet<String>();
+	private Map<String, Integer> occurrenceCounts = new TreeMap<String, Integer>();
 
+	private List<String> values = new ArrayList<String>(100);
+	
 	public DataDimension(String key, DataType dataType) {
 		dimensionKey = key;
 		type = dataType;
@@ -51,8 +52,15 @@ public class DataDimension {
 	}
 	
 	public void addValue(String value) {
-		if (uniqueValues.size() < 100)
-			uniqueValues.add(value);
+		if (occurrenceCounts.size() < 100) {
+			values.add(value);
+			Integer num = occurrenceCounts.get(value);
+			if (num == null)
+				num = Integer.valueOf(1);
+			else
+				num = Integer.valueOf(num+1);
+			occurrenceCounts.put(value, num);
+		}
 		switch(type) {
 		case numerical:
 			try {
@@ -62,14 +70,18 @@ public class DataDimension {
 			}
 			break;
 		case categorical:
-			if (uniqueValues.size() > 100)
+			if (occurrenceCounts.size() > 100)
 				type = DataType.textual;
 			break;
 		}
 	}
+
+	public Map<String, Integer> getOccurrenceCounts() {
+		return occurrenceCounts;
+	}
 	
-	public Set<String> getUniqueValues() {
-		return uniqueValues;
+	public List<String> getValues() {
+		return values;
 	}
 	
 	public String getName() {

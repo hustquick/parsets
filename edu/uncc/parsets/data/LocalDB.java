@@ -300,178 +300,178 @@ public class LocalDB {
         }
 	}
 	
-	public String addLocalDBDataSet(CSVDataSet dataSet) {
-		ArrayList<DataDimension> catDims = new ArrayList<DataDimension>(dataSet.getNumDimensions());
-		ArrayList<DataDimension> numDims = new ArrayList<DataDimension>(dataSet.getNumDimensions());
-		
-		int bits = 0;
-		BigInteger combinations = BigInteger.ONE;
-		for (DataDimension d : dataSet)
-			if (d.getDataType() == DataType.categorical) {
-				combinations = combinations.multiply(BigInteger.valueOf(d
-						.getNumCategories()));
-				bits += CategoryKeyDef.numBits(d.getNumCategories() + 1);
-				catDims.add(d);
-			} else
-				numDims.add(d);
-		
-		PSLogging.logger.info("Storing data set " + dataSet.getName());
-		PSLogging.logger.info(dataSet.getNumRecords(0) + " records");
-		PSLogging.logger.info(catDims.size() + " (categorical) dimensions");
-		PSLogging.logger.info(numDims.size() + " measures");
-		PSLogging.logger.info(combinations + " potential combinations ("
-				+ combinations.bitLength() + " bits)");
-		PSLogging.logger.info("Key length: " + bits + " bits");
+//	public String addLocalDBDataSet(CSVDataSet dataSet) {
+//		ArrayList<DataDimension> catDims = new ArrayList<DataDimension>(dataSet.getNumDimensions());
+//		ArrayList<DataDimension> numDims = new ArrayList<DataDimension>(dataSet.getNumDimensions());
+//		
+//		int bits = 0;
+//		BigInteger combinations = BigInteger.ONE;
+//		for (DataDimension d : dataSet)
+//			if (d.getDataType() == DataType.categorical) {
+//				combinations = combinations.multiply(BigInteger.valueOf(d
+//						.getNumCategories()));
+//				bits += CategoryKeyDef.numBits(d.getNumCategories() + 1);
+//				catDims.add(d);
+//			} else
+//				numDims.add(d);
+//		
+//		PSLogging.logger.info("Storing data set " + dataSet.getName());
+//		PSLogging.logger.info(dataSet.getNumRecords(0) + " records");
+//		PSLogging.logger.info(catDims.size() + " (categorical) dimensions");
+//		PSLogging.logger.info(numDims.size() + " measures");
+//		PSLogging.logger.info(combinations + " potential combinations ("
+//				+ combinations.bitLength() + " bits)");
+//		PSLogging.logger.info("Key length: " + bits + " bits");
+//
+//		// where is map() when I need it?
+//		int categories[] = new int[catDims.size()];
+//		int i = 0;
+//		for (DataDimension d : catDims) {
+//			categories[i] = d.getNumCategories();
+//			i++;
+//		}
+//		
+//		CategoryKeyDef keyDef = new CategoryKeyDef(categories);
+//
+//		Statement stmt = null;
+//		String handle = null;
+//		try {
+//			stmt = createStatement(DBAccess.FORWRITING);
+//			stmt.execute("begin transaction;");
+//			handle = writeAdmin(dataSet, catDims, numDims, keyDef);
+//			writeData(dataSet.getNumRecords(0), handle, catDims, numDims, keyDef);
+//			stmt.execute("commit;");
+//		} catch (SQLException e) {
+//			PSLogging.logger.error("Could not write dataset to local DB.", e);
+//			try {
+//				stmt.execute("rollback;");
+//			} catch (SQLException e1) {
+//				PSLogging.logger.error("Could not roll back changes.", e1);
+//			}
+//		} finally {
+//			releaseWriteLock();
+//			try {
+//				stmt.close();
+//			} catch (SQLException e) {
+//				PSLogging.logger.warn("Could not release DB statement.", e);
+//			}
+//		}
+//
+//		rescanDB();
+//		
+//		PSLogging.logger.info("Done.");
+//		
+//		return handle;
+//	}
 
-		// where is map() when I need it?
-		int categories[] = new int[catDims.size()];
-		int i = 0;
-		for (DataDimension d : catDims) {
-			categories[i] = d.getNumCategories();
-			i++;
-		}
-		
-		CategoryKeyDef keyDef = new CategoryKeyDef(categories);
 
-		Statement stmt = null;
-		String handle = null;
-		try {
-			stmt = createStatement(DBAccess.FORWRITING);
-			stmt.execute("begin transaction;");
-			handle = writeAdmin(dataSet, catDims, numDims, keyDef);
-			writeData(dataSet.getNumRecords(0), handle, catDims, numDims, keyDef);
-			stmt.execute("commit;");
-		} catch (SQLException e) {
-			PSLogging.logger.error("Could not write dataset to local DB.", e);
-			try {
-				stmt.execute("rollback;");
-			} catch (SQLException e1) {
-				PSLogging.logger.error("Could not roll back changes.", e1);
-			}
-		} finally {
-			releaseWriteLock();
-			try {
-				stmt.close();
-			} catch (SQLException e) {
-				PSLogging.logger.warn("Could not release DB statement.", e);
-			}
-		}
-
-		rescanDB();
-		
-		PSLogging.logger.info("Done.");
-		
-		return handle;
-	}
-
-
-	private String writeAdmin(CSVDataSet dataSet, ArrayList<DataDimension> catDims, ArrayList<DataDimension> numDims, CategoryKeyDef keyDef) {
-		String dsHandle = null;
-		PreparedStatement dsStmt = null;
-		PreparedStatement dimStmt = null;
-		PreparedStatement catStmt = null;
-		Statement stmt = null;
-		try {
-			dsStmt = db.prepareStatement("insert into Admin_DataSets values (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?);");
-			dsStmt.clearBatch();
-			dsStmt.setString(1, dataSet.getName());
-			dsHandle = name2handle(dataSet.getName());
-			dsHandle = makeUniqueHandle(dsHandle, db);
-			dsStmt.setString(2, dsHandle);
-			dsStmt.setString(3, "cube");
-			dsStmt.setInt(4, dataSet.getNumDimensions());
-			dsStmt.setInt(5, dataSet.getNumRecords(0));
-			dsStmt.setString(6, dataSet.getMetaData().getSection());
-			dsStmt.setString(7, dataSet.getMetaData().getURL());
-			dsStmt.setString(8, dataSet.getMetaData().getSource());
-			dsStmt.setString(9, dataSet.getMetaData().getSrcURL());
-			dsStmt.addBatch();
-			dsStmt.executeBatch();
-			
-			dimStmt = db.prepareStatement("insert into Admin_Dimensions values (?, ?, ?, ?, ?, ?);");
-			catStmt = db.prepareStatement("insert into Admin_Categories values (?, ?, ?, ?, ?, ?);");
-			int dimNum = 0;
-			for (DataDimension dim : dataSet) {
-				dimStmt.setString(1, dsHandle);
-				dimStmt.setString(2, dim.getName());
-				String dimHandle = name2handle(dim.getKey());
-				dimStmt.setString(3, dimHandle);
-				dimStmt.setString(4, dim.getDataType().toString());
-				if (dim.getDataType() == DataType.categorical) {
-					dimStmt.setInt(5, keyDef.getLeftShift(dimNum));
-					dimStmt.setInt(6, (int)(keyDef.getBitMask(dimNum) >> keyDef.getLeftShift(dimNum)));
-					dimNum++;
-					for (int catNum = 0; catNum < dim.getNumCategories(); catNum++) {
-						catStmt.setString(1, dsHandle);
-						catStmt.setString(2, dimHandle);
-						catStmt.setString(3, dim.getCategoryLabel(catNum));
-						catStmt.setString(4, name2handle(dim.getCategoryName(catNum)));
-						catStmt.setInt(5, catNum+1);
-						catStmt.setInt(6, dim.getCategoryCount(catNum));
-						catStmt.addBatch();
-					}
-				} else {
-					dimStmt.setInt(5, 0);
-					dimStmt.setInt(6, 0);
-				}
-				dimStmt.addBatch();
-			}
-			dimStmt.executeBatch();
-			catStmt.executeBatch();
-			
-			stmt = db.createStatement();
-			StringBuffer createSB = new StringBuffer("create table "+dsHandle+"_dims (key INTEGER, count INTEGER");
-			for (DataDimension dim : catDims) {
-				String handle = name2handle(dim.getKey());
-				createSB.append(", "); createSB.append(handle); createSB.append(" INTEGER");
-			}
-			createSB.append(");");
-			stmt.execute(createSB.toString());
-			
-			if (numDims.size() > 0) {
-				createSB = new StringBuffer("create table "+dsHandle+"_measures (key INTEGER");
-				for (DataDimension dim : numDims) {
-					createSB.append(", "+name2handle(dim.getKey()));
-					if (dim.getDataType() == DataType.numerical)
-						createSB.append(" REAL");
-					else
-						createSB.append(" TEXT");
-				}		
-				createSB.append(");");
-				stmt.execute(createSB.toString());
-				stmt.execute("create index "+dsHandle+"_measures_key on "+dsHandle+"_measures (key);");
-			}
-		
-		} catch (SQLException e) {
-			PSLogging.logger.error("Error writing admin data.", e);
-		} finally {
-			try {
-				if (dsStmt != null)
-					dsStmt.close();
-			} catch (SQLException e) {
-				PSLogging.logger.error("Error closing DB statement 'dsStmt'.", e);
-			}
-			try {
-				if (dimStmt != null)
-					dimStmt.close();
-			} catch (SQLException e) {
-				PSLogging.logger.error("Error closing DB statement 'dimStmt'.", e);
-			}
-			try {
-				if (catStmt != null)
-					catStmt.close();
-			} catch (SQLException e) {
-				PSLogging.logger.error("Error closing DB statement 'catStmt'.", e);
-			}
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException e) {
-				PSLogging.logger.error("Error closing DB statement 'stmt'.", e);
-			}
-		}
-		return dsHandle;
-	}
+//	private String writeAdmin(CSVDataSet dataSet, ArrayList<DataDimension> catDims, ArrayList<DataDimension> numDims, CategoryKeyDef keyDef) {
+//		String dsHandle = null;
+//		PreparedStatement dsStmt = null;
+//		PreparedStatement dimStmt = null;
+//		PreparedStatement catStmt = null;
+//		Statement stmt = null;
+//		try {
+//			dsStmt = db.prepareStatement("insert into Admin_DataSets values (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?);");
+//			dsStmt.clearBatch();
+//			dsStmt.setString(1, dataSet.getName());
+//			dsHandle = name2handle(dataSet.getName());
+//			dsHandle = makeUniqueHandle(dsHandle, db);
+//			dsStmt.setString(2, dsHandle);
+//			dsStmt.setString(3, "cube");
+//			dsStmt.setInt(4, dataSet.getNumDimensions());
+//			dsStmt.setInt(5, dataSet.getNumRecords(0));
+//			dsStmt.setString(6, dataSet.getMetaData().getSection());
+//			dsStmt.setString(7, dataSet.getMetaData().getURL());
+//			dsStmt.setString(8, dataSet.getMetaData().getSource());
+//			dsStmt.setString(9, dataSet.getMetaData().getSrcURL());
+//			dsStmt.addBatch();
+//			dsStmt.executeBatch();
+//			
+//			dimStmt = db.prepareStatement("insert into Admin_Dimensions values (?, ?, ?, ?, ?, ?);");
+//			catStmt = db.prepareStatement("insert into Admin_Categories values (?, ?, ?, ?, ?, ?);");
+//			int dimNum = 0;
+//			for (DataDimension dim : dataSet) {
+//				dimStmt.setString(1, dsHandle);
+//				dimStmt.setString(2, dim.getName());
+//				String dimHandle = name2handle(dim.getKey());
+//				dimStmt.setString(3, dimHandle);
+//				dimStmt.setString(4, dim.getDataType().toString());
+//				if (dim.getDataType() == DataType.categorical) {
+//					dimStmt.setInt(5, keyDef.getLeftShift(dimNum));
+//					dimStmt.setInt(6, (int)(keyDef.getBitMask(dimNum) >> keyDef.getLeftShift(dimNum)));
+//					dimNum++;
+//					for (int catNum = 0; catNum < dim.getNumCategories(); catNum++) {
+//						catStmt.setString(1, dsHandle);
+//						catStmt.setString(2, dimHandle);
+//						catStmt.setString(3, dim.getCategoryLabel(catNum));
+//						catStmt.setString(4, name2handle(dim.getCategoryName(catNum)));
+//						catStmt.setInt(5, catNum+1);
+//						catStmt.setInt(6, dim.getCategoryCount(catNum));
+//						catStmt.addBatch();
+//					}
+//				} else {
+//					dimStmt.setInt(5, 0);
+//					dimStmt.setInt(6, 0);
+//				}
+//				dimStmt.addBatch();
+//			}
+//			dimStmt.executeBatch();
+//			catStmt.executeBatch();
+//			
+//			stmt = db.createStatement();
+//			StringBuffer createSB = new StringBuffer("create table "+dsHandle+"_dims (key INTEGER, count INTEGER");
+//			for (DataDimension dim : catDims) {
+//				String handle = name2handle(dim.getKey());
+//				createSB.append(", "); createSB.append(handle); createSB.append(" INTEGER");
+//			}
+//			createSB.append(");");
+//			stmt.execute(createSB.toString());
+//			
+//			if (numDims.size() > 0) {
+//				createSB = new StringBuffer("create table "+dsHandle+"_measures (key INTEGER");
+//				for (DataDimension dim : numDims) {
+//					createSB.append(", "+name2handle(dim.getKey()));
+//					if (dim.getDataType() == DataType.numerical)
+//						createSB.append(" REAL");
+//					else
+//						createSB.append(" TEXT");
+//				}		
+//				createSB.append(");");
+//				stmt.execute(createSB.toString());
+//				stmt.execute("create index "+dsHandle+"_measures_key on "+dsHandle+"_measures (key);");
+//			}
+//		
+//		} catch (SQLException e) {
+//			PSLogging.logger.error("Error writing admin data.", e);
+//		} finally {
+//			try {
+//				if (dsStmt != null)
+//					dsStmt.close();
+//			} catch (SQLException e) {
+//				PSLogging.logger.error("Error closing DB statement 'dsStmt'.", e);
+//			}
+//			try {
+//				if (dimStmt != null)
+//					dimStmt.close();
+//			} catch (SQLException e) {
+//				PSLogging.logger.error("Error closing DB statement 'dimStmt'.", e);
+//			}
+//			try {
+//				if (catStmt != null)
+//					catStmt.close();
+//			} catch (SQLException e) {
+//				PSLogging.logger.error("Error closing DB statement 'catStmt'.", e);
+//			}
+//			try {
+//				if (stmt != null)
+//					stmt.close();
+//			} catch (SQLException e) {
+//				PSLogging.logger.error("Error closing DB statement 'stmt'.", e);
+//			}
+//		}
+//		return dsHandle;
+//	}
 	
 	private String makeUniqueHandle(String handle, Connection db) {
 		int num = 0;
@@ -512,88 +512,88 @@ public class LocalDB {
 		return false;
 	}
 	
-	private void writeData(int numRecords, String handle, List<DataDimension> catDims, List<DataDimension> numDims, CategoryKeyDef keyDef) {
-		int keyArray[] = new int[catDims.size()];
-		Map<CategoryKey, CubeValues> cubeValues = new TreeMap<CategoryKey, CubeValues>();
-		PreparedStatement measureStmt = null;
-		try {
-			if (numDims.size() > 0) {
-				StringBuffer measureSB = new StringBuffer("insert into "+handle+"_measures values (?");
-				for (int i = 0; i < numDims.size(); i++)
-					measureSB.append(", ?");
-				measureSB.append(");");
-				measureStmt = db.prepareStatement(measureSB.toString());
-			}
-			for (int index = 0; index < numRecords; index++) {
-				int dimNum = 0;
-				for (DataDimension dim : catDims) {
-					keyArray[dimNum] = (int)dim.getValues()[index]+1;
-					dimNum++;
-				}
-				CategoryKey key = new CategoryKey(keyArray, keyDef);
-	
-				CubeValues values = cubeValues.get(key);
-				if (values == null)
-					cubeValues.put(key, new CubeValues(keyArray));
-				else
-					values.count++;
-	
-				if (numDims.size() > 0) {
-					measureStmt.setLong(1, key.getKeyValue());
-					int mDimNum = 2;
-					for (DataDimension dim : numDims) {
-						switch(dim.getDataType()) {
-						case numerical:
-							measureStmt.setFloat(mDimNum, dim.getValues()[index]);
-							break;
-						case textual:
-							measureStmt.setString(mDimNum, dim.getCategoryName((int)dim.getValues()[index]));
-						}
-						mDimNum++;
-					}
-					measureStmt.addBatch();
-				}
-			}
-			if (numDims.size() > 0)
-				measureStmt.executeBatch();
-		} catch (SQLException e) {
-			PSLogging.logger.error("Error writing measures.", e);
-		} finally {
-			try {
-				if (measureStmt != null)
-					measureStmt.close();
-			} catch (SQLException e) {
-				PSLogging.logger.error("Error closing DB statement 'measureStmt'.", e);
-			}
-		}
-
-		StringBuffer dimsSB = new StringBuffer("insert into "+handle+"_dims values (?, ?");
-		for (int i = 0; i < catDims.size(); i++)
-			dimsSB.append(", ?");
-		dimsSB.append(");");
-		PreparedStatement dimsStmt = null;
-		try {
-			dimsStmt = db.prepareStatement(dimsSB.toString());
-			for (Map.Entry<CategoryKey, CubeValues> e : cubeValues.entrySet()) {
-				dimsStmt.setLong(1, e.getKey().getKeyValue());
-				CubeValues vals = e.getValue();
-				dimsStmt.setInt(2, vals.count);
-				for (int i = 0; i < vals.categoryValues.length; i++)
-					dimsStmt.setInt(i+3, vals.categoryValues[i]);
-				dimsStmt.addBatch();
-			}
-			dimsStmt.executeBatch();
-		} catch (SQLException e) {
-			PSLogging.logger.error("Error writing measures.", e);
-		} finally {
-			try {
-				if (dimsStmt != null)
-					dimsStmt.close();
-			} catch (SQLException e) {
-				PSLogging.logger.error("Error closing DB statement 'dimsStmt'.", e);
-			}
-		}
-	}
+//	private void writeData(int numRecords, String handle, List<DataDimension> catDims, List<DataDimension> numDims, CategoryKeyDef keyDef) {
+//		int keyArray[] = new int[catDims.size()];
+//		Map<CategoryKey, CubeValues> cubeValues = new TreeMap<CategoryKey, CubeValues>();
+//		PreparedStatement measureStmt = null;
+//		try {
+//			if (numDims.size() > 0) {
+//				StringBuffer measureSB = new StringBuffer("insert into "+handle+"_measures values (?");
+//				for (int i = 0; i < numDims.size(); i++)
+//					measureSB.append(", ?");
+//				measureSB.append(");");
+//				measureStmt = db.prepareStatement(measureSB.toString());
+//			}
+//			for (int index = 0; index < numRecords; index++) {
+//				int dimNum = 0;
+//				for (DataDimension dim : catDims) {
+//					keyArray[dimNum] = (int)dim.getValues()[index]+1;
+//					dimNum++;
+//				}
+//				CategoryKey key = new CategoryKey(keyArray, keyDef);
+//	
+//				CubeValues values = cubeValues.get(key);
+//				if (values == null)
+//					cubeValues.put(key, new CubeValues(keyArray));
+//				else
+//					values.count++;
+//	
+//				if (numDims.size() > 0) {
+//					measureStmt.setLong(1, key.getKeyValue());
+//					int mDimNum = 2;
+//					for (DataDimension dim : numDims) {
+//						switch(dim.getDataType()) {
+//						case numerical:
+//							measureStmt.setFloat(mDimNum, dim.getValues()[index]);
+//							break;
+//						case textual:
+//							measureStmt.setString(mDimNum, dim.getCategoryName((int)dim.getValues()[index]));
+//						}
+//						mDimNum++;
+//					}
+//					measureStmt.addBatch();
+//				}
+//			}
+//			if (numDims.size() > 0)
+//				measureStmt.executeBatch();
+//		} catch (SQLException e) {
+//			PSLogging.logger.error("Error writing measures.", e);
+//		} finally {
+//			try {
+//				if (measureStmt != null)
+//					measureStmt.close();
+//			} catch (SQLException e) {
+//				PSLogging.logger.error("Error closing DB statement 'measureStmt'.", e);
+//			}
+//		}
+//
+//		StringBuffer dimsSB = new StringBuffer("insert into "+handle+"_dims values (?, ?");
+//		for (int i = 0; i < catDims.size(); i++)
+//			dimsSB.append(", ?");
+//		dimsSB.append(");");
+//		PreparedStatement dimsStmt = null;
+//		try {
+//			dimsStmt = db.prepareStatement(dimsSB.toString());
+//			for (Map.Entry<CategoryKey, CubeValues> e : cubeValues.entrySet()) {
+//				dimsStmt.setLong(1, e.getKey().getKeyValue());
+//				CubeValues vals = e.getValue();
+//				dimsStmt.setInt(2, vals.count);
+//				for (int i = 0; i < vals.categoryValues.length; i++)
+//					dimsStmt.setInt(i+3, vals.categoryValues[i]);
+//				dimsStmt.addBatch();
+//			}
+//			dimsStmt.executeBatch();
+//		} catch (SQLException e) {
+//			PSLogging.logger.error("Error writing measures.", e);
+//		} finally {
+//			try {
+//				if (dimsStmt != null)
+//					dimsStmt.close();
+//			} catch (SQLException e) {
+//				PSLogging.logger.error("Error closing DB statement 'dimsStmt'.", e);
+//			}
+//		}
+//	}
 
 	protected void deleteFromDB(String dbHandle) {
 		PSLogging.logger.info("Deleting dataset '"+dbHandle+"' from local DB.");

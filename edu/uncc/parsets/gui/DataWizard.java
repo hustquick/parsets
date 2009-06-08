@@ -30,12 +30,10 @@ import javax.swing.table.AbstractTableModel;
 
 import net.miginfocom.swing.MigLayout;
 import edu.uncc.parsets.data.DataType;
-import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.data.old.CSVDataSet;
-import edu.uncc.parsets.data.old.CSVReader;
+import edu.uncc.parsets.data.old.CSVParser;
 import edu.uncc.parsets.data.old.DataDimension;
 import edu.uncc.parsets.data.old.DataSetReceiver;
-import edu.uncc.parsets.data.old.MetaData;
 import edu.uncc.parsets.data.old.MetaDataParser;
 import edu.uncc.parsets.gui.DBTab.CSVFileFilter;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
@@ -123,7 +121,7 @@ public class DataWizard implements DataSetReceiver {
 
 		public int getRowCount() {
 			if (data != null) {
-				numRows = Math.min(data.getNumRecords(0), 100);
+				numRows = Math.min(data.getNumRecords(), 100);
 				return numRows+1;
 			} else
 				return 0;
@@ -134,10 +132,7 @@ public class DataWizard implements DataSetReceiver {
 				return "...";
 			else {
 				DataDimension d = data.getDimension(col);
-				if (d.getDataType() == DataType.categorical)
-					return d.getCategoryName((int) d.getValues()[row]);
-				else
-					return d.getValues()[row];
+				return d.getValues().get(row);
 			}
 		}
 
@@ -230,33 +225,33 @@ public class DataWizard implements DataSetReceiver {
 	 * dataset if callBack is null.
 	 */
 	public static CSVDataSet parseCSVFile(String filename, DataSetReceiver callBack) {
-		CSVReader reader = new CSVReader();
+		CSVParser reader = new CSVParser(filename, callBack);
+		MetaDataParser mp = new MetaDataParser();
 		String metafilename = filename.substring(0, filename.lastIndexOf('.'))
 				+ ".xml";
-		MetaData metaData = null;
-		if (new File(metafilename).exists())
-			metaData = new MetaDataParser().parse(metafilename);
-		else {
+		if (new File(metafilename).exists()) {
+			mp.parse(reader.getDataSet(), metafilename);
+		} else {
 			if (metafilename.contains("_")) {
 				metafilename = metafilename.substring(0, metafilename.lastIndexOf("_"))+".xml";
 				if (new File(metafilename).exists()) {
-					metaData = new MetaDataParser().parse(metafilename);
+					mp.parse(reader.getDataSet(), metafilename);
 					String name = new File(filename).getName();
 					name = name.substring(0, name.lastIndexOf('.'));
 					name = name.replace('_', ' ');
-					metaData.setName(name);
+					reader.getDataSet().setName(name);
 				}
 			}
-			if (metaData == null) {
-				metaData = new MetaData();
-				String name = (new File(filename)).getName();
-				int lastPeriod = name.lastIndexOf('.');
-				if (lastPeriod > 0)
-					name = name.substring(0, lastPeriod);
-				metaData.setName(name);
-			}
+//			if (metaData == null) {
+//				metaData = new MetaData();
+//				String name = (new File(filename)).getName();
+//				int lastPeriod = name.lastIndexOf('.');
+//				if (lastPeriod > 0)
+//					name = name.substring(0, lastPeriod);
+//				metaData.setName(name);
+//			}
 		}
-		reader.readFile(filename, metaData, callBack);
+		reader.analyzeFile();
 		return reader.getDataSet();
 	}
 
@@ -281,14 +276,14 @@ public class DataWizard implements DataSetReceiver {
 		saveBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				data.setName(nameTF.getText());
-				data.getMetaData().setSource(sourceTF.getText());
-				data.getMetaData().setSrcURL(srcURLTF.getText());
-				data.getMetaData().setSection(sectionTF.getText());
+				data.setSource(sourceTF.getText());
+				data.setSourceURL(srcURLTF.getText());
+				data.setSection(sectionTF.getText());
 				progressBar.setIndeterminate(true);
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
-						LocalDB.getDefaultDB().addLocalDBDataSet(data);
+//						LocalDB.getDefaultDB().addLocalDBDataSet(data);
 						SwingUtilities.invokeLater(new Runnable() {
 							@Override
 							public void run() {
@@ -336,17 +331,17 @@ public class DataWizard implements DataSetReceiver {
 		dimNameTF.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				currentDimension.getMetaData().setName(dimNameTF.getText());
+				currentDimension.setName(dimNameTF.getText());
 			}
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				currentDimension.getMetaData().setName(dimNameTF.getText());
+				currentDimension.setName(dimNameTF.getText());
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				currentDimension.getMetaData().setName(dimNameTF.getText());
+				currentDimension.setName(dimNameTF.getText());
 			}
 		});
 		p.add(dimNameTF, "gap related");
@@ -386,10 +381,10 @@ public class DataWizard implements DataSetReceiver {
 	public void setDataSet(CSVDataSet data) {
 		this.data = data;
 		nameTF.setText(data.getName());
-		sectionTF.setText(data.getMetaData().getSection());
+		sectionTF.setText(data.getSection());
 		fileNameLabel.setText(data.getFileBaseName());
-		sourceTF.setText(data.getMetaData().getSource());
-		srcURLTF.setText(data.getMetaData().getSrcURL());
+		sourceTF.setText(data.getSource());
+		srcURLTF.setText(data.getSourceURL());
 		table.setModel(new DataTableModel());
 		progressBar.setIndeterminate(false);
 	}

@@ -50,6 +50,10 @@ public class MetaDataParser {
 					dataSet.setName(atts.getValue("name"));
 				if (atts.getValue("section") != null)
 					dataSet.setSection(atts.getValue("section"));
+				if (atts.getValue("source") != null)
+					dataSet.setSource(atts.getValue("source"));
+				if (atts.getValue("srcURL") != null)
+					dataSet.setSourceURL(atts.getValue("srcURL"));
 			} else if (qName.equals("user")) {
 				// ignore for now		
 			} else {
@@ -70,7 +74,7 @@ public class MetaDataParser {
 		}
 		
 		public void characters(char[] ch, int start, int length) {
-			characters.append(String.copyValueOf(ch, start, length));
+			characters.append(ch, start, length);
 		}
 	}
 	
@@ -86,5 +90,4 @@ public class MetaDataParser {
 		}
 		return true;
 	}
-	
 }
