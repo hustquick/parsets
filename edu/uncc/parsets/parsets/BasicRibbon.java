@@ -108,13 +108,13 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	}
 	
 	
-	public void display(GL gl) {
+	public void display(GL gl, float alpha) {
 		
 		if (width == 0 || isSelected) {
 			return;
 		}
 
-		ColorBrewer.setColor(colorBrewerIndex, false, 0.8f, gl);
+		ColorBrewer.setColor(colorBrewerIndex, false, alpha, gl);
 
 		if (width >= 1) {
 			gl.glEnable(GL.GL_POLYGON_SMOOTH);

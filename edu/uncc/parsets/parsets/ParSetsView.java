@@ -101,6 +101,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 	private boolean showTooltips = true;
 
 	boolean antialias = true;
+	private boolean strongerSelection = true;
 	
 	public ParSetsView(Component canv, Controller ctrl) {
 		canvas = canv;
@@ -149,7 +150,11 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 			
 			gl.glEnable(GL.GL_BLEND);
 
-			connectionTree.display(gl);
+			if (tooltip != null && strongerSelection )
+				connectionTree.display(gl, .5f);
+			else
+				connectionTree.display(gl, .8f);
+
 			// passing all those values isn't very pretty, but it'll do for now.
 			for (VisualAxis axis : axes)
 				axis.display(gl, dimensionTextRenderer, dimensionFontMetrics, categoryTextRenderer, categoryFontMetrics);
@@ -507,6 +512,11 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 	
 	public void setAntiAlias(boolean aa) {
 		antialias = aa;
+		repaint();
+	}
+	
+	public void setStrongerSelection(boolean stronger) {
+		strongerSelection = stronger;
 		repaint();
 	}
 	

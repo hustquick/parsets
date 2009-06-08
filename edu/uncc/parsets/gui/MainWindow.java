@@ -214,7 +214,7 @@ public class MainWindow extends JFrame {
 		menuBar.add(dataset);
 				
 		JMenu view = new JMenu("View");
-		final JMenuItem tooltips = new JCheckBoxMenuItem("Show tooltips", true);
+		final JMenuItem tooltips = new JCheckBoxMenuItem("Show Tooltips", true);
 		tooltips.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -223,7 +223,13 @@ public class MainWindow extends JFrame {
 		});
 		view.add(tooltips);
 
-		JCheckBoxMenuItem strong = new JCheckBoxMenuItem("Stronger highlights", false);
+		final JCheckBoxMenuItem strong = new JCheckBoxMenuItem("Stronger Highlights", true);
+		strong.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.parSetsView.setStrongerSelection(strong.isSelected());
+			}
+		});
 		view.add(strong);
 		
 		final JCheckBoxMenuItem antialiasing = new JCheckBoxMenuItem("Anti-Aliasing", true);

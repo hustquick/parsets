@@ -89,7 +89,7 @@ public class VisualConnection {
 	 * 
 	 * @param gl: The graphics instance to paint to.
 	 */
-	public void display(GL gl) {
+	public void display(GL gl, float alpha) {
 		
 	}
 	

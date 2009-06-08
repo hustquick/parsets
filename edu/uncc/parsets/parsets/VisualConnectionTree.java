@@ -274,18 +274,18 @@ public class VisualConnectionTree {
 
 	}
 	
-	public void display(GL gl) {
-		display(gl, root);
+	public void display(GL gl, float alpha) {
+		display(gl, root, alpha);
 		displaySelected(gl, root);
 	}
 	
-	private void display(GL gl, VisualConnection node) {
+	private void display(GL gl, VisualConnection node, float alpha) {
 		
-		node.display(gl);
+		node.display(gl, alpha);
 		
 		for (VisualConnection child : node.getChildren()) {
 			if (child.getNode().isVisible()) 
-				display(gl, child);
+				display(gl, child, alpha);
 		}
 
 	}
