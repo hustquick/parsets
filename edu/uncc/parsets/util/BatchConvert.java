@@ -4,12 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.JSONExport;
 import edu.uncc.parsets.data.LocalDB;
-import edu.uncc.parsets.data.LocalDBDataSet;
 import edu.uncc.parsets.data.old.CSVDataSet;
-import edu.uncc.parsets.gui.DataWizard;
+import edu.uncc.parsets.data.old.CSVParser;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -65,7 +63,14 @@ public class BatchConvert {
 		
 		List<File> csvFiles = scanDir(srcDir, dstDir);
 		for (File f : csvFiles) {
-			CSVDataSet csvData = DataWizard.parseCSVFile(f.getPath(), null);
+			CSVParser parser = new CSVParser(f.getPath(), null);
+			Thread t = parser.analyzeCSVFile();
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			CSVDataSet csvData = parser.getDataSet();
 			String newPath = rebase(f.getPath(), dstDir.getPath())+".json.gz";
 			csvData.setURL(BASEURL+newPath);
 //			String handle = tempDB.addLocalDBDataSet(csvData);

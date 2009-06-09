@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -32,9 +31,8 @@ import net.miginfocom.swing.MigLayout;
 import edu.uncc.parsets.data.DataType;
 import edu.uncc.parsets.data.old.CSVDataSet;
 import edu.uncc.parsets.data.old.CSVParser;
+import edu.uncc.parsets.data.old.CSVParserListener;
 import edu.uncc.parsets.data.old.DataDimension;
-import edu.uncc.parsets.data.old.DataSetReceiver;
-import edu.uncc.parsets.data.old.MetaDataParser;
 import edu.uncc.parsets.gui.DBTab.CSVFileFilter;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
 
@@ -68,15 +66,13 @@ import edu.uncc.parsets.util.osabstraction.AbstractOS;
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 @SuppressWarnings("serial")
-public class DataWizard implements DataSetReceiver {
+public class DataWizard implements CSVParserListener {
 
 	private JTable table;
 
 	CSVDataSet data;
 
 	DataDimension currentDimension;
-
-	private CategoryTableModel categoryModel;
 
 	private JTable categoriesTable;
 
@@ -92,8 +88,6 @@ public class DataWizard implements DataSetReceiver {
 
 	private JTextField nameTF;
 
-//	private JLabel statusLabel;
-
 	private JProgressBar progressBar;
 
 	private JLabel fileNameLabel;
@@ -104,9 +98,9 @@ public class DataWizard implements DataSetReceiver {
 
 	private String fileName;
 
-	private DataTableModel tableModel;
-
 	private JTextField sectionTF;
+
+	private JLabel statusLabel;
 
 	class DataTableModel extends AbstractTableModel implements ListSelectionListener {
 
@@ -164,9 +158,9 @@ public class DataWizard implements DataSetReceiver {
 
 		public Object getValueAt(int row, int col) {
 			if (col == 0)
-				return currentDimension.getCategoryName(row);
+				return currentDimension.getCategoryKey(row);
 			else
-				return currentDimension.getCategoryLabel(row);
+				return currentDimension.getCategoryName(row);
 		}
 
 		public String getColumnName(int i) {
@@ -186,12 +180,10 @@ public class DataWizard implements DataSetReceiver {
 	};
 
 	public DataWizard() {
-		tableModel = new DataTableModel();
-		table = new JTable(tableModel);
+		table = new JTable();
 		table.setRowSelectionAllowed(false);
 		table.setColumnSelectionAllowed(true);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.getColumnModel().getSelectionModel().addListSelectionListener(tableModel);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 		JScrollPane scrollPane = new JScrollPane(table);
@@ -210,59 +202,23 @@ public class DataWizard implements DataSetReceiver {
 		fileName = AbstractOS.getCurrentOS().showDialog(wizardFrame, new CSVFileFilter(), FileDialog.LOAD);
 	    if (fileName != null) {
 	    	progressBar.setIndeterminate(true);
-	    	parseCSVFile(fileName, this);
+	    	statusLabel.setText("Analyzing CSV file ...");
+	    	CSVParser csvParser = new CSVParser(fileName, this);
+	    	csvParser.analyzeCSVFile();
 	    } else {
 	    	wizardFrame.setVisible(false);
 	    	wizardFrame.dispose();
 	    }
 	}
 
-	/**
-	 * Call the parser to read in a dataset, and parse the XML metadata file if
-	 * it exists. The parser runs in a separate thread, and this function
-	 * returns before the data has been parsed if the {@literal callBack} 
-	 * parameter is not null. Waits for the parse and returns the
-	 * dataset if callBack is null.
-	 */
-	public static CSVDataSet parseCSVFile(String filename, DataSetReceiver callBack) {
-		CSVParser reader = new CSVParser(filename, callBack);
-		MetaDataParser mp = new MetaDataParser();
-		String metafilename = filename.substring(0, filename.lastIndexOf('.'))
-				+ ".xml";
-		if (new File(metafilename).exists()) {
-			mp.parse(reader.getDataSet(), metafilename);
-		} else {
-			if (metafilename.contains("_")) {
-				metafilename = metafilename.substring(0, metafilename.lastIndexOf("_"))+".xml";
-				if (new File(metafilename).exists()) {
-					mp.parse(reader.getDataSet(), metafilename);
-					String name = new File(filename).getName();
-					name = name.substring(0, name.lastIndexOf('.'));
-					name = name.replace('_', ' ');
-					reader.getDataSet().setName(name);
-				}
-			}
-//			if (metaData == null) {
-//				metaData = new MetaData();
-//				String name = (new File(filename)).getName();
-//				int lastPeriod = name.lastIndexOf('.');
-//				if (lastPeriod > 0)
-//					name = name.substring(0, lastPeriod);
-//				metaData.setName(name);
-//			}
-		}
-		reader.analyzeFile();
-		return reader.getDataSet();
-	}
-
 	private JComponent createButtonPanel() {
 		JPanel p = new JPanel(new MigLayout("fillx, insets 0"));
 
 		progressBar = new JProgressBar();
-		p.add(progressBar, "gapleft 5, width 250");
+		p.add(progressBar, "gapleft 5, width 250, split 2");
 
-//		statusLabel = new JLabel("Analyzing file ...");
-//		p.add(statusLabel, "gapleft 7");
+		statusLabel = new JLabel();
+		p.add(statusLabel, "gapleft 7");
 		
 		closeBtn = new JButton("Cancel");
 		closeBtn.addActionListener(new ActionListener() {
@@ -280,6 +236,7 @@ public class DataWizard implements DataSetReceiver {
 				data.setSourceURL(srcURLTF.getText());
 				data.setSection(sectionTF.getText());
 				progressBar.setIndeterminate(true);
+				statusLabel.setText("Writing data to local database ...");
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
@@ -358,8 +315,7 @@ public class DataWizard implements DataSetReceiver {
 		});
 		p.add(typeCB, "gap related");
 
-		categoryModel = new CategoryTableModel();
-		categoriesTable = new JTable(categoryModel);
+		categoriesTable = new JTable();
 		JScrollPane scrollPane = new JScrollPane(categoriesTable);
 		scrollPane.setOpaque(false);
 		scrollPane.setBorder(BorderFactory.createTitledBorder("Categories"));
@@ -372,20 +328,43 @@ public class DataWizard implements DataSetReceiver {
 
 	private void setActiveDimension(DataDimension d) {
 		currentDimension = d;
-		categoryModel.fireTableDataChanged();
+		categoriesTable.setModel(new CategoryTableModel());
 		dimKeyLabel.setText(d.getKey());
 		dimNameTF.setText(d.getName());
 		typeCB.setSelectedIndex(d.getDataType().ordinal());
 	}
 
-	public void setDataSet(CSVDataSet data) {
+	public void setDataSet(final CSVDataSet data) {
 		this.data = data;
-		nameTF.setText(data.getName());
-		sectionTF.setText(data.getSection());
-		fileNameLabel.setText(data.getFileBaseName());
-		sourceTF.setText(data.getSource());
-		srcURLTF.setText(data.getSourceURL());
-		table.setModel(new DataTableModel());
-		progressBar.setIndeterminate(false);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				statusLabel.setText("");
+				nameTF.setText(data.getName());
+				sectionTF.setText(data.getSection());
+				fileNameLabel.setText(data.getFileBaseName());
+				sourceTF.setText(data.getSource());
+				srcURLTF.setText(data.getSourceURL());
+				DataTableModel m = new DataTableModel();
+				table.setModel(m);
+				table.getColumnModel().getSelectionModel().addListSelectionListener(m);
+
+				progressBar.setValue(0);
+			}
+		});
+	}
+
+	@Override
+	public void setProgress(final int progress) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (progress >= 0) {
+					progressBar.setIndeterminate(false);
+					progressBar.setValue(progress);
+				} else
+					progressBar.setIndeterminate(true);
+			}
+		});
 	}
 }

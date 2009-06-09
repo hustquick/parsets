@@ -5,23 +5,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
-
 import edu.uncc.parsets.data.DataType;
 
-/**
- * A dimension contains the data of one dimension in the data, for all the
- * records. In addition to the single values, there are also some statistics
- * like the number of different values, occurrence counts, etc.
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
+ *                     and others (see Authors.txt for full list)
+ * All rights reserved.
  * 
- * The process for filling a dimension with data is as follows. First, the data
- * is read in without knowing how many values there will be. This is
- * accomplished by calling {@link DataDimension#addDataItem}. Once the file is
- * read in, the function {@link DataDimension#initializeDimension} must be
- * called to process the list into an array, and to compute statistics. Only
- * once this function was called, can those values be retrieved.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  * 
- */
+ *    * Redistributions of source code must retain the above copyright
+ *      notice, this list of conditions and the following disclaimer.
+ *    * Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *    * Neither the name of UNC Charlotte nor the names of its contributors
+ *      may be used to endorse or promote products derived from this software
+ *      without specific prior written permission.
+ *      
+ * THIS SOFTWARE IS PROVIDED BY ITS AUTHORS ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 public class DataDimension {
 
 	// * The key (internal name) for this dimension
@@ -36,7 +50,7 @@ public class DataDimension {
 	// * The map of category keys to integers, for faster lookup when parsing
 	private Map<String, Integer> categoryMap = new TreeMap<String, Integer>();
 
-	private ArrayList<String> categories = new ArrayList<String>();
+	private ArrayList<String> categoryKeys = new ArrayList<String>();
 
 	private Map<String, Integer> occurrenceCounts = new TreeMap<String, Integer>();
 
@@ -49,11 +63,14 @@ public class DataDimension {
 
 	public void addCategory(String key, String name) {
 		categoryNames.put(key, name);
+		categoryKeys.add(key);
+		categoryMap.put(key, categoryKeys.size());
 	}
 	
 	public void addValue(String value) {
-		if (occurrenceCounts.size() < 100) {
+		if (values.size() < 100)
 			values.add(value);
+		if (occurrenceCounts.size() < 100) {
 			Integer num = occurrenceCounts.get(value);
 			if (num == null)
 				num = Integer.valueOf(1);
@@ -65,7 +82,7 @@ public class DataDimension {
 		case numerical:
 			try {
 				Float.parseFloat(value);
-			} catch (ParseException e) {
+			} catch (Exception e) {
 				type = DataType.categorical;
 			}
 			break;
@@ -98,7 +115,7 @@ public class DataDimension {
 
 	public String getCategoryName(int categoryValue) {
 		if (type != DataType.textual)
-			return categories.get(categoryValue);
+			return categoryNames.get(categoryKeys.get(categoryValue));
 		else {
 			for (Map.Entry<String, Integer> e : categoryMap.entrySet()) {
 				if (e.getValue() == categoryValue)
@@ -109,15 +126,15 @@ public class DataDimension {
 	}
 
 	public void setCategoryName(int categoryValue, String name) {
-		categoryNames.put(categories.get(categoryValue), name);
+		categoryNames.put(categoryKeys.get(categoryValue), name);
 	}
 
-	public String getCategoryLabel(int categoryValue) {
-		return categories.get(categoryValue);
+	public String getCategoryKey(int categoryValue) {
+		return categoryKeys.get(categoryValue);
 	}
 
 	public int getNumCategories() {
-		return categories.size();
+		return categoryKeys.size();
 	}
 
 	public DataType getDataType() {
