@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import au.com.bytecode.opencsv.CSVReader;
+import edu.uncc.parsets.data.DataType;
+import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -47,6 +49,10 @@ public class CSVParser {
 	private CSVDataSet dataSet;
 
 	private char separator = ';';
+
+	private String[] columns;
+
+	private CSVReader parser;
 		
 	public CSVParser(String fileName, CSVParserListener receiver) {
 		csvFileName = fileName;
@@ -137,6 +143,7 @@ public class CSVParser {
 						callBack.setProgress((int)(numLines/numLinesEstimate));
 					for (int i = 0; i < columns.length; i++)
 						dataSet.getDimension(i).addValue(columns[i]);
+					dataSet.setNumRecords(numLines);
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -154,59 +161,37 @@ public class CSVParser {
 			callBack.setDataSet(dataSet);
 	}
 	
-//	public void makeDataCube() {
-//		try {
-//			Reader fileReader = new FileReader(csvFileName);
-//			CSVReader parser = new CSVReader(fileReader, separator);
-//
-//			int linenum = 1;
-//
-//			String[] firstline = parser.readNext();
-//			String[] line = parser.readNext();
-//
-//
-//			linenum++;
-//
-//			while (line != null) {
-//
-//				for (int i = 0; i < line.length; i++) {
-//
-//					switch (dimensions[i].getDataType()) {
-//					case categorical:
-//						dimensions[i].addDataItem(line[i]);
-//						break;
-//
-//					case numerical:
-//						try {
-//							dimensions[i].addDataItem(Float.parseFloat(line[i]));
-//						} catch (NumberFormatException e) {
-//							dimensions[i].addDataItem(Float.MAX_VALUE);
-//						}
-//						break;
-//
-//					case textual:
-//						dimensions[i].addTextData(line[i]);
-//						break;
-//					}
-//
-//				}
-//				line = parser.readNext();
-//				linenum++;
-//			}
-//
-//			for (int i = 0; i < dimensions.length; i++)
-//				// Initializing Dimension in DataDimension
-//				dimensions[i].initializeDimension();
-//
-//			callBack.setDataSet(dataSet);
-//
-//		} catch (FileNotFoundException e) {
-//			PSLogging.logger.error("File not found: "+csvFileName, e);
-//		} catch (IOException e) {
-//			PSLogging.logger.error("IOException while reading file: "+csvFileName, e);
-//		}
-//	}
+	public void streamToDB(LocalDB db) {
+		try {
+			parser = new CSVReader(new FileReader(csvFileName), separator);
+			columns = parser.readNext();
+			db.addLocalDBDataSet(dataSet, this);
+			if (callBack != null)
+				callBack.importDone();
+		} catch (Exception e) {
+			PSLogging.logger.error("Error streaming data", e);
+		}
+	}
 
+	public float[] readNextLine() {
+		try {
+			columns = parser.readNext();
+			if (columns != null) {
+				float values[] = new float[columns.length];
+				for (int i = 0; i < columns.length; i++) {
+					if (dataSet.getDimension(i).getDataType() == DataType.categorical)
+						values[i] = dataSet.getDimension(i).getNumForKey(columns[i]);
+					else
+						values[i] = Float.valueOf(columns[i]);
+				}
+				return values;
+			}
+		} catch (Exception e) {
+			PSLogging.logger.error("Error reading line", e);
+		}
+		return null;
+	}
+	
 	public CSVDataSet getDataSet() {
 		return dataSet;
 	}

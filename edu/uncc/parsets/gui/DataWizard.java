@@ -29,6 +29,7 @@ import javax.swing.table.AbstractTableModel;
 
 import net.miginfocom.swing.MigLayout;
 import edu.uncc.parsets.data.DataType;
+import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.data.old.CSVDataSet;
 import edu.uncc.parsets.data.old.CSVParser;
 import edu.uncc.parsets.data.old.CSVParserListener;
@@ -101,6 +102,8 @@ public class DataWizard implements CSVParserListener {
 	private JTextField sectionTF;
 
 	private JLabel statusLabel;
+
+	private CSVParser csvParser;
 
 	class DataTableModel extends AbstractTableModel implements ListSelectionListener {
 
@@ -203,7 +206,7 @@ public class DataWizard implements CSVParserListener {
 	    if (fileName != null) {
 	    	progressBar.setIndeterminate(true);
 	    	statusLabel.setText("Analyzing CSV file ...");
-	    	CSVParser csvParser = new CSVParser(fileName, this);
+	    	csvParser = new CSVParser(fileName, this);
 	    	csvParser.analyzeCSVFile();
 	    } else {
 	    	wizardFrame.setVisible(false);
@@ -240,13 +243,7 @@ public class DataWizard implements CSVParserListener {
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
-//						LocalDB.getDefaultDB().addLocalDBDataSet(data);
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								wizardFrame.setVisible(false);
-							}
-						});
+						csvParser.streamToDB(LocalDB.getDefaultDB());
 					}
 				}).start();
 			}
@@ -364,6 +361,16 @@ public class DataWizard implements CSVParserListener {
 					progressBar.setValue(progress);
 				} else
 					progressBar.setIndeterminate(true);
+			}
+		});
+	}
+
+	@Override
+	public void importDone() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				wizardFrame.setVisible(false);
 			}
 		});
 	}

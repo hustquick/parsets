@@ -93,8 +93,12 @@ public class DataDimension {
 		}
 	}
 
-	public Map<String, Integer> getOccurrenceCounts() {
-		return occurrenceCounts;
+	public int getOccurrenceCount(String key) {
+		Integer count = occurrenceCounts.get(key);
+		if (count != null)
+			return count;
+		else
+			return 0;
 	}
 	
 	public List<String> getValues() {
@@ -147,5 +151,9 @@ public class DataDimension {
 	
 	public void setName(String newName) {
 		name = newName;
+	}
+	
+	public int getNumForKey(String key) {
+		return categoryMap.get(key);
 	}
 }
