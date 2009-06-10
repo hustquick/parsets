@@ -31,13 +31,25 @@ package edu.uncc.parsets.data.old;
 
 public interface CSVParserListener {
 
+	/**
+	 * Called at the end of {@link CSVParser#analyzeCSVFile()}.
+	 * 
+	 * @param data The dataset, containing dimensions with metadata (if any)
+	 * and category definitions and stats.
+	 */
 	public void setDataSet(CSVDataSet data);
 	
 	/**
 	 * Will be called with values from 0 to 100 during parsing. If length of
 	 * file is unknown, will be called with value of -1.
-	 * @param progress
+	 * 
+	 * @param progress Parsing progress from 0 to 100 or -1
 	 */
 	public void setProgress(int progress);
+	
+	/**
+	 * Called when the complete import is done.
+	 */
+	public void importDone();
 	
 }
