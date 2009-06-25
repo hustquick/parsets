@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +66,8 @@ import edu.uncc.parsets.util.PSLogging;
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-public class ParSetsView implements GLEventListener, DataSetListener, AnimationListener {
+public class ParSetsView implements GLEventListener, DataSetListener,
+									AnimationListener, MouseListener {
 
 	private static final GLU glu = new GLU();
 	private int width;
@@ -102,6 +105,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 
 	boolean antialias = true;
 	private boolean strongerSelection = true;
+	private boolean mouseInDisplay = false;
 	
 	public ParSetsView(Component canv, Controller ctrl) {
 		canvas = canv;
@@ -110,6 +114,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 		controller.parSetsView = this;
 		ParSetsInteraction interaction = new ParSetsInteraction(this);
 		canvas.addMouseListener(interaction);
+		canvas.addMouseListener(this);
 		canvas.addMouseMotionListener(interaction);
 		dimensionList = new ArrayList<DimensionHandle>();
 		categoryLists = new ArrayList<ArrayList<CategoryHandle>>();
@@ -150,7 +155,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 			
 			gl.glEnable(GL.GL_BLEND);
 
-			if (tooltip != null && strongerSelection )
+			if (strongerSelection && mouseInDisplay)
 				connectionTree.display(gl, .5f);
 			else
 				connectionTree.display(gl, .8f);
@@ -161,7 +166,6 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 			
 			if (tooltip != null && showTooltips) 
 				tooltip.display(gl, categoryTextRenderer, categoryFontMetrics);
-			
 			
 			gl.glDisable(GL.GL_BLEND);
 		}
@@ -522,6 +526,30 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 	
 	public CategoryTree getDataTree() {
 		return dataTree;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		mouseInDisplay = true;
+		repaint();
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		mouseInDisplay = false;
+		repaint();
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
 	}
 		
 }
