@@ -2,7 +2,6 @@ package edu.uncc.parsets.data;
 
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
@@ -75,7 +74,7 @@ public class LocalDB {
 	 * entry in the Admin_Settings table, and will allow us to open old dbs
 	 * even when the schema changes.
 	 */
-	private static final int SCHEMA_VERSION = 1000;
+	private static final int SCHEMA_VERSION = 2000;
 	
 	public static final String LOCALDBFILENAME = "local.db";
 
@@ -304,24 +303,11 @@ public class LocalDB {
 	public String addLocalDBDataSet(CSVDataSet dataSet, CSVParser parser) {
 		ArrayList<DataDimension> catDims = new ArrayList<DataDimension>(dataSet.getNumDimensions());
 		ArrayList<DataDimension> numDims = new ArrayList<DataDimension>(dataSet.getNumDimensions());
-		
-		int bits = 0;
-		BigInteger combinations = BigInteger.ONE;
-		for (DataDimension d : dataSet)
-			if (d.getDataType() == DataType.categorical) {
-				combinations = combinations.multiply(BigInteger.valueOf(d.getNumCategories()));
-				bits += CategoryKeyDef.numBits(d.getNumCategories() + 1);
-				catDims.add(d);
-			} else
-				numDims.add(d);
-		
+				
 		PSLogging.logger.info("Storing data set " + dataSet.getName());
 		PSLogging.logger.info(dataSet.getNumRecords() + " records");
 		PSLogging.logger.info(catDims.size() + " (categorical) dimensions");
 		PSLogging.logger.info(numDims.size() + " measures");
-		PSLogging.logger.info(combinations + " potential combinations ("
-				+ combinations.bitLength() + " bits)");
-		PSLogging.logger.info("Key length: " + bits + " bits");
 
 		// where is map() when I need it?
 		int categories[] = new int[catDims.size()];
@@ -331,15 +317,13 @@ public class LocalDB {
 			i++;
 		}
 		
-		CategoryKeyDef keyDef = new CategoryKeyDef(categories);
-
 		Statement stmt = null;
 		String handle = null;
 		try {
 			stmt = createStatement(DBAccess.FORWRITING);
 			stmt.execute("begin transaction;");
-			handle = writeAdmin(dataSet, catDims, numDims, keyDef);
-			writeData(parser, handle, catDims, numDims, keyDef);
+			handle = writeAdmin(dataSet, catDims, numDims);
+			writeData(parser, handle, catDims, numDims);
 			stmt.execute("commit;");
 		} catch (SQLException e) {
 			PSLogging.logger.error("Could not write dataset to local DB.", e);
@@ -365,7 +349,7 @@ public class LocalDB {
 	}
 
 
-	private String writeAdmin(CSVDataSet dataSet, ArrayList<DataDimension> catDims, ArrayList<DataDimension> numDims, CategoryKeyDef keyDef) {
+	private String writeAdmin(CSVDataSet dataSet, ArrayList<DataDimension> catDims, ArrayList<DataDimension> numDims) {
 		String dsHandle = null;
 		PreparedStatement dsStmt = null;
 		PreparedStatement dimStmt = null;
@@ -388,7 +372,7 @@ public class LocalDB {
 			dsStmt.addBatch();
 			dsStmt.executeBatch();
 			
-			dimStmt = db.prepareStatement("insert into Admin_Dimensions values (?, ?, ?, ?, ?, ?);");
+			dimStmt = db.prepareStatement("insert into Admin_Dimensions values (?, ?, ?, ?);");
 			catStmt = db.prepareStatement("insert into Admin_Categories values (?, ?, ?, ?, ?, ?);");
 			int dimNum = 0;
 			for (DataDimension dim : dataSet) {
@@ -398,8 +382,6 @@ public class LocalDB {
 				dimStmt.setString(3, dimHandle);
 				dimStmt.setString(4, dim.getDataType().toString());
 				if (dim.getDataType() == DataType.categorical) {
-					dimStmt.setInt(5, keyDef.getLeftShift(dimNum));
-					dimStmt.setInt(6, (int)(keyDef.getBitMask(dimNum) >> keyDef.getLeftShift(dimNum)));
 					dimNum++;
 					for (int catNum = 0; catNum < dim.getNumCategories(); catNum++) {
 						catStmt.setString(1, dsHandle);
@@ -512,10 +494,11 @@ public class LocalDB {
 		return false;
 	}
 	
-	private void writeData(CSVParser parser, String handle, List<DataDimension> catDims, List<DataDimension> numDims, CategoryKeyDef keyDef) {
+	private void writeData(CSVParser parser, String handle, List<DataDimension> catDims, List<DataDimension> numDims) {
 		CSVDataSet dataSet = parser.getDataSet();
 		int keyArray[] = new int[catDims.size()];
-		Map<CategoryKey, CubeValues> cubeValues = new TreeMap<CategoryKey, CubeValues>();
+		ArrayList<CubeValues> cubeValues = new ArrayList<CubeValues>(10000);
+		int key = 1;
 		PreparedStatement measureStmt = null;
 		try {
 			if (numDims.size() > 0) {
@@ -539,23 +522,22 @@ public class LocalDB {
 						numIndex++;
 					}
 				}
-
-				CategoryKey key = new CategoryKey(keyArray, keyDef);
 	
 				CubeValues values = cubeValues.get(key);
 				if (values == null)
-					cubeValues.put(key, new CubeValues(keyArray));
+					cubeValues.set(key, new CubeValues(keyArray));
 				else
 					values.count++;
 	
 				recordNum++;
 				if (numDims.size() > 0) {
-					measureStmt.setLong(1, key.getKeyValue());
+					measureStmt.setLong(1, key);
 					measureStmt.addBatch();
 					if ((recordNum & 0xff) == 0)
 						measureStmt.executeBatch();
 				}
 				record = parser.readNextLine();
+				key++;
 			}
 			if (numDims.size() > 0)
 				measureStmt.executeBatch();
@@ -579,9 +561,9 @@ public class LocalDB {
 		try {
 			int numCube = 0;
 			dimsStmt = db.prepareStatement(dimsSB.toString());
-			for (Map.Entry<CategoryKey, CubeValues> e : cubeValues.entrySet()) {
-				dimsStmt.setLong(1, e.getKey().getKeyValue());
-				CubeValues vals = e.getValue();
+			for (int keyValue = 1; keyValue < cubeValues.size(); keyValue++) {
+				dimsStmt.setLong(1, keyValue);
+				CubeValues vals = cubeValues.get(keyValue);
 				dimsStmt.setInt(2, vals.count);
 				for (int i = 0; i < vals.categoryValues.length; i++)
 					dimsStmt.setInt(i+3, vals.categoryValues[i]);

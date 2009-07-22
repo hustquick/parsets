@@ -60,9 +60,9 @@ public class JSONExport {
 	 * that requires an update of the reader adds 100. A change in the first
 	 * digit would mean a complete revamp of the data model.
 	 */
-	public static final int JSONVERSION = 1000;
+	public static final int JSONVERSION = 2000;
 
-	public static final int JSONMAXCOMPATIBLEVERSION = 1099;
+	public static final int JSONMAXCOMPATIBLEVERSION = 2099;
 	
 	public static final String METAKEY = "%meta";
 

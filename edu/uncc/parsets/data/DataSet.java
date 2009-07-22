@@ -118,6 +118,4 @@ public abstract class DataSet implements Iterable<DimensionHandle>, Comparable<D
 		assert false : "hashCode not designed";
 		return 42; // any arbitrary constant will do
 	}
-
-	
 }

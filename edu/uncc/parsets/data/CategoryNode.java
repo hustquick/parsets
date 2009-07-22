@@ -33,10 +33,8 @@ import java.util.Iterator;
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-public class CategoryNode implements Iterable<CategoryNode>{
+public class CategoryNode implements Iterable<CategoryNode>, Comparable<CategoryNode> {
 
-	private CategoryKey key;
-	
 	private int count;
 	
 	private float ratio;
@@ -49,29 +47,18 @@ public class CategoryNode implements Iterable<CategoryNode>{
 	
 	private ArrayList<CategoryNode> children = new ArrayList<CategoryNode>();
 
+	private String pathName;
+	
 	protected CategoryNode(CategoryNode parent, CategoryHandle toCategory, int count) {
 		this.parent = parent;
 		this.toCategory = toCategory;
 		this.count = count;
 		if (parent != null) {
 			parent.addChild(this);
-			key = new CategoryKey(parent.key, toCategory);
-		}
+			pathName = parent.pathName+"/"+toCategory.getName();
+		} else
+			pathName = "//";
 		visible = true;
-	}
-
-	/**
-	 * Additional constructor that also supplies the key. This is only used
-	 * in {@link LocalDBDataSet#getTree(java.util.List)}
-	 * 
-	 * @param parent
-	 * @param toCategory
-	 * @param key
-	 * @param count
-	 */
-	protected CategoryNode(CategoryNode parent, CategoryHandle toCategory, CategoryKey key, int count) {
-		this(parent, toCategory, count);
-		this.key = key;
 	}
 	
 	public int getCount() {
@@ -80,10 +67,6 @@ public class CategoryNode implements Iterable<CategoryNode>{
 
 	public float getRatio() {
 		return ratio;
-	}
-	
-	public CategoryKey getKey() {
-		return key;
 	}
 	
 	public String getTooltipText(int filteredTotal) {		
@@ -152,7 +135,7 @@ public class CategoryNode implements Iterable<CategoryNode>{
 	}
 	
 	public void print() {
-		System.err.println(key+" => "+count);
+		System.err.println(pathName+" => "+count);
 		for (CategoryNode n : children)
 			n.print();
 	}
@@ -173,5 +156,21 @@ public class CategoryNode implements Iterable<CategoryNode>{
 		for (CategoryNode child : children) {
 			child.setVisible(visible);
 		}
+	}
+
+	@Override
+	public int compareTo(CategoryNode o) {
+		return pathName.compareTo(o.pathName);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return (o instanceof CategoryNode) && compareTo((CategoryNode)o) == 0;
+	}
+	
+	@Override
+	public int hashCode() {
+		assert false : "hashCode not designed";
+		return 42; // any arbitrary constant will do
 	}
 }

@@ -62,7 +62,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	}
 
 	public int compareTo(BasicRibbon o) {
-		return node.getKey().compareTo(o.node.getKey());
+		return node.compareTo(o.node);
 	}
 
 	@Override

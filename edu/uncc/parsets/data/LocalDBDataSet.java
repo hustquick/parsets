@@ -59,8 +59,6 @@ public class LocalDBDataSet extends DataSet {
 	
 	private ArrayList<DimensionHandle> dimHandles;
 	
-	private CategoryKeyDef keyDef;
-
 	private int numRecords;
 
 	private String url = "";
@@ -131,7 +129,7 @@ public class LocalDBDataSet extends DataSet {
 			ResultSet rs = stmt.executeQuery(query.toString());
 			CategoryNode thisLine[] = new CategoryNode[dimensions.size()+1];
 			CategoryNode previousLine[] = new CategoryNode[dimensions.size()+1];
-			CategoryNode root = new CategoryNode(null, null, new CategoryKey(0, keyDef), 0);
+			CategoryNode root = new CategoryNode(null, null, 0);
 			tree.addtoLevel(0, root);
 			// this would be much prettier as a recursive function, but the
 			// semantics and side effects of the ResultSet make that very
@@ -204,18 +202,13 @@ public class LocalDBDataSet extends DataSet {
 		try {
 			Statement stmt = db.createStatement(DBAccess.FORREADING);
 			dimHandles = new ArrayList<DimensionHandle>();
-			ResultSet rs = stmt.executeQuery("select name, handle, type, leftShift, bitMask from Admin_Dimensions where dataSet = '"+dbHandle+"';");
-			List<Integer> leftShifts = new ArrayList<Integer>();
-			List<Integer> masks = new ArrayList<Integer>();
+			ResultSet rs = stmt.executeQuery("select name, handle, type from Admin_Dimensions where dataSet = '"+dbHandle+"';");
 			int dimNum = 0;
 			while (rs.next()) {
 				dimHandles.add(new DimensionHandle(rs.getString(1), rs.getString(2), DataType.typeFromString(rs.getString(3)), dimNum, this));
-				leftShifts.add(rs.getInt(4));
-				masks.add(rs.getInt(5));
 				dimNum++;
 			}
 			rs.close();
-			keyDef = new CategoryKeyDef(leftShifts, masks);
 			if (RECORDOPENTIMES)
 				stmt.executeUpdate("update Admin_DataSets set lastOpened=datetime('now') where handle='"+dbHandle+"';");
 		} catch (SQLException e) {
@@ -270,10 +263,6 @@ public class LocalDBDataSet extends DataSet {
 		return 0;
 	}
 
-	public CategoryKeyDef getKeyDef() {
-		return keyDef;
-	}
-	
 	public int getNumDimensions() {
 		if (dimHandles == null)
 			loadDimensions();
