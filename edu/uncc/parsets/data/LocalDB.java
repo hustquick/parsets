@@ -144,7 +144,11 @@ public class LocalDB {
 
 	    	if (!initialized)
 	    		initializeDB();
-	    	
+	    	else {
+	    		int dbVersion = Integer.parseInt(getSetting("schema_version"));
+	    		if (dbVersion < SCHEMA_VERSION)
+	    			migrate1000to2000();
+	    	}
 		} catch (ClassNotFoundException e) {
 			PSLogging.logger.fatal("SQLite could not be initialized.", e);
 		} catch (SQLException e) {
@@ -210,7 +214,7 @@ public class LocalDB {
 			statement.execute("insert into Admin_Settings values ('schema_version', '"+SCHEMA_VERSION+"');");
 			statement.execute("insert into Admin_Settings values ('"+LAST_VERSION_SEEN_KEY+"', '"+ParallelSets.VERSION+"');");
 			statement.execute("create table Admin_Datasets (name TEXT, handle TEXT PRIMARY KEY, type TEXT, numDimensions INTEGER, numRecords INTEGER, section TEXT, dateAdded TEXT, lastOpened TEXT, dataURL TEXT, source TEXT, srcURL TEXT);");
-	        statement.execute("create table Admin_Dimensions (dataSet TEXT, name TEXT, handle TEXT, type TEXT, leftShift INTEGER, bitMask INTEGER);");
+	        statement.execute("create table Admin_Dimensions (dataSet TEXT, name TEXT, handle TEXT, type TEXT);");
 	        statement.execute("create table Admin_Categories (dataSet TEXT, dimension TEXT, name TEXT, handle TEXT, number INTEGER, count INTEGER);");
 	        statement.execute("create index Admin_Dimensions_Handle on Admin_Dimensions (dataSet);");
 	        statement.execute("create index Admin_Categories_DSHandle on Admin_Categories (dataSet, dimension);");
@@ -303,7 +307,12 @@ public class LocalDB {
 	public String addLocalDBDataSet(CSVDataSet dataSet, CSVParser parser) {
 		ArrayList<DataDimension> catDims = new ArrayList<DataDimension>(dataSet.getNumDimensions());
 		ArrayList<DataDimension> numDims = new ArrayList<DataDimension>(dataSet.getNumDimensions());
-				
+		
+		for (DataDimension d : dataSet)
+			if (d.getDataType() == DataType.categorical)
+				catDims.add(d);
+			else
+				numDims.add(d);
 		PSLogging.logger.info("Storing data set " + dataSet.getName());
 		PSLogging.logger.info(dataSet.getNumRecords() + " records");
 		PSLogging.logger.info(catDims.size() + " (categorical) dimensions");
@@ -641,5 +650,42 @@ public class LocalDB {
 			releaseWriteLock();
 		}
 	}
+
+	/**
+	 * Migrate DB schema version 1000 to 2000.
+	 * 
+	 * SQLite does not implement ALTER TABLE DROP COLUMN, so we need to create
+	 * a temporary table, copy the values, drop the original, and rename the
+	 * temporary table.
+	 */
+	private void migrate1000to2000() {
+		PSLogging.logger.info("Migrating DB from version 1000 to version 2000.");
+		Statement stmt = null;
+		try {
+			stmt = createStatement(DBAccess.FORWRITING);
+			stmt.execute("begin transaction;");
+			stmt.execute("create table Admin_Dims (dataSet TEXT, name TEXT, handle TEXT, type TEXT);");
+			stmt.execute("insert into Admin_Dims select dataSet, name, handle, type from Admin_Dimensions;");
+			stmt.execute("drop table Admin_Dimensions;");
+			stmt.execute("alter table Admin_Dims rename to Admin_Dimensions;");
+			stmt.execute("commit;");
+		} catch (SQLException e) {
+			PSLogging.logger.fatal("Could not migrate DB", e);
+			try {
+				stmt.execute("rollback;");
+			} catch (SQLException e1) {
+				PSLogging.logger.fatal("Could not roll back changes", e);
+			}
+		} finally {
+			releaseWriteLock();
+			if (stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					PSLogging.logger.error("Error closing DB statement.", e);
+				}
+		}
+	}
+
 	
 }
