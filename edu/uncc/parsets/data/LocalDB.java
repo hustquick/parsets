@@ -81,6 +81,8 @@ public class LocalDB {
 	private static final LocalDB defaultDB;
 
 	public static final String LAST_VERSION_SEEN_KEY = "last_version_seen";
+
+	private static final String DB_SCHEMA_KEY = "schema_version";
 	
 	private final ReentrantReadWriteLock dbLock = new ReentrantReadWriteLock();
 
@@ -145,7 +147,7 @@ public class LocalDB {
 	    	if (!initialized)
 	    		initializeDB();
 	    	else {
-	    		int dbVersion = Integer.parseInt(getSetting("schema_version"));
+	    		int dbVersion = Integer.parseInt(getSetting(DB_SCHEMA_KEY));
 	    		if (dbVersion < SCHEMA_VERSION)
 	    			migrate1000to2000();
 	    	}
@@ -211,7 +213,7 @@ public class LocalDB {
 			statement.execute("begin transaction;");
 			statement.execute("create table Admin_Settings (key TEXT PRIMARY KEY, value TEXT);");
 			statement.execute("insert into Admin_Settings values ('creator', '"+MainWindow.WINDOWTITLE+"');");
-			statement.execute("insert into Admin_Settings values ('schema_version', '"+SCHEMA_VERSION+"');");
+			statement.execute("insert into Admin_Settings values ('"+DB_SCHEMA_KEY+"', '"+SCHEMA_VERSION+"');");
 			statement.execute("insert into Admin_Settings values ('"+LAST_VERSION_SEEN_KEY+"', '"+ParallelSets.VERSION+"');");
 			statement.execute("create table Admin_Datasets (name TEXT, handle TEXT PRIMARY KEY, type TEXT, numDimensions INTEGER, numRecords INTEGER, section TEXT, dateAdded TEXT, lastOpened TEXT, dataURL TEXT, source TEXT, srcURL TEXT);");
 	        statement.execute("create table Admin_Dimensions (dataSet TEXT, name TEXT, handle TEXT, type TEXT);");
@@ -669,15 +671,17 @@ public class LocalDB {
 			stmt.execute("drop table Admin_Dimensions;");
 			stmt.execute("alter table Admin_Dims rename to Admin_Dimensions;");
 			stmt.execute("commit;");
+			releaseWriteLock();
+			storeSetting(DB_SCHEMA_KEY, "2000");
 		} catch (SQLException e) {
 			PSLogging.logger.fatal("Could not migrate DB", e);
+			releaseWriteLock();
 			try {
 				stmt.execute("rollback;");
 			} catch (SQLException e1) {
 				PSLogging.logger.fatal("Could not roll back changes", e);
 			}
 		} finally {
-			releaseWriteLock();
 			if (stmt != null)
 				try {
 					stmt.close();
