@@ -2,12 +2,12 @@
 Version history for Parallel Sets
 Ticket numbers refer to issues at http://code.google.com/p/parsets/issues/list
 
-V2.1, 2009-06-
+V2.1, 2009-07-
 	* Add menu
 	* Add screenshot function (issue #9)
 	* Add way to reinitialize database
 	* Add option to make highlighted ribbons/bars stand out more (issue #6)
-
+	* Show what's new in version check dialog
 
 V2.0, 2009-06-01
 	* Original release

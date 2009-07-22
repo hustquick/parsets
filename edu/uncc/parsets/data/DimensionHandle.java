@@ -72,7 +72,7 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 	protected int getNum() {
 		return num;
 	}
-	
+
 	public Iterator<CategoryHandle> iterator() {
 		if (categories == null)
 			loadCategories();
@@ -85,7 +85,7 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 			Statement stmt = dataSet.getDB().createStatement(DBAccess.FORREADING);
 			ResultSet rs = stmt.executeQuery("select name, handle, number, count from Admin_Categories where dataSet='"+dataSet.getHandle()+"' and dimension='"+handle+"';");
 			while (rs.next())
-				categories.add(new CategoryHandle(rs.getString(1), rs.getString(2), rs.getInt(3), this, rs.getInt(4), dataSet.getKeyDef()));
+				categories.add(new CategoryHandle(rs.getString(1), rs.getString(2), rs.getInt(3), this, rs.getInt(4)));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {

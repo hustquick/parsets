@@ -35,21 +35,16 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 	private String handle;
 	private int num;
 	private DimensionHandle dimension;
-	private CategoryKey key;
 	private int apriori;
 	
-	protected static final CategoryHandle ROOT = new CategoryHandle("ROOT", "ROOT", 0, null, 0, null);
+	protected static final CategoryHandle ROOT = new CategoryHandle("ROOT", "ROOT", 0, null, 0);
 	
-	public CategoryHandle(String name, String handle, int num, DimensionHandle dim, int count, CategoryKeyDef keyDef) {
+	public CategoryHandle(String name, String handle, int num, DimensionHandle dim, int count) {
 		this.name = name;
 		this.handle = handle;
 		this.num = num;
 		dimension = dim;
 		apriori = count;
-		if (dim != null)
-			key = new CategoryKey(((long)num) << keyDef.getLeftShift(dim.getNum()), keyDef);
-		else
-			key = new CategoryKey(0L, null); // only for ROOT constant 
 	}
 	
 	public String getName() {
@@ -80,13 +75,9 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 	public DimensionHandle getDimension() {
 		return dimension;
 	}
-
-	protected CategoryKey getKey() {
-		return key;
-	}
 	
 	public int compareTo(CategoryHandle o) {
-		return key.compareTo(o.key);
+		return name.compareTo(o.name);
 	}
 
 	@Override
