@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -103,18 +104,31 @@ public class LocalDB {
 	}
 	
 	/** 
-	 * Simple storage class to hold information for {@link #addLocalDBDataSet}.
-	 *
+	 * Simple storage class to hold information for {@link LocalDB#writeData(CSVParser, String, List, List)}.
+	 * No longer copies the vaues array!
 	 */
 	private static class CubeValues {
 		public int count;
 		public int categoryValues[];
-		public CubeValues(int values[]) {
+		public int key;
+
+		public CubeValues(int values[], int cubeKey) {
 			count = 1;
-			// Java 6 has Arrays.copyOf() for this purpose ...
-			categoryValues = new int[values.length];
-			for (int i = 0; i < values.length; i++)
-				categoryValues[i] = values[i];
+			key = cubeKey;
+			categoryValues = values;
+		}
+	}
+
+	/**
+	 * This is strictly for int arrays of the same size, like use in {@link LocalDB#addLocalDBDataSet(CSVDataSet, CSVParser)}
+	 */
+	private static class IntArrayComparator implements Comparator<int[]> {
+		@Override
+		public int compare(int[] o1, int[] o2) {
+			for (int i = 0; i < o1.length; i++)
+				if (o1[i] != o2[i])
+					return o1[i]-o2[i];
+			return 0;
 		}
 	}
 	
@@ -385,7 +399,6 @@ public class LocalDB {
 			
 			dimStmt = db.prepareStatement("insert into Admin_Dimensions values (?, ?, ?, ?);");
 			catStmt = db.prepareStatement("insert into Admin_Categories values (?, ?, ?, ?, ?, ?);");
-			int dimNum = 0;
 			for (DataDimension dim : dataSet) {
 				dimStmt.setString(1, dsHandle);
 				dimStmt.setString(2, dim.getName());
@@ -393,7 +406,6 @@ public class LocalDB {
 				dimStmt.setString(3, dimHandle);
 				dimStmt.setString(4, dim.getDataType().toString());
 				if (dim.getDataType() == DataType.categorical) {
-					dimNum++;
 					for (int catNum = 0; catNum < dim.getNumCategories(); catNum++) {
 						catStmt.setString(1, dsHandle);
 						catStmt.setString(2, dimHandle);
@@ -403,9 +415,6 @@ public class LocalDB {
 						catStmt.setInt(6, dim.getOccurrenceCount(dim.getCategoryKey(catNum)));
 						catStmt.addBatch();
 					}
-				} else {
-					dimStmt.setInt(5, 0);
-					dimStmt.setInt(6, 0);
 				}
 				dimStmt.addBatch();
 			}
@@ -508,7 +517,7 @@ public class LocalDB {
 	private void writeData(CSVParser parser, String handle, List<DataDimension> catDims, List<DataDimension> numDims) {
 		CSVDataSet dataSet = parser.getDataSet();
 		int keyArray[] = new int[catDims.size()];
-		ArrayList<CubeValues> cubeValues = new ArrayList<CubeValues>(10000);
+		TreeMap<int[], CubeValues> cubes = new TreeMap<int[], CubeValues>(new IntArrayComparator());
 		int key = 1;
 		PreparedStatement measureStmt = null;
 		try {
@@ -533,22 +542,23 @@ public class LocalDB {
 						numIndex++;
 					}
 				}
-	
-				CubeValues values = cubeValues.get(key);
-				if (values == null)
-					cubeValues.set(key, new CubeValues(keyArray));
-				else
-					values.count++;
-	
+
+				CubeValues cube = cubes.get(keyArray);
+				if (cube != null)
+					cube.count++;
+				else {
+					int keyArrayCopy[] = Arrays.copyOf(keyArray, keyArray.length);
+					cubes.put(keyArrayCopy, new CubeValues(keyArrayCopy, key));
+					key++;
+				}	
 				recordNum++;
 				if (numDims.size() > 0) {
-					measureStmt.setLong(1, key);
+					measureStmt.setInt(1, key);
 					measureStmt.addBatch();
 					if ((recordNum & 0xff) == 0)
 						measureStmt.executeBatch();
 				}
 				record = parser.readNextLine();
-				key++;
 			}
 			if (numDims.size() > 0)
 				measureStmt.executeBatch();
@@ -563,7 +573,7 @@ public class LocalDB {
 			}
 		}
 
-		PSLogging.logger.info(cubeValues.size()+" cube values");
+		PSLogging.logger.info(cubes.size()+" cube values");
 		StringBuffer dimsSB = new StringBuffer("insert into "+handle+"_dims values (?, ?");
 		for (int i = 0; i < catDims.size(); i++)
 			dimsSB.append(", ?");
@@ -572,12 +582,11 @@ public class LocalDB {
 		try {
 			int numCube = 0;
 			dimsStmt = db.prepareStatement(dimsSB.toString());
-			for (int keyValue = 1; keyValue < cubeValues.size(); keyValue++) {
-				dimsStmt.setLong(1, keyValue);
-				CubeValues vals = cubeValues.get(keyValue);
-				dimsStmt.setInt(2, vals.count);
-				for (int i = 0; i < vals.categoryValues.length; i++)
-					dimsStmt.setInt(i+3, vals.categoryValues[i]);
+			for (CubeValues cube : cubes.values()) {
+				dimsStmt.setInt(1, cube.key);
+				dimsStmt.setInt(2, cube.count);
+				for (int i = 0; i < cube.categoryValues.length; i++)
+					dimsStmt.setInt(i+3, cube.categoryValues[i]);
 				numCube++;
 				dimsStmt.addBatch();
 				if ((numCube & 0xff) == 0)
