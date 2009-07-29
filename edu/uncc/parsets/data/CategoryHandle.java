@@ -36,8 +36,9 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 	private int num;
 	private DimensionHandle dimension;
 	private int apriori;
-	
-	protected static final CategoryHandle ROOT = new CategoryHandle("ROOT", "ROOT", 0, null, 0);
+	// used for comparing categories, so that the same name in different
+	// dimensions doesn't look like the same handle
+	private String categoryID;
 	
 	public CategoryHandle(String name, String handle, int num, DimensionHandle dim, int count) {
 		this.name = name;
@@ -45,6 +46,7 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 		this.num = num;
 		dimension = dim;
 		apriori = count;
+		categoryID = dim.getHandle()+":"+handle;
 	}
 	
 	public String getName() {
@@ -77,7 +79,7 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 	}
 	
 	public int compareTo(CategoryHandle o) {
-		return name.compareTo(o.name);
+		return categoryID.compareTo(o.categoryID);
 	}
 
 	@Override

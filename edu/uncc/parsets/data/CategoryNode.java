@@ -57,7 +57,7 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 			parent.addChild(this);
 			pathName = parent.pathName+"/"+toCategory.getName();
 		} else
-			pathName = "//";
+			pathName = "/";
 		visible = true;
 	}
 	
@@ -129,7 +129,6 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 			for (CategoryNode n : children) {
 				if (n.isVisible()) 
 					n.ratio = (float)n.count/(float)count;
-				
 			}			
 		}
 	}

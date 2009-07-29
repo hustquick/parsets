@@ -2,6 +2,7 @@ package edu.uncc.parsets.data;
 
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
@@ -122,7 +123,9 @@ public class LocalDB {
 	/**
 	 * This is strictly for int arrays of the same size, like use in {@link LocalDB#addLocalDBDataSet(CSVDataSet, CSVParser)}
 	 */
-	private static class IntArrayComparator implements Comparator<int[]> {
+	private static class IntArrayComparator implements Comparator<int[]>, Serializable {
+		private static final long serialVersionUID = -3430764319461553139L;
+
 		@Override
 		public int compare(int[] o1, int[] o2) {
 			for (int i = 0; i < o1.length; i++)
