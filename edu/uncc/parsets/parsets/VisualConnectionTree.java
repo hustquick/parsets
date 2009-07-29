@@ -452,55 +452,6 @@ public class VisualConnectionTree {
 		clearSelection();
 		
 		selectCategory(category, root);
-
-//		List<GenericTreeNode<OLD_VisualConnection>> treeList = toList();
-//
-//		float values[] = dimension.getValues();
-//
-//		for (GenericTreeNode<OLD_VisualConnection> connection : treeList) {
-//
-//			// On the top level bar, this just means selecting the corresponding
-//			// invisible.
-//
-//			if (connection.getData().getLowerDimension() == dimension
-//					&& connection.getData() instanceof InvisibleConnection) {
-//
-//				if (connection.getData().getNode().getCategoryKey() == category) {
-//
-//					setSelected(connection);
-//					return;
-//
-//				}
-//
-//			}
-//
-//			// On other bars, this involves partial highlighting.
-//
-//			if (connection.getData() instanceof BasicRibbon) {
-//
-//				// Find out the percentage of items in this node with this
-//				// category value.
-//
-//				Vector<Integer> pointsInNode = connection.getData().getNode().getPointList();
-//
-//				float highlightNumber = 0;
-//
-//				for (int point : pointsInNode) {
-//
-//					if (values[point] == category) {
-//						highlightNumber++;
-//					}
-//
-//				}
-//
-//				float percentage = highlightNumber / ((float) connection.getData().getNode().getValue());
-//
-//				((OLD_BasicRibbon) connection.getData()).setSelectionPercentage(percentage);
-//
-//			}
-//
-//		}
-
 	}
 	
 

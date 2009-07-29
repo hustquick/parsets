@@ -89,20 +89,6 @@ public class CategoryTree implements Iterable<List<CategoryNode>> {
 	
 	public float getFilteredFrequency(CategoryHandle cat) {
 		
-//		List<CategoryNode> nodes = new ArrayList<CategoryNode>();
-		
-//		for (int i=0; i<levels.size(); i++) {
-//			if (getNodesForCategory(i, cat) != null) 
-//				nodes.addAll(getNodesForCategory(i, cat));
-//		}
-		
-//		float count = 0;
-//
-//		for(CategoryNode node : nodes) {
-//			if (node.isVisible()) 
-//				count += node.getCount();
-//		}
-		
 		float total = 0;
 		
 		List<CategoryNode> nodes = getLevelList(levels.size()-1);
@@ -113,27 +99,21 @@ public class CategoryTree implements Iterable<List<CategoryNode>> {
 		}
 
 		return (float)getFilteredCount(cat)/total;
-		
 	}
-	
+
 	public int getFilteredCount(CategoryHandle cat) {
-		
-		List<CategoryNode> nodes = new ArrayList<CategoryNode>();
-		
-		for (int i=0; i<levels.size(); i++) {
-			if (getNodesForCategory(i, cat) != null) 
-				nodes.addAll(getNodesForCategory(i, cat));
-		}
 		
 		int count = 0;
 
-		for(CategoryNode node : nodes) {
-			if (node.isVisible()) 
-				count += node.getCount();
+		for (int i=0; i<levels.size(); i++) {
+			List<CategoryNode> nodes = getNodesForCategory(i, cat);
+			if (nodes != null)
+				for (CategoryNode node : nodes)
+					if (node.isVisible()) 
+						count += node.getCount();
 		}
-
-		return count;
 		
+		return count;
 	}
 	
 	public int getFilteredTotal() {
