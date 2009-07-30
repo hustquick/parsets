@@ -83,38 +83,35 @@ public class VersionCheck extends Thread {
 			JSONParser p = new JSONParser();
 			JSONObject versionInfo = (JSONObject) p.parse(reader);
 			String latestVersion = (String) versionInfo.get("latest");
-			LocalDB.getDefaultDB().storeSetting(LocalDB.LAST_VERSION_SEEN_KEY, latestVersion);
 			String versionParts[] = latestVersion.split("\\.");
 			int majorVersion = Integer.parseInt(versionParts[0]);
 			int minorVersion = Integer.parseInt(versionParts[1]);
 			if (majorVersion > ParallelSets.MAJOR_VERSION ||
 				(majorVersion == ParallelSets.MAJOR_VERSION && minorVersion > ParallelSets.MINOR_VERSION)) {
-				if (!latestVersion.equals(LocalDB.getDefaultDB().getSetting(LocalDB.LAST_VERSION_SEEN_KEY))) {
-					JSONArray versions = (JSONArray) versionInfo.get("versions");
-					StringBuilder versionsHTML = new StringBuilder("<html>");
-					for (Object v : versions) {
-						JSONObject version = (JSONObject) v;
-						versionsHTML.append("<p><b>Version ");
-						versionsHTML.append(version.get("version")+"</b> (released ");
-						versionsHTML.append(version.get("release_date")+")</p>");
-						versionsHTML.append(version.get("notes"));
-					}
-					versionsHTML.append("</html>");
-					JTextPane textPane = new JTextPane();
-					textPane.setContentType("text/html");
-					textPane.setText(versionsHTML.toString());
-					textPane.setEditable(false);
-					Box b = new Box(BoxLayout.Y_AXIS);
-					b.add(new JLabel(MESSAGE1));
-					b.add(Box.createVerticalStrut(5));
-					JScrollPane scrollPane = new JScrollPane(textPane);
-					scrollPane.setPreferredSize(new Dimension(300, 300));
-					b.add(scrollPane);
-					b.add(new JLabel(MESSAGE2));
-					int response = JOptionPane.showConfirmDialog(frame, b, TITLE, JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-					if (response == 0)
-						Desktop.getDesktop().browse(new URI(ParallelSets.WEBSITE));
+				JSONArray versions = (JSONArray) versionInfo.get("versions");
+				StringBuilder versionsHTML = new StringBuilder("<html>");
+				for (Object v : versions) {
+					JSONObject version = (JSONObject) v;
+					versionsHTML.append("<p><b>Version ");
+					versionsHTML.append(version.get("version")+"</b> (released ");
+					versionsHTML.append(version.get("release_date")+")</p>");
+					versionsHTML.append(version.get("notes"));
 				}
+				versionsHTML.append("</html>");
+				JTextPane textPane = new JTextPane();
+				textPane.setContentType("text/html");
+				textPane.setText(versionsHTML.toString());
+				textPane.setEditable(false);
+				Box b = new Box(BoxLayout.Y_AXIS);
+				b.add(new JLabel(MESSAGE1));
+				b.add(Box.createVerticalStrut(5));
+				JScrollPane scrollPane = new JScrollPane(textPane);
+				scrollPane.setPreferredSize(new Dimension(300, 300));
+				b.add(scrollPane);
+				b.add(new JLabel(MESSAGE2));
+				int response = JOptionPane.showConfirmDialog(frame, b, TITLE, JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+				if (response == 0)
+					Desktop.getDesktop().browse(new URI(ParallelSets.WEBSITE));
 			}
 		} catch (RuntimeException e) { // to make FindBugs happy
 			PSLogging.logger.info("Could not check for new version.", e);

@@ -82,6 +82,7 @@ public class LocalDB {
 
 	private static final LocalDB defaultDB;
 
+	// deprecated, is being delete from db as of schema version 2000
 	public static final String LAST_VERSION_SEEN_KEY = "last_version_seen";
 
 	private static final String DB_SCHEMA_KEY = "schema_version";
@@ -682,6 +683,7 @@ public class LocalDB {
 			stmt.execute("insert into Admin_Dims select dataSet, name, handle, type from Admin_Dimensions;");
 			stmt.execute("drop table Admin_Dimensions;");
 			stmt.execute("alter table Admin_Dims rename to Admin_Dimensions;");
+			stmt.execute("delete from Admin_Settings where key='"+LAST_VERSION_SEEN_KEY+"';");
 			stmt.execute("commit;");
 			releaseWriteLock();
 			storeSetting(DB_SCHEMA_KEY, "2000");
