@@ -8,8 +8,8 @@ import javax.media.opengl.GL;
 import com.sun.opengl.util.j2d.TextRenderer;
 
 import edu.uncc.parsets.data.CategoryHandle;
-import edu.uncc.parsets.util.AnimatableProperty;
 import edu.uncc.parsets.data.CategoryTree;
+import edu.uncc.parsets.util.AnimatableProperty;
 import edu.uncc.parsets.util.ColorBrewer;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\

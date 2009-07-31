@@ -22,7 +22,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import edu.uncc.parsets.ParallelSets;
-import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.util.PSLogging;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
 

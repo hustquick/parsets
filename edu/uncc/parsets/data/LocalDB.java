@@ -403,10 +403,21 @@ public class LocalDB {
 			
 			dimStmt = db.prepareStatement("insert into Admin_Dimensions values (?, ?, ?, ?);");
 			catStmt = db.prepareStatement("insert into Admin_Categories values (?, ?, ?, ?, ?, ?);");
+			List<String> dimHandles = new ArrayList<String>(dataSet.getNumDimensions());
 			for (DataDimension dim : dataSet) {
 				dimStmt.setString(1, dsHandle);
 				dimStmt.setString(2, dim.getName());
 				String dimHandle = name2handle(dim.getKey());
+				if (dimHandles.contains(dimHandle)) {
+					int suffix = 1;
+					String suffixString = "_"+Integer.toString(suffix);
+					while (dimHandles.contains(dimHandle+suffixString)) {
+						suffix++;
+						suffixString = "_"+Integer.toString(suffix);
+					}
+					dimHandle += suffixString;
+				}
+				dimHandles.add(dimHandle);
 				dimStmt.setString(3, dimHandle);
 				dimStmt.setString(4, dim.getDataType().toString());
 				if (dim.getDataType() == DataType.categorical) {
@@ -427,9 +438,8 @@ public class LocalDB {
 			
 			stmt = db.createStatement();
 			StringBuffer createSB = new StringBuffer("create table "+dsHandle+"_dims (key INTEGER, count INTEGER");
-			for (DataDimension dim : catDims) {
-				String handle = name2handle(dim.getKey());
-				createSB.append(", "); createSB.append(handle); createSB.append(" INTEGER");
+			for (String dimHandle : dimHandles) {
+				createSB.append(", "); createSB.append(dimHandle); createSB.append(" INTEGER");
 			}
 			createSB.append(");");
 			stmt.execute(createSB.toString());
