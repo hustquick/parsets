@@ -167,7 +167,13 @@ public class DataDimension {
 	}
 	
 	public int getNumForKey(String key) {
-		return categoryMap.get(key);
+		// TODO: Debug code that needs to go before release
+		if (categoryMap.containsKey(key))
+			return categoryMap.get(key);
+		else {
+			System.err.println("Can't find "+key+" in dimension "+getName());
+			return 0;
+		}
 	}
 
 	public void setHandle(String dimHandle) {

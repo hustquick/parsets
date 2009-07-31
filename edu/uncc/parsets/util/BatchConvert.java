@@ -6,6 +6,7 @@ import java.util.List;
 
 import edu.uncc.parsets.data.JSONExport;
 import edu.uncc.parsets.data.LocalDB;
+import edu.uncc.parsets.data.LocalDBDataSet;
 import edu.uncc.parsets.data.old.CSVDataSet;
 import edu.uncc.parsets.data.old.CSVParser;
 
@@ -71,14 +72,19 @@ public class BatchConvert {
 				e.printStackTrace();
 			}
 			CSVDataSet csvData = parser.getDataSet();
+			System.out.println("Importing "+csvData.getName()+" ...");
 			String newPath = rebase(f.getPath(), dstDir.getPath())+".json.gz";
 			csvData.setURL(BASEURL+newPath);
-//			String handle = tempDB.addLocalDBDataSet(csvData);
-//			DataSet localDS = tempDB.getDataSet(handle);
-//			JSONExport.exportDataSet((LocalDBDataSet)localDS, newPath);
-//			System.out.println(f.getPath()+" => "+localDS.getURL());
+			parser.streamToDB(tempDB);
 		}
 		
+		for (LocalDBDataSet ds : tempDB.getDataSets()) {
+			String newPath = ds.getURL().substring(BASEURL.length());
+			System.out.println("Exporting "+ds.getName()+" to "+newPath);
+			JSONExport.exportDataSet(ds, newPath);
+		}
+		
+		System.out.println("Exporting index ...");
 		String indexName = JSONExport.exportDBIndex(tempDB, dstDir.getPath()+File.separatorChar+"index");
 		System.out.println("Index: "+indexName);
 		System.out.println("Done.");
@@ -110,6 +116,5 @@ public class BatchConvert {
 			}
 		}
 		return files;
-	}
-	
+	}	
 }
