@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -403,7 +405,7 @@ public class LocalDB {
 			
 			dimStmt = db.prepareStatement("insert into Admin_Dimensions values (?, ?, ?, ?);");
 			catStmt = db.prepareStatement("insert into Admin_Categories values (?, ?, ?, ?, ?, ?);");
-			List<String> dimHandles = new ArrayList<String>(dataSet.getNumDimensions());
+			Set<String> dimHandles = new HashSet<String>(dataSet.getNumDimensions());
 			for (DataDimension dim : dataSet) {
 				dimStmt.setString(1, dsHandle);
 				dimStmt.setString(2, dim.getName());
@@ -418,6 +420,7 @@ public class LocalDB {
 					dimHandle += suffixString;
 				}
 				dimHandles.add(dimHandle);
+				dim.setHandle(dimHandle);
 				dimStmt.setString(3, dimHandle);
 				dimStmt.setString(4, dim.getDataType().toString());
 				if (dim.getDataType() == DataType.categorical) {
@@ -438,8 +441,10 @@ public class LocalDB {
 			
 			stmt = db.createStatement();
 			StringBuffer createSB = new StringBuffer("create table "+dsHandle+"_dims (key INTEGER, count INTEGER");
-			for (String dimHandle : dimHandles) {
-				createSB.append(", "); createSB.append(dimHandle); createSB.append(" INTEGER");
+			for (DataDimension dim : dataSet) {
+				if (dim.getDataType() == DataType.categorical) {
+					createSB.append(", "); createSB.append(dim.getHandle()); createSB.append(" INTEGER");
+				}
 			}
 			createSB.append(");");
 			stmt.execute(createSB.toString());
@@ -447,7 +452,7 @@ public class LocalDB {
 			if (numDims.size() > 0) {
 				createSB = new StringBuffer("create table "+dsHandle+"_measures (key INTEGER");
 				for (DataDimension dim : numDims) {
-					createSB.append(", "+name2handle(dim.getKey()));
+					createSB.append(", "+dim.getHandle());
 					if (dim.getDataType() == DataType.numerical)
 						createSB.append(" REAL");
 					else

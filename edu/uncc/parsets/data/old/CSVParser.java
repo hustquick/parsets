@@ -118,14 +118,18 @@ public class CSVParser {
 			}
 			CSVReader parser = new CSVReader(new FileReader(csvFileName), separator);
 			String[] headerLine = parser.readNext();
-			for (int i = 0; i < headerLine.length; i++)
-				dataSet.instantiateDimension(headerLine[i]);
+			for (String columnName : headerLine)
+				dataSet.instantiateDimension(columnName);
 
+			int numColumns = headerLine.length;
+			
 			if (firstLine != null) {
 				int numBytes = firstLine.length()+1;
 				int numLines = 1;
 				String columns[];
 				while (((columns = parser.readNext()) != null) && (numLines < 100)) {
+					if (columns.length != numColumns)
+						PSLogging.logger.warn("Found "+columns.length+" columns instead of "+numColumns+" in line "+numLines);
 					numLines++;
 					for (int i = 0; i < columns.length; i++) {
 						numBytes += columns[i].length()+1;
@@ -136,14 +140,17 @@ public class CSVParser {
 				File f = new File(csvFileName);
 				numLinesEstimate = (int) (f.length() / numBytes) * numLines;
 				numLinesEstimate /= 100f; // to scale from 0 to 100
-				
-				while ((columns = parser.readNext()) != null) {
+
+				while (columns != null) {
+					if (columns.length != numColumns)
+						PSLogging.logger.warn("Found "+columns.length+" columns instead of "+numColumns+" in line "+numLines);
 					numLines++;
 					if ((numLines & 0xff) == 0 && callBack != null)
 						callBack.setProgress((int)(numLines/numLinesEstimate));
 					for (int i = 0; i < columns.length; i++)
 						dataSet.getDimension(i).addValue(columns[i]);
 					dataSet.setNumRecords(numLines);
+					columns = parser.readNext();
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -159,6 +166,12 @@ public class CSVParser {
 		}
 		if (callBack != null)
 			callBack.setDataSet(dataSet);
+//		for (DataDimension dim : dataSet) {
+//			System.err.print(dim.getName()+": ");
+//			for (int i = 0; i < dim.getNumCategories(); i++)
+//				System.err.print(dim.getCategoryName(i)+", ");
+//			System.err.println();
+//		}
 	}
 	
 	public void streamToDB(LocalDB db) {

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import edu.uncc.parsets.data.DataType;
+import edu.uncc.parsets.util.PSLogging;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -55,6 +56,10 @@ public class DataDimension {
 	private Map<String, Integer> occurrenceCounts = new TreeMap<String, Integer>();
 
 	private List<String> values = new ArrayList<String>(100);
+
+	private boolean hasMetaData = false;
+
+	private String dbHandle;
 	
 	public DataDimension(String key, DataType dataType) {
 		dimensionKey = key;
@@ -70,14 +75,12 @@ public class DataDimension {
 	public void addValue(String value) {
 		if (values.size() < 100)
 			values.add(value);
-		if (occurrenceCounts.size() < 100) {
-			Integer num = occurrenceCounts.get(value);
-			if (num == null)
-				num = Integer.valueOf(1);
-			else
-				num = Integer.valueOf(num+1);
-			occurrenceCounts.put(value, num);
-		}
+		Integer num = occurrenceCounts.get(value);
+		if (num == null)
+			num = Integer.valueOf(1);
+		else
+			num = Integer.valueOf(num+1);
+		occurrenceCounts.put(value, num);
 		switch(type) {
 		case numerical:
 			try {
@@ -91,14 +94,20 @@ public class DataDimension {
 				type = DataType.textual;
 			break;
 		}
+		if (type != DataType.textual)
+			if (!hasMetaData)
+				if (!categoryMap.containsKey(value))
+					addCategory(value, value);
 	}
 
 	public int getOccurrenceCount(String key) {
 		Integer count = occurrenceCounts.get(key);
 		if (count != null)
 			return count;
-		else
+		else {
+			PSLogging.logger.warn("No occurrance count found for '"+key+"'");
 			return 0;
+		}
 	}
 	
 	public List<String> getValues() {
@@ -106,7 +115,10 @@ public class DataDimension {
 	}
 	
 	public String getName() {
-		return name;
+		if (name != null)
+			return name;
+		else
+			return dimensionKey;
 	}
 
 	public String getKey() {
@@ -151,9 +163,18 @@ public class DataDimension {
 	
 	public void setName(String newName) {
 		name = newName;
+		hasMetaData = true;
 	}
 	
 	public int getNumForKey(String key) {
 		return categoryMap.get(key);
+	}
+
+	public void setHandle(String dimHandle) {
+		dbHandle = dimHandle;
+	}
+	
+	public String getHandle() {
+		return dbHandle;
 	}
 }
