@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
 import com.sun.opengl.util.Screenshot;
@@ -25,7 +25,6 @@ import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;
 
-import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.data.CategoryTree;
@@ -123,23 +122,31 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 	public final void display(GLAutoDrawable glDrawable) {
 
 		GL gl = null;
-		if (ParallelSets.isInstalled())
+//		if (ParallelSets.isInstalled())
 			gl = glDrawable.getGL();
-		else
-			gl = new DebugGL(glDrawable.getGL());
+//		else
+//			gl = new DebugGL(glDrawable.getGL());
 
 		if (antialias) {
 			gl.glEnable(GL.GL_LINE_SMOOTH);
 			gl.glEnable(GL.GL_POLYGON_SMOOTH);
-//			gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
-//			gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
-			gl.glEnable(GL.GL_MULTISAMPLE);
+			gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
+			gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
+			try {
+				gl.glEnable(GL.GL_MULTISAMPLE);
+			} catch(GLException e) {
+				PSLogging.logger.warn("GL_MULTISAMPLE not recognized.");
+			}
 		} else {
 			gl.glDisable(GL.GL_LINE_SMOOTH);
 			gl.glDisable(GL.GL_POLYGON_SMOOTH);
-//			gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_FASTEST);
-//			gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_FASTEST);
-			gl.glDisable(GL.GL_MULTISAMPLE);
+			gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_FASTEST);
+			gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_FASTEST);
+			try {
+				gl.glDisable(GL.GL_MULTISAMPLE);
+			} catch(GLException e) {
+				PSLogging.logger.warn("GL_MULTISAMPLE not recognized.");
+			}
 		}
 		
 		gl.glClearColor(1, 1, 1, 0);
