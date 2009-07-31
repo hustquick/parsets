@@ -273,4 +273,8 @@ public class MainWindow extends JFrame {
 		editDataSet.setEnabled(enabled);
 		deleteDataSet.setEnabled(enabled);
 	}
+	
+	public Controller getController() {
+		return controller;
+	}
 }
