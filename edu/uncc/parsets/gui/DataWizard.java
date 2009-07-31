@@ -118,14 +118,14 @@ public class DataWizard implements CSVParserListener {
 
 		public int getRowCount() {
 			if (data != null) {
-				numRows = Math.min(data.getNumRecords(), 100);
+				numRows = Math.min(data.getNumRecords()-1, 100);
 				return numRows+1;
 			} else
 				return 0;
 		}
 
 		public Object getValueAt(int row, int col) {
-			if (row == numRows)
+			if (row >= numRows)
 				return "...";
 			else {
 				DataDimension d = data.getDimension(col);
@@ -337,6 +337,7 @@ public class DataWizard implements CSVParserListener {
 			@Override
 			public void run() {
 				statusLabel.setText("");
+				progressBar.setIndeterminate(false);
 				nameTF.setText(data.getName());
 				sectionTF.setText(data.getSection());
 				fileNameLabel.setText(data.getFileBaseName());
