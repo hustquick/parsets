@@ -110,7 +110,7 @@ public class CategoryBar {
 		if (topLevel)
 			ColorBrewer.setColor(color, true, gl);
 		else
-			gl.glColor3f(.3f, .3f, .3f);
+			gl.glColor3f(.3f, .3f, .5f);
 
 		gl.glLineWidth(2);
 		gl.glBegin(GL.GL_LINES);
@@ -137,7 +137,7 @@ public class CategoryBar {
 		catFont.begin3DRendering();
 		catFont.setColor(Color.BLACK);
 		if (label.length() > 0)
-			catFont.draw(label, (int) leftX.getValue() + 3, topY - catFontMetrics.getAscent() - 1);
+			catFont.draw(label, (int) leftX.getValue(), topY - catFontMetrics.getAscent() - 1);
 		catFont.end3DRendering();
 
 	}

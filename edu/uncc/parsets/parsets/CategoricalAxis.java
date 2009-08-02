@@ -108,7 +108,7 @@ public class CategoricalAxis extends VisualAxis {
 		}
 		
 		if (isHandleActive) {
-			gl.glColor4f(1f, 1f, 1f, .3f);
+			gl.glColor4f(1f, 1f, 1f, .5f);
 			gl.glBegin(GL.GL_QUADS);
 			gl.glVertex2f(xOffset, barY.getValue() + textHeight + 5);
 			gl.glVertex2f(xOffset, barY.getValue() - textHeight);
@@ -170,7 +170,6 @@ public class CategoricalAxis extends VisualAxis {
 	
 	public int moveCategoryBar(int x, CategoryBar activeBar) {
 		int activeIndex = bars.indexOf(activeBar);
-		//bars.remove(activeBar);
 		int insertIndex = 0;
 		while ((insertIndex < bars.size()) && (x > bars.get(insertIndex).getLeftX()))
 			insertIndex++;

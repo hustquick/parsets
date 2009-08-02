@@ -51,6 +51,9 @@ public class Tooltip {
 	
 	public void display(GL gl, TextRenderer tooltipFont, FontMetrics tooltipFontMetrics) {
 		
+		if (text == null)
+			return;
+		
 		gl.glColor4f(.8f, .8f, .8f, .8f);
 
 		String tok[] = text.split("\n");
@@ -85,7 +88,11 @@ public class Tooltip {
 		}
 			
 		tooltipFont.end3DRendering();
-		
 	}
 	
+	public void newValues(String newText, int newX, int newY) {
+		text = newText;
+		x = newX;
+		y = newY;
+	}
 }

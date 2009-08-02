@@ -18,7 +18,6 @@ import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
 import com.sun.opengl.util.Screenshot;
@@ -98,7 +97,7 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 	private Texture logoTexture;
 	private Dimension logoDimensions;
 	
-	private Tooltip tooltip = null;
+	private Tooltip tooltip = new Tooltip(null, 0, 0);
 	
 	private boolean needsLayout = true;
 	
@@ -137,21 +136,11 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 			gl.glEnable(GL.GL_POLYGON_SMOOTH);
 			gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
 			gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
-			try {
-				gl.glEnable(GL.GL_MULTISAMPLE); // causing problems on some machines
-			} catch(GLException e) {
-				PSLogging.logger.warn("GL_MULTISAMPLE not recognized.");
-			}
 		} else {
 			gl.glDisable(GL.GL_LINE_SMOOTH);
 			gl.glDisable(GL.GL_POLYGON_SMOOTH);
 			gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_FASTEST);
 			gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_FASTEST);
-			try {
-				gl.glDisable(GL.GL_MULTISAMPLE);
-			} catch(GLException e) {
-				PSLogging.logger.warn("GL_MULTISAMPLE not recognized.");
-			}
 		}
 		
 		gl.glClearColor(1, 1, 1, 0);
@@ -361,8 +350,10 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 		if (yPos < ((CategoricalAxis)axis).getBarHeight()*2) 
 			return 0;
 		
-		int newIndex = (yPos ) / (getHeight() / (axes.size()-1));
+		int newIndex = yPos / (getHeight() / (axes.size()-1));
 		int oldIndex = dimensionList.indexOf(axis.getDimension());
+		
+		System.err.println("oldIndex = "+oldIndex+", newIndex = "+newIndex);
 		
 		if (newIndex == oldIndex) 
 			return -1;
@@ -514,11 +505,11 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 	}
 	
 	public void setTooltip(String text, int x, int y) {
-		tooltip = new Tooltip(text, x, y);
+		tooltip.newValues(text, x, y);
 	}
 
 	public void clearTooltip() {
-		tooltip = null;	
+		tooltip.newValues(null, 0, 0);	
 	}
 
 	public void setShowTooltips(boolean show) {
@@ -557,6 +548,7 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 	@Override
 	public void mouseExited(MouseEvent e) {
 		mouseInDisplay = false;
+		clearTooltip();
 		repaint();
 	}
 
