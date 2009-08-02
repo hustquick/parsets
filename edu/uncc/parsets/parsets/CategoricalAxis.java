@@ -57,9 +57,10 @@ public class CategoricalAxis extends VisualAxis {
 
 	private boolean isHandleActive = false;
 
-
 	private float newBarY = -1;
-	
+
+	private int displayWidth;
+
 	public CategoricalAxis(DimensionHandle dim) {
 		dimension = dim;
 		int colorNum = 0;
@@ -80,10 +81,13 @@ public class CategoricalAxis extends VisualAxis {
 		for (CategoryBar bar : bars) 
 			if (bar.isVisible()) 
 				visibleSize++;
+		
 		float gapPer = (float)gap/(float)(visibleSize-1);
-		if (visibleSize == 1) gapPer = 0;
+		if (visibleSize == 1)
+			gapPer = 0;
 				
 		this.xOffset = xOffset;
+		displayWidth = width+gap;
 		float x = xOffset;
 		for (CategoryBar bar : bars) {
 			if (bar.isVisible()) {
@@ -98,30 +102,30 @@ public class CategoricalAxis extends VisualAxis {
 	public void display(GL gl, TextRenderer dimFont, FontMetrics dimFontMetrics,
 			TextRenderer catFont, FontMetrics catFontMetrics) {
 		
-		for (CategoryBar bar : bars)
-		if (bar.isVisible())
-			bar.display(gl, catFont, catFontMetrics, (int)barY.getValue(), barHeight);
-
-		textWidth = dimFontMetrics.stringWidth(dimension.getName());
-		textHeight = dimFontMetrics.getAscent();
+		if (textWidth == 0) {
+			textWidth = dimFontMetrics.stringWidth(dimension.getName());
+			textHeight = dimFontMetrics.getAscent();
+		}
 		
 		if (isHandleActive) {
-			gl.glColor4f(.8f, .8f, .8f, .8f);
+			gl.glColor4f(1f, 1f, 1f, .3f);
 			gl.glBegin(GL.GL_QUADS);
-			gl.glVertex2f(xOffset-5, barY.getValue() + textHeight + 5);
-			gl.glVertex2f(xOffset-5, barY.getValue());
-			gl.glVertex2f(xOffset + textWidth + 5, barY.getValue());
-			gl.glVertex2f(xOffset + textWidth + 5, barY.getValue() + textHeight + 5);
+			gl.glVertex2f(xOffset, barY.getValue() + textHeight + 5);
+			gl.glVertex2f(xOffset, barY.getValue() - textHeight);
+			gl.glVertex2f(xOffset + displayWidth, barY.getValue() - textHeight);
+			gl.glVertex2f(xOffset + displayWidth, barY.getValue() + textHeight + 5);
 			gl.glEnd();
 			dimFont.setColor(Color.black);
-		}
-		else {
+		} else
 			dimFont.setColor(Color.LIGHT_GRAY.darker());
-		}
-		
+
 		dimFont.begin3DRendering();
 		dimFont.draw(dimension.getName(), (int)xOffset, (int)barY.getValue()+5);
 		dimFont.end3DRendering();
+		
+		for (CategoryBar bar : bars)
+			if (bar.isVisible())
+				bar.display(gl, catFont, catFontMetrics, (int)barY.getValue(), barHeight);
 	}	
 	
 	public CategoryBar getCategoryBar(CategoryHandle handle) {
@@ -148,22 +152,19 @@ public class CategoricalAxis extends VisualAxis {
 
 	@Override
 	public boolean containsY(int y) {
-		return (y < barY.getValue()) && (y >= barY.getValue()-barHeight);
+		return (y < barY.getValue() + textHeight + 5) && (y >= barY.getValue() - textHeight-1);
 	}
 	
-	public boolean handleContains(int x, int y) {
-		return (y < barY.getValue() + 5 + textHeight) && (y >= barY.getValue()) && (x > xOffset) && (x <= xOffset + textWidth);
-	}
-		
 	public int getBarHeight() {
 		return barHeight;
 	}
 	
 	@Override
 	public CategoryBar findBar(int x, int y) {
-		for (CategoryBar bar : bars)
-			if (bar.containsX(x))
-				return bar;
+		if (y < barY.getValue())
+			for (CategoryBar bar : bars)
+				if (bar.containsX(x))
+					return bar;
 		return null;
 	}
 	

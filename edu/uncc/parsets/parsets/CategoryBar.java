@@ -93,6 +93,20 @@ public class CategoryBar {
 	public void display(GL gl, TextRenderer catFont, FontMetrics catFontMetrics,
 			int topY, int barHeight) {
 
+		if (active) {		
+			if (topLevel)
+				ColorBrewer.setColor(color, false, 1f, gl);
+			else
+				gl.glColor4f(1f, 1f, 1f, 1f);
+
+			gl.glBegin(GL.GL_QUADS);
+			gl.glVertex2f(leftX.getValue(), topY);
+			gl.glVertex2f(leftX.getValue(), topY - barHeight);
+			gl.glVertex2f(leftX.getValue() + width, topY - barHeight);
+			gl.glVertex2f(leftX.getValue() + width, topY);
+			gl.glEnd();
+		}
+		
 		if (topLevel)
 			ColorBrewer.setColor(color, true, gl);
 		else
@@ -104,21 +118,7 @@ public class CategoryBar {
 		gl.glVertex2f(leftX.getValue() + width, topY - barHeight);
 		gl.glEnd();
 		gl.glLineWidth(1);
-		
-		if (active) {		
-			if (topLevel)
-				ColorBrewer.setColor(color, false, .8f, gl);
-			else
-				gl.glColor4f(.7f, .7f, .7f, .8f);
-
-			gl.glBegin(GL.GL_QUADS);
-			gl.glVertex2f(leftX.getValue(), topY);
-			gl.glVertex2f(leftX.getValue(), topY - barHeight);
-			gl.glVertex2f(leftX.getValue() + width, topY - barHeight);
-			gl.glVertex2f(leftX.getValue() + width, topY);
-			gl.glEnd();
-		}
-		
+				
 		String label = category.getName();
 
 		int labelWidth = catFontMetrics.stringWidth(label);
