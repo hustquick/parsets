@@ -117,7 +117,7 @@ public class MainWindow extends JFrame {
 		caps.setSampleBuffers(true);
 		caps.setNumSamples(2);
 		GLCanvas glCanvas = new GLCanvas(caps);
-		glCanvas.addGLEventListener(new ParSetsView(glCanvas, controller));
+		glCanvas.addGLEventListener(new ParSetsView(glCanvas, this, controller));
 		add(glCanvas, BorderLayout.CENTER);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

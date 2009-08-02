@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
@@ -25,6 +27,7 @@ import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;
 
+import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.data.CategoryTree;
@@ -73,11 +76,11 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 	private int height;
 	private Component canvas;
 
-	public static final Font dimensionFont = new Font("Sans-Serif", Font.BOLD, 18);
-	public static final Font categoryFont = new Font("Sans-Serif", Font.PLAIN, 12);
+	public static final Font DIMENSIONFONT = new Font("Sans-Serif", Font.BOLD, 18);
+	public static final Font CATEGORYFONT = new Font("Sans-Serif", Font.PLAIN, 12);
 	
-	private TextRenderer dimensionTextRenderer = new TextRenderer(dimensionFont, true, false);
-	private TextRenderer categoryTextRenderer = new TextRenderer(categoryFont, true, false);
+	private TextRenderer dimensionTextRenderer = new TextRenderer(DIMENSIONFONT, true, false);
+	private TextRenderer categoryTextRenderer = new TextRenderer(CATEGORYFONT, true, false);
 
 	private FontMetrics dimensionFontMetrics;
 	private FontMetrics categoryFontMetrics;
@@ -105,9 +108,11 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 	boolean antialias = true;
 	private boolean strongerSelection = true;
 	private boolean mouseInDisplay = false;
+	private Window window;
 	
-	public ParSetsView(Component canv, Controller ctrl) {
+	public ParSetsView(Component canv, Window win, Controller ctrl) {
 		canvas = canv;
+		window = win;
 		controller = ctrl;
 		controller.addDataSetListener(this);
 		controller.parSetsView = this;
@@ -122,10 +127,10 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 	public final void display(GLAutoDrawable glDrawable) {
 
 		GL gl = null;
-//		if (ParallelSets.isInstalled())
+		if (ParallelSets.isInstalled())
 			gl = glDrawable.getGL();
-//		else
-//			gl = new DebugGL(glDrawable.getGL());
+		else
+			gl = new DebugGL(glDrawable.getGL());
 
 		if (antialias) {
 			gl.glEnable(GL.GL_LINE_SMOOTH);
@@ -133,7 +138,7 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 			gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
 			gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
 			try {
-				gl.glEnable(GL.GL_MULTISAMPLE);
+				gl.glEnable(GL.GL_MULTISAMPLE); // causing problems on some machines
 			} catch(GLException e) {
 				PSLogging.logger.warn("GL_MULTISAMPLE not recognized.");
 			}
@@ -257,8 +262,8 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 
 	public final void init(GLAutoDrawable glDrawable) {
 		if (dimensionFontMetrics == null) {
-			dimensionFontMetrics = canvas.getGraphics().getFontMetrics(dimensionFont);
-			categoryFontMetrics = canvas.getGraphics().getFontMetrics(categoryFont);
+			dimensionFontMetrics = canvas.getGraphics().getFontMetrics(DIMENSIONFONT);
+			categoryFontMetrics = canvas.getGraphics().getFontMetrics(CATEGORYFONT);
 		}
 		
 		GL gl = glDrawable.getGL();
@@ -535,6 +540,10 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 		return dataTree;
 	}
 
+	public Window getWindow() {
+		return window;
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
