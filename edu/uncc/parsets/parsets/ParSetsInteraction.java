@@ -86,9 +86,8 @@ public class ParSetsInteraction extends MouseInputAdapter {
 		} else if (activeAxis != null) {
 			activeAxis.setBarY(view.getHeight() - e.getY());
 			
-			int index = view.getAxisPosition(e.getY(), activeAxis);
+			int index = view.getAxisPosition(view.getHeight() - e.getY(), activeAxis);
 			if (index != -1) {
-				System.err.println("new Index! "+index);
 				view.moveAxis(index, activeAxis);
 				view.layout();
 			}

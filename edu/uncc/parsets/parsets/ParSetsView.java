@@ -344,22 +344,22 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 		canvas.repaint();
 	}
 	
-
+	// TODO: This needs to be rewritten and combined with moveAxis
 	public int getAxisPosition(int yPos, VisualAxis axis) {
 
-		if (yPos < ((CategoricalAxis)axis).getBarHeight()*2) 
-			return 0;
-		
-		int newIndex = yPos / (getHeight() / (axes.size()-1));
+		int newIndex = (height - yPos) / (height / (axes.size()-1));
 		int oldIndex = dimensionList.indexOf(axis.getDimension());
-		
-		System.err.println("oldIndex = "+oldIndex+", newIndex = "+newIndex);
+
+		// up movements create unnecessary reconfigurations.
+		// this is to catch this special case where the movement has not
+		// been far enough
+		if (newIndex < oldIndex) {
+			if (axes.get(newIndex).getBarY() > yPos)
+				newIndex++;
+		}
 		
 		if (newIndex == oldIndex) 
 			return -1;
-		
-		if (newIndex < oldIndex) 
-			newIndex++;
 		
 		if (newIndex >= axes.size())
 			return axes.size() - 1;
