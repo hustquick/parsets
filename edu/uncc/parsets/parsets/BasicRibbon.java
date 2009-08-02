@@ -117,55 +117,20 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		ColorBrewer.setColor(colorBrewerIndex, false, alpha, gl);
 
 		if (width >= 1) {
-			gl.glEnable(GL.GL_POLYGON_SMOOTH);
 			gl.glBegin(GL.GL_QUADS);
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue() + width, upperBar.getOutRibbonY());
 				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + width, lowerBar.getInRibbonY());
 				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue(), lowerBar.getInRibbonY());
 			gl.glEnd();
-			gl.glDisable(GL.GL_POLYGON_SMOOTH);
 		}
 		
 		else {
-			gl.glEnable(GL.GL_LINE_SMOOTH);
 			gl.glBegin(GL.GL_LINES);
 			gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
 			gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + (int)width, lowerBar.getInRibbonY());
 			gl.glEnd();
-			gl.glDisable(GL.GL_LINE_SMOOTH);
-		}		
-
-//		gl.glDisable(GL.GL_BLEND);
-		
-/*		if (selectionPercentage > 0) {
-			
-			int lowerY;
-			
-			if (OLD_Controller.drawStyle == DrawStyle.classic)
-				lowerY = lowerAxis.topY;
-			else
-				lowerY = lowerAxis.bottomY;
-
-			Polygon selectedPoly = new Polygon();
-			
-			selectedPoly.addPoint(upperBar.getX() + (int)upperOffset, (int)upperAxis.bottomY);
-			selectedPoly.addPoint((int)(upperBar.getX() + upperOffset + (width * selectionPercentage)), (int)upperAxis.bottomY);
-			selectedPoly.addPoint((int)(lowerBar.getX() + lowerOffset + (width * selectionPercentage)), (int)lowerY);
-			selectedPoly.addPoint(lowerBar.getX() + (int)lowerOffset, (int)lowerY);
-			
-			g.setColor(ColorBrewer.getColor(colorBrewerIndex, 0.9f));
-			
-			g.fillPolygon(selectedPoly);
-			
-			g.setColor(ColorBrewer.getColor(colorBrewerIndex, 0.7f).darker());
-			
-			g.drawPolygon(polygon);
-			
 		}
-		
-		*/
-
 	}
 	
 	public void displaySelected(GL gl) {
@@ -175,32 +140,25 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		}
 	
 		if (width >= 1) {
-			ColorBrewer.setColor(colorBrewerIndex, false, 0.9f, gl);
+			ColorBrewer.setColor(colorBrewerIndex, false, 1f, gl);
 			
-			gl.glEnable(GL.GL_POLYGON_SMOOTH);
 			gl.glBegin(GL.GL_QUADS);
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue() + width, upperBar.getOutRibbonY());
 				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + width, lowerBar.getInRibbonY());
 				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue(), lowerBar.getInRibbonY());
 			gl.glEnd();
-			gl.glDisable(GL.GL_POLYGON_SMOOTH);
 			
-			ColorBrewer.setColor(colorBrewerIndex, true, 0.9f, gl);
+			ColorBrewer.setColor(colorBrewerIndex, true, .8f, gl);
 			
-			gl.glEnable(GL.GL_LINE_SMOOTH);
 			gl.glBegin(GL.GL_LINE_LOOP);
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue() + width, upperBar.getOutRibbonY());
 				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + width, lowerBar.getInRibbonY());
 				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue(), lowerBar.getInRibbonY());
 			gl.glEnd();
-			gl.glDisable(GL.GL_LINE_SMOOTH);
-			
-		}
-		
-		else {
-			ColorBrewer.setColor(colorBrewerIndex, true, 0.9f, gl);
+		} else {
+			ColorBrewer.setColor(colorBrewerIndex, true, 1f, gl);
 			gl.glEnable(GL.GL_LINE_SMOOTH);
 			gl.glBegin(GL.GL_LINES);
 			gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
@@ -211,45 +169,6 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		
 	}
 	
-/*	public void handleMouseEvent(MouseEvent me) {
-
-		if (me.getID() == MouseEvent.MOUSE_MOVED) {
-
-			if (polygon != null) {
-			
-				if (polygon.contains((double)me.getX(), (double)me.getY())) {
-					
-					String tooltip = node.toString();
-					tooltip += ": " + node.getValue();
-					
-					OLD_Controller.controller.getLayout().setToolTip(tooltip, me.getX(), me.getY());		
-					
-				}
-			
-			}			
-		
-		}
-		
-		if (me.getID() == MouseEvent.MOUSE_CLICKED) {
-
-			if (polygon != null) {
-			
-				if (polygon.contains((double)me.getX(), (double)me.getY())) {
-					
-					//controller.getLayout().setLayoutInvalid();
-					EventService.getEventService().fireSelectedNodeChangeEvent(
-							new SelectedNodeChangeEvent(this, node));
-					System.err.println("setSelected()" + node.getPointList().size());
-					
-				}
-			
-			}			
-			
-		}
-
-	}
-*/
-
 	/**
 	 * @param colorBrewerIndex the colorBrewerIndex to set
 	 */
@@ -269,26 +188,6 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 
 		return poly.contains(x, y);
 		
-	}
-//	
-//	
-//
-//	
-//	public void setSelectionPercentage(float selectionPercentage) {
-//		this.selectionPercentage = selectionPercentage;
-//	}
-//	
-//	public Point getCenterPoint() {
-//		
-//		Point pt = new Point();
-//		
-//		pt.x = (int)polygon.getBounds().getCenterX();
-//		pt.y = (int)polygon.getBounds().getCenterY();
-//		
-//		return pt;		
-//		
-//	}
-
-	
+	}	
 	
 }
