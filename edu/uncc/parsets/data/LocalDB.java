@@ -410,6 +410,8 @@ public class LocalDB {
 				dimStmt.setString(1, dsHandle);
 				dimStmt.setString(2, dim.getName());
 				String dimHandle = name2handle(dim.getKey());
+				if (Character.getType(dimHandle.charAt(0)) == Character.DECIMAL_DIGIT_NUMBER)
+					dimHandle = "_"+dimHandle;
 				if (dimHandles.contains(dimHandle)) {
 					int suffix = 1;
 					String suffixString = "_"+Integer.toString(suffix);
