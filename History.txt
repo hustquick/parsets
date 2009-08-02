@@ -19,6 +19,8 @@ V2.1, 2009-08-03
 	* Fix a bug that resulted in crashes if there was a duplicate column name
 	  in the data, or it was created by the program when converting the names
 	  (issue #12)
+	* Fix problem when column name starts with a digit, which causes a parse
+	  error in SQL (issue #13)
 
 V2.0, 2009-06-01
 	* Original release
