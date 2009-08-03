@@ -7,6 +7,7 @@ V2.1, 2009-08-03
 	* Add screenshot function (issue #9)
 	* Add way to reinitialize database
 	* Add option to make highlighted ribbons/bars stand out more (issue #6)
+	* Add way of sorting categories in a dimension by name or size (issue #8)
 	* Show what's new in version check dialog
 	* Fix a number of bugs in the data import that lead to wrong values.
 	  We suggest you re-import data sets to be sure they have been correctly
