@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Window;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -67,8 +65,7 @@ import edu.uncc.parsets.util.PSLogging;
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-public class ParSetsView implements GLEventListener, DataSetListener,
-									AnimationListener, MouseListener {
+public class ParSetsView implements GLEventListener, DataSetListener, AnimationListener {
 
 	private static final GLU glu = new GLU();
 	private int width;
@@ -117,7 +114,6 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 		controller.parSetsView = this;
 		ParSetsInteraction interaction = new ParSetsInteraction(this);
 		canvas.addMouseListener(interaction);
-		canvas.addMouseListener(this);
 		canvas.addMouseMotionListener(interaction);
 		dimensionList = new ArrayList<DimensionHandle>();
 		categoryLists = new ArrayList<ArrayList<CategoryHandle>>();
@@ -534,30 +530,8 @@ public class ParSetsView implements GLEventListener, DataSetListener,
 	public Window getWindow() {
 		return window;
 	}
-	
-	@Override
-	public void mouseClicked(MouseEvent e) {
-	}
 
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		mouseInDisplay = true;
-		repaint();
+	public void setMouseInDisplay(boolean b) {
+		mouseInDisplay = b;
 	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		mouseInDisplay = false;
-		clearTooltip();
-		repaint();
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-		
 }

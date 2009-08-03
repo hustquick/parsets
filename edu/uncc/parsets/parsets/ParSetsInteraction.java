@@ -3,6 +3,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.event.MouseInputAdapter;
 
+import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -40,6 +41,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	private CategoricalAxis activeAxis = null;
 	private int deltaMouseX;
 	private ParSetsView view;
+	private ButtonAction axisCommand;
 	
 	public ParSetsInteraction(ParSetsView parSetsView) {
 		view = parSetsView;
@@ -56,7 +58,9 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	public final void mouseReleased(MouseEvent e) {
 		if (activeAxis != null) {
 			AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
-			activeAxis.setHandleActive(false);
+			activeAxis.setActive(false);
+			if (axisCommand != ButtonAction.None)
+				activeAxis.sort(view.getDataTree(), view.getConnectionTree(), axisCommand);
 			activeAxis = null;
 			view.layout();
 			AnimatableProperty.commitAnimations();
@@ -67,11 +71,13 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			activeCategoryBar = null;
 			AnimatableProperty.commitAnimations();
 		}
+		view.repaint();
 	}
 
 	@Override
 	public final void mouseDragged(MouseEvent e) {
 		view.clearTooltip();
+		axisCommand = ButtonAction.None;
 		if (activeCategoryBar != null) {
 			activeCategoryBar.setLeftX(e.getX()-deltaMouseX);
 			int index = activeAxis.moveCategoryBar(e.getX(), activeCategoryBar);
@@ -107,15 +113,17 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			activeCategoryBar.setActive(false);
 
 		if (activeAxis != null)
-			activeAxis.setHandleActive(false);
+			activeAxis.setActive(false);
 
 		activeCategoryBar = null;
 		activeAxis = null;
 		for (VisualAxis va : view.getAxes()) {
 			if (va.containsY(mouseY)) {
 				activeAxis = (CategoricalAxis)va;
-				activeAxis.setHandleActive(true);
+				activeAxis.setActive(true);
 				activeCategoryBar = va.findBar(mouseX, mouseY);
+				if (activeCategoryBar == null)
+					axisCommand = activeAxis.getButtonAction();
 			}
 		}
 		if (activeCategoryBar != null) {			
@@ -127,17 +135,31 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			view.setTooltip(s, mouseX, mouseY);
 			
 			view.getConnectionTree().selectCategory(activeCategoryBar.getCategory());
-		} else {
+		} else if (activeAxis == null) {
 			String s = view.getConnectionTree().highlightRibbon(mouseX, mouseY, view.getDataTree());
 			if (s != null) 
 				view.setTooltip(s, mouseX, mouseY);
-			
-		}
+		} else
+			view.getConnectionTree().clearSelection();
 
 		// TODO: Change cursor according to type of movement possible
 		// requires hand-drawn cursors, standard types don't seem to include
 		// up-down or left-right movement.
 		
+		view.repaint();
+	}
+	
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		view.setMouseInDisplay(true);
+		view.repaint();
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		view.setMouseInDisplay(false);
+		view.clearTooltip();
+		view.getConnectionTree().clearSelection();
 		view.repaint();
 	}
 }
