@@ -60,7 +60,7 @@ public class VersionCheck extends Thread {
 	
 	private static final String MESSAGE1 = "A new version of this program is available:";
 	
-	private static final String MESSAGE2 = "Do you want to upgrade?";
+	private static final String MESSAGE2 = "<html><b>Do you want to upgrade?</b></html>";
 	
 	private static final String TITLE = "New Version!";
 	

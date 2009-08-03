@@ -90,6 +90,8 @@ public class OnlineDataTab extends JPanel implements Runnable, ComponentListener
 	private JProgressBar progressBar;
 
 	private ArrayList<OnlineDataSet> onlineDSList;
+
+	private boolean versionChecked = false;
 	
 	public OnlineDataTab(JFrame f) {
 		super(new MigLayout("fillx, wrap 1, insets 0","[]", "[fill, grow]r[]r[]r"));
@@ -203,9 +205,10 @@ public class OnlineDataTab extends JPanel implements Runnable, ComponentListener
 	}
 
 	public void componentShown(ComponentEvent e) {
-		if (ParallelSets.isInstalled()) {
+		if (ParallelSets.isInstalled() && !versionChecked ) {
 			VersionCheck vc = new VersionCheck(frame);
 			vc.start();
+			versionChecked = true;
 		}
 	}
 
