@@ -41,7 +41,6 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	private CategoricalAxis activeAxis = null;
 	private int deltaMouseX;
 	private ParSetsView view;
-	private ButtonAction axisCommand;
 	
 	public ParSetsInteraction(ParSetsView parSetsView) {
 		view = parSetsView;
@@ -59,8 +58,8 @@ public class ParSetsInteraction extends MouseInputAdapter {
 		if (activeAxis != null) {
 			AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
 			activeAxis.setActive(false);
-			if (axisCommand != ButtonAction.None)
-				activeAxis.sort(view.getDataTree(), view.getConnectionTree(), axisCommand);
+			if (activeAxis.getButtonAction() != ButtonAction.None)
+				activeAxis.sort(view.getDataTree(), view.getConnectionTree(), activeAxis.getButtonAction());
 			activeAxis = null;
 			view.layout();
 			AnimatableProperty.commitAnimations();
@@ -77,7 +76,6 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	@Override
 	public final void mouseDragged(MouseEvent e) {
 		view.clearTooltip();
-		axisCommand = ButtonAction.None;
 		if (activeCategoryBar != null) {
 			activeCategoryBar.setLeftX(e.getX()-deltaMouseX);
 			int index = activeAxis.moveCategoryBar(e.getX(), activeCategoryBar);
@@ -122,8 +120,6 @@ public class ParSetsInteraction extends MouseInputAdapter {
 				activeAxis = (CategoricalAxis)va;
 				activeAxis.setActive(true);
 				activeCategoryBar = va.findBar(mouseX, mouseY);
-				if (activeCategoryBar == null)
-					axisCommand = activeAxis.getButtonAction();
 			}
 		}
 		if (activeCategoryBar != null) {			

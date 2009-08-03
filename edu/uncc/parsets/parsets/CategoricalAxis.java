@@ -180,6 +180,10 @@ public class CategoricalAxis extends VisualAxis {
 		public ButtonAction getActiveButton() {
 			return activeButton;
 		}
+
+		public void setActiveButton(ButtonAction newBtn) {
+			activeButton = newBtn;
+		}
 	}
 	
 	private DimensionHandle dimension;
@@ -371,6 +375,13 @@ public class CategoricalAxis extends VisualAxis {
 			return ButtonAction.None;
 	}
 
+	@Override
+	public void setBarY(float value) {
+		if (buttons != null)
+			buttons.setActiveButton(ButtonAction.None);
+		super.setBarY(value);
+	}
+	
 	public void sort(CategoryTree categoryTree, VisualConnectionTree visualConnectionTree, ButtonAction axisCommand) {
 		Comparator<CategoryBar> cbComparator = null;
 		switch(axisCommand) {
