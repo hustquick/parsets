@@ -1,7 +1,6 @@
 package edu.uncc.parsets.parsets;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.media.opengl.GL;
@@ -51,13 +50,9 @@ public class VisualConnectionTree {
 	}
 	
 	public void print(VisualConnection node) {
-		
 		System.out.println(node.toString());
-		
-		for (VisualConnection child : node.getChildren()) {
+		for (VisualConnection child : node.getChildren())
 			print(child);
-		}
-		
 	}
 
 	
@@ -70,7 +65,6 @@ public class VisualConnectionTree {
 		
 		root = new VisualConnection();
 		addChildren(root, tree.getRootNode(), axes, 1);
-
 	}	
 	
 	private void addChildren(VisualConnection parentNode, CategoryNode dataNode, ArrayList<VisualAxis> axes, int childLevel) {
@@ -91,27 +85,20 @@ public class VisualConnectionTree {
 			}
 			
 			orderChildren(parentNode, ((CategoricalAxis)axes.get(0)).getCategoryOrder());
-			
-		}
-		
-		else if (childLevel <= axes.size()){
+		} else if (childLevel <= axes.size()){
 			
 			// The lower levels are ribbons.
 			
 			for (CategoryNode child : dataNode.getChildren()) {
-
 				VisualConnection newChild = parentNode.addChild(new BasicRibbon(parentNode, child, 
 																(CategoricalAxis)axes.get(childLevel-2), 
 																(CategoricalAxis)axes.get(childLevel-1)));
 
 				addChildren(newChild, child, axes, childLevel+1);
-		
 			}
 			
 			orderChildren(parentNode, ((CategoricalAxis)axes.get(childLevel-1)).getCategoryOrder());
-			
 		}
-
 	}
 	
 	private void orderChildren(VisualConnection parentNode,	List<CategoryHandle> categoryOrder) {
@@ -129,44 +116,44 @@ public class VisualConnectionTree {
 				}
 			}
 		}
-		
-	}
-
-	public void sortChildren(VisualConnection node) {
-		
-		if (node instanceof BasicRibbon)
-			Arrays.sort(node.getChildren().toArray());
-
-		for (VisualConnection child : node.getChildren()) {
-			sortChildren(child);
-		}
-		
 	}
 	
+	public void orderChildren(DimensionHandle dimension, List<CategoryHandle> order) {
+		orderChildren(dimension, order, root);
+	}
+
+	private void orderChildren(DimensionHandle dimension, List<CategoryHandle> order, VisualConnection node) {
+		if (node.getChildren() == null)
+			return;
+		
+		if (!node.getChildren().isEmpty() && node.getChildren().get(0).getNode().getToCategory().getDimension().equals(dimension))
+			orderChildren(node, order);
+		else
+			for (VisualConnection vc : node.getChildren())
+				orderChildren(dimension, order, vc);
+	}
+
+	
 	public void doLayout(int minX, int maxX) {
-		if (style == RibbonLayoutStyle.BRANCHING) {
+		if (style == RibbonLayoutStyle.BRANCHING)
 			doLayoutBranching(minX, maxX);
-		}
-		else if (style == RibbonLayoutStyle.BUNDLED) {
+		else if (style == RibbonLayoutStyle.BUNDLED)
 			doLayoutBundled(minX, maxX);
-		}
 	}
 	
 
 	public void doLayoutBranching(int minX, int maxX) {
-		//sortChildren(root);
 		root.setWidth((float)(maxX - minX));
 		layoutChildren(root);
 		setColors(root);
 	}
 
 	public void layoutChildren(VisualConnection connectionNode) {		
-		for (VisualConnection child : connectionNode.getChildren()) {
+		for (VisualConnection child : connectionNode.getChildren())
 			if (child.getNode().isVisible()) {
 				child.layout(connectionNode.getWidth());
 				layoutChildren(child);
 			}
-		}	
 	}
 
 	/**
@@ -184,47 +171,31 @@ public class VisualConnectionTree {
 		root.setWidth(maxX - minX);
 
 		// Set all the layout and completeness flags to false.
-
 		resetForBundling(root);
 
 		// If there are no connections, return.
-
 		if (!root.getChildren().isEmpty()) {
 
 			// While the root is not set to complete...
-
 			while (!root.isComplete()) {
 
 				// Iterate through each of the invisible nodes, each of
 				// which represents a top-level category bar. At each
 				// step, lay out the leftmost incomplete branch of the
 				// top-level node.
-
 				for (VisualConnection invisible : root.getChildren()) {
 
-					if (!invisible.isComplete()) {
-
+					if (!invisible.isComplete())
 						layoutBranch(invisible);
-
-					}
 
 					// If this node is complete and is the last of the root's
 					// children, then we're done.
-
-					else if (invisible == root.getChildren().get(root.getChildren().size() - 1)) {
-
+					else if (invisible == root.getChildren().get(root.getChildren().size() - 1))
 						root.setComplete(true);
-
-					}
-
 				}
-
 			}
-
 		}
-		
 		setColors(root);
-
 	}
 
 	/**
@@ -235,43 +206,30 @@ public class VisualConnectionTree {
 	public boolean layoutBranch(VisualConnection connectionNode) {
 
 		// If this node isn't laid out already, lay it out.
-
 		if (!connectionNode.isLaidOut()) {
 
 			connectionNode.layout(connectionNode.getParent().getWidth());
 			connectionNode.setLaidOut(true);
 
 			// If this is a leaf, this node is completed.
-
 			if (connectionNode.getChildren().isEmpty()) {
 				connectionNode.setComplete(true);
 				return true;
 			}
-
 		}
 
 		// If this is not a leaf, call layoutBranch on this node's
 		// leftmost incomplete child.
-
-		for (VisualConnection child : connectionNode.getChildren()) {
-
-			if (!child.isComplete()) {
-
-				if (layoutBranch(child) == false) {
+		for (VisualConnection child : connectionNode.getChildren())
+			if (!child.isComplete())
+				if (layoutBranch(child) == false)
 					return false;
-				}
-
-			}
-
-		}
 
 		// If all of the children are complete, this node is
 		// completed.
-
 		connectionNode.setComplete(true);
 		
 		return true;
-
 	}
 	
 	public void display(GL gl, float alpha) {
@@ -283,57 +241,37 @@ public class VisualConnectionTree {
 		
 		node.display(gl, alpha);
 		
-		for (VisualConnection child : node.getChildren()) {
+		for (VisualConnection child : node.getChildren())
 			if (child.getNode().isVisible()) 
 				display(gl, child, alpha);
-		}
-
 	}
 	
 	private void displaySelected(GL gl, VisualConnection node) {
-		if (node.isSelected()) {
+		if (node.isSelected())
 			node.displaySelected(gl);
-		}
 		
-		for (VisualConnection child : node.getChildren()) {
-			if (child.getNode().isVisible()) {
+		for (VisualConnection child : node.getChildren())
+			if (child.getNode().isVisible())
 				displaySelected(gl, child);
-			}
-		}
 	}
 
 	public void setColors(VisualConnection connectionNode) {
 		
 		// The top level categorical axis determines the color scheme.
-
-		if (connectionNode.getChildren().isEmpty()) {
+		if (connectionNode.getChildren().isEmpty())
 			return;
-		}
 
 		if (connectionNode == root) {
-
 			for (VisualConnection childNode : connectionNode.getChildren()) {
-
 				childNode.setColorBrewerIndex(childNode.getNode().getToCategory().getCategoryNum() - 1);
-
 				setColors(childNode);
-
 			}
-
-		}
-
-		else {
-
+		} else {
 			for (VisualConnection childNode : connectionNode.getChildren()) {
-
 				childNode.setColorBrewerIndex(connectionNode.getColorBrewerIndex());
-
 				setColors(childNode);
-
 			}
-
 		}
-
 	}
 	
 	public String highlightRibbon(int x, int y, CategoryTree dataTree) {
@@ -350,9 +288,8 @@ public class VisualConnectionTree {
 		
 		VisualConnection returnNode = null;
 		
-		if (node.contains(x, y)) {
+		if (node.contains(x, y))
 			returnNode = node;
-		}
 		
 		for (VisualConnection child : node.getChildren()) {
 			VisualConnection temp = highlightRibbon(x, y, child);
@@ -360,9 +297,7 @@ public class VisualConnectionTree {
 				returnNode = temp;
 		}
 
-		
 		return returnNode;
-		
 	}
 
 	/**
@@ -373,34 +308,24 @@ public class VisualConnectionTree {
 	 *            The connection to highlight.
 	 */
 	public void setSelected(VisualConnection connection) {
-
 		selectUp(connection);
 		selectDown(connection);
-
 	}
 
 	private void selectDown(VisualConnection connection) {
 
 		connection.setSelected(true);
 
-		for (VisualConnection child : connection.getChildren()) {
-
+		for (VisualConnection child : connection.getChildren())
 			selectDown(child);
-
-		}
-
 	}
 
 	private void selectUp(VisualConnection connection) {
 
 		connection.setSelected(true);
 
-		if (connection.equals(root)) {
-			return;
-		}
-
-		selectUp(connection.getParent());
-
+		if (!connection.equals(root))
+			selectUp(connection.getParent());
 	}
 	
 	public void clearSelection() {
@@ -413,44 +338,32 @@ public class VisualConnectionTree {
 		
 		for (VisualConnection child : node.getChildren()) 
 			clearSelection(child);
-
 	}
 
 	public void clearConnections() {
 		root = new VisualConnection();
 	}
-
 	
 	public void resetForBundling(VisualConnection connectionNode) {
 		connectionNode.setComplete(false);
 		connectionNode.setLaidOut(false);
 		
-		for (VisualConnection child : connectionNode.getChildren()) {
+		for (VisualConnection child : connectionNode.getChildren())
 			resetForBundling(child);
-		}
 	}
 	
 	private void selectCategory(CategoryHandle category, VisualConnection node) {
 	
-		if (!node.equals(root) && node.getNode().getToCategory().equals(category)) {
-			for (VisualConnection child : node.getChildren()) {
+		if (!node.equals(root) && node.getNode().getToCategory().equals(category))
+			for (VisualConnection child : node.getChildren())
 				selectDown(child);
-			}
-		}
-		
-		else {
-			for (VisualConnection child : node.getChildren()) {
+		else
+			for (VisualConnection child : node.getChildren())
 				selectCategory(category, child);
-			}
-		}
-		
 	}
 
-
 	public void selectCategory(CategoryHandle category) {
-
 		clearSelection();
-		
 		selectCategory(category, root);
 	}
 	
@@ -468,7 +381,8 @@ public class VisualConnectionTree {
 
 	private void moveCategory(DimensionHandle dimension, CategoryHandle category, int index, VisualConnection node) {
 		
-		if (node.getChildren() == null) return;
+		if (node.getChildren() == null)
+			return;
 		
 		ArrayList<VisualConnection> children = node.getChildren();
 		
@@ -476,11 +390,9 @@ public class VisualConnectionTree {
 			
 			VisualConnection moveCat = null; 
 			
-			for (VisualConnection child : children) {
-				if (child.getNode().getToCategory().equals(category)) {
+			for (VisualConnection child : children)
+				if (child.getNode().getToCategory().equals(category))
 					moveCat = child;
-				}
-			}
 			
 			if (moveCat != null) {
 				children.remove(moveCat);
@@ -489,14 +401,11 @@ public class VisualConnectionTree {
 				else 
 					children.add(moveCat);
 			}
-			
-		}
-		
-		else 
+		} else {
 			for (VisualConnection child : children) {
 				moveCategory(dimension, category, index, child);
 			}
-		
+		}		
 	}
 
 }

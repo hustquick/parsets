@@ -47,6 +47,9 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	public BasicRibbon(VisualConnection parent, CategoryNode categoryNode, CategoricalAxis upperAxis, CategoricalAxis lowerAxis) {
 		super(parent);
 		node = categoryNode;
+
+		upperOffset.setDontAnimate(true);
+		lowerOffset.setDontAnimate(true);
 		
 		this.upperBar = upperAxis.getCategoryBar(node.getParent().getToCategory());
 		this.lowerBar = lowerAxis.getCategoryBar(node.getToCategory());
@@ -55,6 +58,9 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	public BasicRibbon(CategoryNode categoryNode, CategoricalAxis upperAxis, CategoricalAxis lowerAxis) {
 		
 		node = categoryNode;
+
+		upperOffset.setDontAnimate(true);
+		lowerOffset.setDontAnimate(true);
 
 		this.upperBar = upperAxis.getCategoryBar(node.getParent().getToCategory());
 		this.lowerBar = lowerAxis.getCategoryBar(node.getToCategory());
@@ -91,10 +97,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 
 		if (node == null || node.getCount() == 0) {
 			width = 0;
-		}
-		
-		else {
-		
+		} else {
 			width = parentWidth * node.getRatio();
 			
 			upperOffset.setValue(upperBar.getBottomIndexPoint());
@@ -102,20 +105,15 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 
 			lowerOffset.setValue(lowerBar.getTopIndexPoint());
 			lowerBar.setTopIndexPoint(lowerOffset.getValue() + width);
-
 		}
-
 	}
-	
 	
 	public void display(GL gl, float alpha) {
 		
-		if (width == 0 || isSelected) {
+		if (width == 0 || isSelected)
 			return;
-		}
 
 		ColorBrewer.setColor(colorBrewerIndex, false, alpha, gl);
-
 		if (width >= 1) {
 			gl.glBegin(GL.GL_QUADS);
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
@@ -123,9 +121,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + width, lowerBar.getInRibbonY());
 				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue(), lowerBar.getInRibbonY());
 			gl.glEnd();
-		}
-		
-		else {
+		} else {
 			gl.glBegin(GL.GL_LINES);
 			gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
 			gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + (int)width, lowerBar.getInRibbonY());
@@ -135,13 +131,11 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	
 	public void displaySelected(GL gl) {
 		
-		if (width == 0) {
+		if (width == 0)
 			return;
-		}
 	
 		if (width >= 1) {
 			ColorBrewer.setColor(colorBrewerIndex, false, 1f, gl);
-			
 			gl.glBegin(GL.GL_QUADS);
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue() + width, upperBar.getOutRibbonY());
@@ -150,7 +144,6 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 			gl.glEnd();
 			
 			ColorBrewer.setColor(colorBrewerIndex, true, .8f, gl);
-			
 			gl.glBegin(GL.GL_LINE_LOOP);
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
 				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue() + width, upperBar.getOutRibbonY());
@@ -166,7 +159,6 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 			gl.glEnd();
 			gl.glDisable(GL.GL_LINE_SMOOTH);
 		}
-		
 	}
 	
 	/**
@@ -175,7 +167,6 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	public void setColorBrewerIndex(int colorBrewerIndex) {
 		this.colorBrewerIndex = colorBrewerIndex;
 	}
-
 	
 	public boolean contains(int x, int y) {
 		
@@ -187,7 +178,6 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		poly.addPoint((int)(lowerBar.getLeftX() + lowerOffset.getValue()), (int)lowerBar.getInRibbonY());
 
 		return poly.contains(x, y);
-		
 	}	
 	
 }

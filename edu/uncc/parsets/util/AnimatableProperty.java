@@ -103,6 +103,9 @@ public class AnimatableProperty {
 	
 	private boolean interpolate = false;
 
+	// used to exclude certain propertis from an animation
+	private boolean dontAnimate = false;
+
 	/**
 	 * Create a property with an initial value of 0.
 	 */
@@ -282,7 +285,7 @@ public class AnimatableProperty {
 	 * @see #getValue()
 	 */
 	public void setValue(float newValue) {
-		if (animationSetup == false)
+		if (animationSetup == false || dontAnimate )
 			currentValue = newValue;
 		else {
 			if (values == null) {
@@ -354,6 +357,10 @@ public class AnimatableProperty {
 
 	public static int getNumSteps() {
 		return (int)numSteps[currentSegment];
+	}
+	
+	public void setDontAnimate(boolean b) {
+		dontAnimate = b;
 	}
 }
 
