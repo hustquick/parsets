@@ -5,9 +5,9 @@ Name "Parallel Sets"
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 2.0
-!define COMPANY ""
-!define URL ""
+!define VERSION 2.1
+!define COMPANY "UNC Charlotte"
+!define URL "http://eagereyes.org/parallel-sets"
 
 # MUI Symbol Definitions
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\classic-install.ico"
@@ -40,7 +40,7 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile "Parallel Sets 2.0 Setup.exe"
+OutFile "Parallel Sets 2.1 Setup.exe"
 InstallDir "$PROGRAMFILES\Parallel Sets"
 CRCCheck on
 XPStyle on

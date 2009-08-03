@@ -57,7 +57,7 @@ public class DataDimension {
 
 	private List<String> values = new ArrayList<String>(100);
 
-	private boolean hasMetaData = false;
+//	private boolean hasMetaData = false;
 
 	private String dbHandle;
 	
@@ -95,7 +95,7 @@ public class DataDimension {
 			break;
 		}
 		if (type != DataType.textual)
-			if (!hasMetaData)
+//			if (!hasMetaData)
 				if (!categoryMap.containsKey(value))
 					addCategory(value, value);
 	}
@@ -163,7 +163,7 @@ public class DataDimension {
 	
 	public void setName(String newName) {
 		name = newName;
-		hasMetaData = true;
+//		hasMetaData = true;
 	}
 	
 	public int getNumForKey(String key) {
