@@ -375,4 +375,22 @@ public class DataWizard implements CSVParserListener {
 			}
 		});
 	}
+
+	@Override
+	public void errorFileNotFound(String filename) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void errorReadingFile(String filename) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void errorWrongNumberOfColumns(int expected, int found, int line) {
+		// TODO Auto-generated method stub
+		
+	}
 }

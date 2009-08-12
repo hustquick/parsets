@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import au.com.bytecode.opencsv.CSVReader;
-import edu.uncc.parsets.data.DataType;
 import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.util.PSLogging;
 
@@ -128,8 +127,12 @@ public class CSVParser {
 				int numLines = 1;
 				String columns[];
 				while (((columns = parser.readNext()) != null) && (numLines < 100)) {
-					if (columns.length != numColumns)
-						PSLogging.logger.warn("Found "+columns.length+" columns instead of "+numColumns+" in line "+numLines);
+					if (columns.length != numColumns) {
+						PSLogging.logger.error("Found "+columns.length+" columns instead of "+numColumns+" in line "+numLines);
+						if (callBack != null)
+							callBack.errorWrongNumberOfColumns(numColumns, columns.length, numLines);
+						return;
+					}
 					numLines++;
 					for (int i = 0; i < columns.length; i++) {
 						numBytes += columns[i].length()+1;
@@ -142,8 +145,12 @@ public class CSVParser {
 				numLinesEstimate /= 100f; // to scale from 0 to 100
 
 				while (columns != null) {
-					if (columns.length != numColumns)
-						PSLogging.logger.warn("Found "+columns.length+" columns instead of "+numColumns+" in line "+numLines);
+					if (columns.length != numColumns) {
+						PSLogging.logger.error("Found "+columns.length+" columns instead of "+numColumns+" in line "+numLines);
+						if (callBack != null)
+							callBack.errorWrongNumberOfColumns(numColumns, columns.length, numLines);
+						return;
+					}
 					numLines++;
 					if ((numLines & 0xff) == 0 && callBack != null)
 						callBack.setProgress((int)(numLines/numLinesEstimate));
@@ -155,8 +162,12 @@ public class CSVParser {
 			}
 		} catch (FileNotFoundException e) {
 			PSLogging.logger.error("File not found: "+csvFileName, e);
+			if (callBack != null)
+				callBack.errorFileNotFound(csvFileName);
 		} catch (IOException e) {
 			PSLogging.logger.error("IOException while reading file: "+csvFileName, e);
+			if (callBack != null)
+				callBack.errorReadingFile(csvFileName);
 		} finally {
 			try {
 				reader.close();
@@ -166,12 +177,6 @@ public class CSVParser {
 		}
 		if (callBack != null)
 			callBack.setDataSet(dataSet);
-//		for (DataDimension dim : dataSet) {
-//			System.err.print(dim.getName()+": ");
-//			for (int i = 0; i < dim.getNumCategories(); i++)
-//				System.err.print(dim.getCategoryName(i)+", ");
-//			System.err.println();
-//		}
 	}
 	
 	public void streamToDB(LocalDB db) {
@@ -183,6 +188,8 @@ public class CSVParser {
 				callBack.importDone();
 		} catch (Exception e) {
 			PSLogging.logger.error("Error streaming data", e);
+			if (callBack != null)
+				callBack.errorReadingFile(csvFileName);
 		}
 	}
 
@@ -192,12 +199,19 @@ public class CSVParser {
 			if (columns != null) {
 				float values[] = new float[columns.length];
 				for (int i = 0; i < columns.length; i++) {
-					if (dataSet.getDimension(i).getDataType() == DataType.categorical)
+					switch (dataSet.getDimension(i).getDataType()) {
+					case categorical:
 						values[i] = dataSet.getDimension(i).getNumForKey(columns[i]);
-					else
+						break;
+					case numerical:
 						values[i] = Float.valueOf(columns[i]);
+						break;
+					default:
+						values[i] = 0;
+						break;
+					}
+					return values;
 				}
-				return values;
 			}
 		} catch (Exception e) {
 			PSLogging.logger.error("Error reading line", e);

@@ -52,4 +52,11 @@ public interface CSVParserListener {
 	 */
 	public void importDone();
 	
+	public void errorFileNotFound(String filename);
+	
+	public void errorReadingFile(String filename);
+	
+	public void errorWrongNumberOfColumns(int expected, int found, int line);
+
+	
 }
