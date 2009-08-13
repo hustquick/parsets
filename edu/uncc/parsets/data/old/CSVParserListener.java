@@ -52,10 +52,31 @@ public interface CSVParserListener {
 	 */
 	public void importDone();
 	
+	/**
+	 * Called when the parser can't open the file.
+	 * 
+	 * @param filename
+	 */
 	public void errorFileNotFound(String filename);
 	
+	/**
+	 * Called when the parser encounters an IOError or other problem while
+	 * reading the file.
+	 * 
+	 * @param filename The name of the file being read.
+	 */
 	public void errorReadingFile(String filename);
 	
+	/**
+	 * Called when the parser encounters a line with the wrong number of
+	 * columns while analyzing the CSV file. At that point, the parser
+	 * aborts the analysis and goes into an undefined state. Trying
+	 * to continue the import will lead to a program crash.
+	 * 
+	 * @param expected The number of columns the parser expected
+	 * @param found The number of columns found
+	 * @param line The line the error happened
+	 */
 	public void errorWrongNumberOfColumns(int expected, int found, int line);
 
 	
