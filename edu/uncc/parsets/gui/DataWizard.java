@@ -14,6 +14,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -378,19 +379,19 @@ public class DataWizard implements CSVParserListener {
 
 	@Override
 	public void errorFileNotFound(String filename) {
-		// TODO Auto-generated method stub
-		
+		JOptionPane.showConfirmDialog(wizardFrame, "The program could not locate the file '"+filename+"'.", "File Not Found!", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
+		wizardFrame.setVisible(false);
 	}
 
 	@Override
 	public void errorReadingFile(String filename) {
-		// TODO Auto-generated method stub
-		
+		JOptionPane.showConfirmDialog(wizardFrame, "An error occured while reading the file '"+filename+"'.", "Error Reading File!", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
+		wizardFrame.setVisible(false);
 	}
 
 	@Override
 	public void errorWrongNumberOfColumns(int expected, int found, int line) {
-		// TODO Auto-generated method stub
-		
+		JOptionPane.showConfirmDialog(wizardFrame, "The parser encountered a line with the wrong number of columns ("+found+" instead of "+expected+").", "Wrong Number of Columns!", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
+		wizardFrame.setVisible(false);
 	}
 }
