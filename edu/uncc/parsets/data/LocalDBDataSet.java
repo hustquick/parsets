@@ -122,6 +122,7 @@ public class LocalDBDataSet extends DataSet {
 		query.append(", sum(count) from "+dbHandle+"_dims group by ");
 		query.append(dimList);
 		query.append(";");
+
 		try {
 			Statement stmt = db.createStatement(DBAccess.FORREADING);
 			ResultSet rs = stmt.executeQuery(query.toString());
