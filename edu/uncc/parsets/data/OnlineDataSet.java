@@ -61,11 +61,6 @@ public class OnlineDataSet extends DataSet {
 	}
 
 	@Override
-	public int getCount(CategoryHandle[] categories) {
-		return 0;
-	}
-
-	@Override
 	public int getNumCategoricalDimensions() {
 		return ((Long)jsonData.get("categorical")).intValue();
 	}
@@ -101,12 +96,6 @@ public class OnlineDataSet extends DataSet {
 
 	public String getSrcURL() {
 		return (String)jsonData.get("srcURL");
-	}
-
-	@Override
-	public float getSum(CategoryHandle[] categories,
-			DimensionHandle numericalDim) {
-		return 0;
 	}
 
 	@Override
