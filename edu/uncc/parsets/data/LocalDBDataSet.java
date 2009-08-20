@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import edu.uncc.parsets.data.LocalDB.DBAccess;
 import edu.uncc.parsets.util.PSLogging;
 
@@ -232,37 +230,6 @@ public class LocalDBDataSet extends DataSet {
 		return dbHandle;
 	}
 
-	@Override
-	public int getCount(CategoryHandle[] categories) {
-		try {
-			Statement stmt = db.createStatement(DBAccess.FORREADING);
-			StringBuffer query = new StringBuffer("select sum(count) from '"+dbHandle+"_dims'");
-			if (categories != null) {
-				query.append(" where ");
-				for (int i = 0; i < categories.length; i++) {
-					query.append(categories[i].getDimension().getHandle()+"="+categories[i].getCategoryNum());
-					if (i < categories.length-1)
-						query.append(" and ");
-				}
-			}
-			query.append(';');
-			ResultSet rs = stmt.executeQuery(query.toString());
-			int count = rs.getInt(1);
-			rs.close();
-			return count;
-		} catch (SQLException e) {
-			PSLogging.logger.error("SQL error while getting dimension count.", e);
-		} finally {
-			db.releaseReadLock();
-		}
-		return 0;
-	}
-
-	@Override
-	public float getSum(CategoryHandle[] categories, DimensionHandle numericalDim) {
-		return 0;
-	}
-
 	public int getNumDimensions() {
 		if (dimHandles == null)
 			loadDimensions();
@@ -292,26 +259,5 @@ public class LocalDBDataSet extends DataSet {
 				handles[i++] = d;
 		
 		return handles;
-	}
-	
-	public DefaultMutableTreeNode getCategoricalDimensionsAsTree() {
-		if (dimHandles == null)
-			loadDimensions();
-		
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(name);
-		
-		for (DimensionHandle d : dimHandles)
-			if (d.getDataType() == DataType.categorical) {
-				
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(d);
-				
-				for (CategoryHandle cat : d.getCategories())
-					node.add(new DefaultMutableTreeNode(cat));
-				
-				root.add(node);
-				
-			}
-		
-		return root;
 	}
 }

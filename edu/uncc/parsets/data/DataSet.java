@@ -42,26 +42,6 @@ public abstract class DataSet implements Iterable<DimensionHandle>, Comparable<D
 	public abstract Iterator<DimensionHandle> iterator();
 
 	public abstract CategoryTree getTree(List<DimensionHandle> dimensions);
-
-	/**
-	 * Calculate the sum of counts for a selection of categories. If the categories
-	 * array is null, the sum of all counts in the data set is returned.
-	 * 
-	 * @param categories handles of the categories to be used in filtering. If null, no filtering is applied
-	 * @return
-	 */
-	public abstract int getCount(CategoryHandle categories[]);
-
-	/**
-	 * Calculate the sum of a numerical dimension over the given categorical dimensions.
-	 * This function will likely have to be replaced by something more useful for showing
-	 * the values on an entire tree, but it's a start.
-	 * 
-	 * @param categories
-	 * @param numDim
-	 * @return
-	 */
-	public abstract float getSum(CategoryHandle categories[], DimensionHandle numericalDim);
 	
 	protected String name;
 	
@@ -97,7 +77,24 @@ public abstract class DataSet implements Iterable<DimensionHandle>, Comparable<D
 	
 	public abstract DimensionHandle[] getNumericDimensions();
 	
-	public abstract DefaultMutableTreeNode getCategoricalDimensionsAsTree();
+	public DefaultMutableTreeNode getCategoricalDimensionsAsTree() {
+		
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode(name);
+		
+		for (DimensionHandle d : this)
+			if (d.getDataType() == DataType.categorical) {
+				
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(d);
+				
+				for (CategoryHandle cat : d.getCategories())
+					node.add(new DefaultMutableTreeNode(cat));
+				
+				root.add(node);
+				
+			}
+		
+		return root;
+	}
 
 	public abstract String getSection();
 	
