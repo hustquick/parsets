@@ -17,6 +17,10 @@ public class GenoSetsDataSet extends DataSet{
 		// TODO Auto-generated method stub
 
 	}
+	
+	public GenoSetsDataSet(String name){
+		this.name = name;
+	}
 
 	@Override
 	public int getNumCategoricalDimensions() {
