@@ -1,67 +1,84 @@
 package edu.uncc.parsets.data;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /** 
  * Dataset that is backed by GenoSets Database
  * @author aacain
  *
  */
-public class GenoSetsDataSet extends DataSet{
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
+public abstract class GenoSetsDataSet extends DataSet{
 	
-	public GenoSetsDataSet(String name){
-		this.name = name;
+	protected ArrayList<DimensionHandle> dimHandles;
+	protected Class factClass;
+	protected Map classMap;
+	protected int numRecords;
+	protected String section = "Genosets";
+	
+	
+	public GenoSetsDataSet(String dbname, Class factClass){
+		this.name = dbname;
+		this.factClass = factClass;
+		
+		loadDimensions();
+		loadClassMap();
 	}
 
+	public abstract CategoryTree getTree(List<DimensionHandle> dimensions);
+	public abstract void loadClassMap();
+	protected abstract void loadDimensions();
+	
 	@Override
 	public int getNumCategoricalDimensions() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (dimHandles == null)
+			loadDimensions();
+		int num = 0;
+		for (DimensionHandle d : dimHandles)
+			if (d.getDataType() == DataType.categorical) 
+				num++;
+		return num;
 	}
+
 
 	@Override
 	public int getNumDimensions() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (dimHandles == null)
+			loadDimensions();
+
+		return dimHandles.size();
 	}
+
 
 	@Override
 	public int getNumNumericDimensions() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getNumDimensions()-getNumCategoricalDimensions();
 	}
+
 
 	@Override
 	public int getNumRecords() {
-		// TODO Auto-generated method stub
-		return 0;
+		return numRecords;
 	}
+
 
 	@Override
 	public DimensionHandle[] getNumericDimensions() {
-		// TODO Auto-generated method stub
-		return null;
+		DimensionHandle handles[] = new DimensionHandle[getNumNumericDimensions()];
+		int i = 0;
+		for (DimensionHandle d : dimHandles)
+			if (d.getDataType() != DataType.categorical)
+				handles[i++] = d;
+		
+		return handles;	
 	}
+
 
 	@Override
 	public String getSection() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CategoryTree getTree(List<DimensionHandle> dimensions) {
-		// TODO Auto-generated method stub
-		return null;
+		return section;
 	}
 
 	@Override
@@ -70,10 +87,12 @@ public class GenoSetsDataSet extends DataSet{
 		return null;
 	}
 
+
 	@Override
 	public Iterator<DimensionHandle> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		if (dimHandles == null)
+			loadDimensions();
+		return dimHandles.iterator();
 	}
-
+	
 }
