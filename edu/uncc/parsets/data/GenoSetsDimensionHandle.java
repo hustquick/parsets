@@ -11,28 +11,26 @@ import genosetsdb.GenoSetsSessionManager;
 
 
 
-public class GenoSetsDimensionHandle extends GenoSetsDimension implements Iterable<CategoryHandle>{
-	private GenoSetsDimension parentSuperDimension;
-	private List<CategoryHandle> categories;
+public class GenoSetsDimensionHandle extends DimensionHandle{
+	private Class parentSuperDimension;
+	private String alias;
 	private String selectStmt;
 	
-	public GenoSetsDimensionHandle(String propertyName, String alias) {
-		super(propertyName, alias);
+	public GenoSetsDimensionHandle(String name, String handle, DataType dataType, int dimNum) {
+		super(name, handle, dataType, dimNum, null);
 	}
-	public GenoSetsDimensionHandle(String propertyName, String alias, String selectStmt){
-		this(propertyName, alias);
-		this.selectStmt = selectStmt;
-	}
+	
+	
 	private void loadCategories(){
 		categories = new ArrayList<CategoryHandle>();
 		StatelessSession session = GenoSetsSessionManager.getStatelessSession();
 		
 		if(selectStmt == null)
-			selectStmt = this.propertyName;
+			selectStmt = this.handle;
 		
 		String query = "Select " + selectStmt + " as " + alias + 
 			" from " + parentSuperDimension.getPropertyName() + 
-			" group by " + this.getPropertyName();
+			" group by " + this.handle;
     	List<Map> list = session.createQuery(query).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
     	for (Map map : list) {
 			Object value = map.get(this.alias);
