@@ -41,13 +41,13 @@ import edu.uncc.parsets.util.PSLogging;
 
 public class DimensionHandle implements Iterable<CategoryHandle> {
 
-	private String name;
-	private String handle;
-	private DataType dataType;
+	protected String name; //Printable name
+	protected String handle; //Database attribute name
+	protected DataType dataType;
 
-	private List<CategoryHandle> categories;
-	private LocalDBDataSet dataSet;
-	private int num;
+	protected List<CategoryHandle> categories;
+	protected LocalDBDataSet dataSet;
+	protected int num;
 	
 	public DimensionHandle(String name, String handle, DataType dataType, int dimNum, LocalDBDataSet localDBDataSet) {
 		this.name = name;

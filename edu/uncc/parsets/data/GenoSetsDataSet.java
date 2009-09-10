@@ -27,7 +27,11 @@ public abstract class GenoSetsDataSet extends DataSet{
 		loadClassMap();
 	}
 
-	public abstract CategoryTree getTree(List<DimensionHandle> dimensions);
+	public CategoryTree getTree(List<DimensionHandle> dimensions){
+		Map<Class, ArrayList<GenoSetsDimensionHandle>> tableDimMap;
+		
+		return null;
+	}
 	public abstract void loadClassMap();
 	protected abstract void loadDimensions();
 	
