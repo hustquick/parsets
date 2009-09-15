@@ -8,6 +8,9 @@ import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.StatelessSession;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.transform.Transformers;
 
 import genosetsdb.GenoSetsClassMap;
 import genosetsdb.GenoSetsSessionManager;
@@ -62,25 +65,41 @@ public class GenoSetsDataSet extends DataSet{
 		
 		//Iterate classMap, lookup tabledimension, and add dimensionhandles to query
 		StatelessSession session = GenoSetsSessionManager.getStatelessSession();
-		Criteria crit = session.createCriteria(rootTableDimension.getClass(), rootTableDimension.getAlias());
-		recursiveCriteria(rootTableDimension, crit, handleParentMap);		
+		Criteria crit = null;
+		crit = recursiveCriteria(rootTableDimension, crit, handleParentMap);
 		
+        crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        crit.list();
+        
 		return null;
 	}
 	
-	private void recursiveCriteria(TableDimension tableDim, Criteria criteria, Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap){
+	private Criteria recursiveCriteria(TableDimension tableDim, Criteria criteria, Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap){
+		if(criteria == null){
+			StatelessSession session = GenoSetsSessionManager.getStatelessSession();
+			criteria = session.createCriteria(tableDim.getClass(), tableDim.getAlias());
+		}
 		List<TableDimension> childList = classMap.get(tableDim);
 		if(childList != null){
 			for (Iterator it = childList.iterator(); it.hasNext();) {
 				TableDimension childDim = (TableDimension) it.next();		
 				List<GenoSetsDimensionHandle> selectedDims = handleParentMap.get(childDim);
-				if(selectedDims != null){ //then add to criteria
-					System.out.println("Adding tableDim");
-					criteria.createCriteria(tableDim.getAlias() + "." + childDim.getPropertyName(), childDim.getAlias());
+				if(selectedDims != null){ //then add to criteria					
+					System.out.println("Adding tableDim " + childDim.getPropertyName());
+					Criteria subCriteria = criteria.createCriteria(childDim.getPropertyName());
+					ProjectionList projList = Projections.projectionList();
+					for (Iterator it2 = selectedDims.iterator(); it2
+							.hasNext();) {
+						GenoSetsDimensionHandle dimHandle = (GenoSetsDimensionHandle) it2.next();	
+						projList.add(Projections.groupProperty(dimHandle.getPropertyName()));
+						projList.add(Projections.property(dimHandle.getPropertyName()), dimHandle.getHandle());
+						subCriteria.setProjection(projList);
+					}
 				}
 				recursiveCriteria(childDim, criteria, handleParentMap);
 			}
 		}
+		return criteria;
 	}
 	
 	@Override
