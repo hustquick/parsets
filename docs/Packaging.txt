@@ -1,0 +1,41 @@
+Packaging
+=========
+
+Mac OS X
+--------
+1.) Export "Runnable jar file"
+2.) In Jar Bundler, create app, including all *.jnilib files and local.db
+	Jar Bundler can be found at /usr/share/java/Tools/Jar\ Bundler.app
+3.) Set properties:
+	- parsets.use_installed_db = true
+	- dock:name = "Parallel Sets"
+	- com.apple.mrj.application.apple.menu.about.name = ParallelSets 
+4.) Set vm parameter -Xmx1G
+5.) Create app
+6.) Use DropDMG to create "Internet-enabled" disk image with license
+
+Windows
+-------
+Programs needed:
+	- launch4j, http://launch4j.sourceforge.net/
+	- NullSoft Scriptable Install System, http://nsis.sourceforge.net/Main_Page
+
+1.) Create directory "C:\Parallel Sets Installation" with the following layout:
+	- Parallel Sets Installation
+		> Parallel Sets Files
+			- Parallel Sets.exe (from launch4j)
+			- jogl*.dll, gluegen-rt.dll
+		- parallel_sets.jar (runnable jar file)
+		- parsets-512.ico
+		- License.txt
+		> Parallel Sets Application Data
+			- local.db
+	
+2.) update seup.nsi with latest version info
+3.) In Launch4j, open the file "parsets launch config.xml"
+4.) Hit the "Build wrapper" button (the gear icon) to export Parallel Sets.exe
+5.) Make sure the most recent local.db is in the folder C:\Parallel Sets Installation\Parallel Sets Application Data
+6.) Run the script "setup.nsi" in either NSIS or the NSIS Eclipse plugin to generate Parallel Sets 2.x Setup.exe
+
+Linux
+-----
