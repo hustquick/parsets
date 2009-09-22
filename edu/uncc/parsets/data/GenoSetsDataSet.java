@@ -92,32 +92,30 @@ public class GenoSetsDataSet extends DataSet{
 		
 		for (Iterator iterator = resultList.iterator(); iterator.hasNext();) {
 			List columnList = (List) iterator.next();
-			int column = 1;
+			int column = 0;
 			CategoryNode previousNode = root;
-			for (Iterator dimIt = dimensions.iterator(); dimIt.hasNext();) {
-				GenoSetsDimensionHandle dim = (GenoSetsDimensionHandle) dimIt.next();
-				//TODO: not the best way to handle different values other than String name
-				Class categoryClass = dim.getPropertyClass();
+			for (Iterator<DimensionHandle> dimIt = dimensions.iterator(); dimIt.hasNext();) {
+				GenoSetsDimensionHandle dim = (GenoSetsDimensionHandle)dimIt.next();
 				String name;
-				if(categoryClass.getSimpleName().equals("String"))
+				if(dim.getPropertyClass().getSimpleName().equals("String"))
 					name = (String)columnList.get(column);
-				else if(categoryClass.getSimpleName().equals("Integer"))
+				else if(dim.getPropertyClass().getSimpleName().equals("Integer"))
 					name = ((Integer)columnList.get(column)).toString();
-				else //TODO: implement
+				else //TODO: implement for other property class types
 					throw new NotImplementedException();
 				CategoryHandle cat = dim.name2Handle(name);
 				CategoryNode node = null;
 				if (previousLine[column] != null && cat == previousLine[column].getToCategory()) {
 					node = previousLine[column];
 				} else {
-					if (column == dimensions.size())
+					if (column+1 == dimensions.size())
 						node = new CategoryNode(previousNode, cat, (Integer)columnList.get(column+1));
 					else {
 						node = new CategoryNode(previousNode, cat, 0);
 						for (int i = column+1; i <= dimensions.size(); i++)
 							previousLine[i] = null;
 					}
-					tree.addtoLevel(column, node);
+					tree.addtoLevel(column+1, node);
 				}
 				previousNode = node;
 				thisLine[column] = node;
@@ -130,13 +128,15 @@ public class GenoSetsDataSet extends DataSet{
 
 		}
         
-		for (Iterator<List<CategoryNode>> iterator = tree.iterator(); iterator.hasNext();) {
-			List<CategoryNode> list = (List) iterator.next();
-			for (Iterator iterator2 = list.iterator(); iterator2.hasNext();) {
-				CategoryNode node = (CategoryNode) iterator2.next();
-				if(node.getToCategory() != null)
-					System.out.println(node.getToCategory().getName() + " " + node.getCount());
+		//Print tree
+		int numLevels = dimensions.size()+1;
+		for (int i = 1; i < numLevels; i++) {
+			List<CategoryNode> levelList = tree.getLevelList(i);
+			for (Iterator it = levelList.iterator(); it.hasNext();) {
+				CategoryNode categoryNode = (CategoryNode) it.next();
+				System.out.print(categoryNode.getToCategory().getName() + categoryNode.getCount() + "\t");
 			}
+			System.out.println();
 		}
    
 		return tree;
