@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.StatelessSession;
+import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.transform.Transformers;
@@ -16,6 +18,7 @@ import genosetsdb.GenoSetsClassMap;
 import genosetsdb.GenoSetsSessionManager;
 import genosetsdb.TableDimension;
 import genosetsdb.entity.Feature;
+import genosetsdb.entity.Organism;
 
 /** 
  * Dataset that is backed by GenoSets Database
@@ -42,10 +45,11 @@ public class GenoSetsDataSet extends DataSet{
 	
 	protected void loadDimensions(){
 		dimHandles = new ArrayList<DimensionHandle>();
-		//Iterate classMap and add all dimensions
-		TableDimension tableDimension = new TableDimension(Feature.class, null, "f");
-		GenoSetsDimensionHandle dim = new GenoSetsDimensionHandle("Type", "featureType1", "featureType", tableDimension, DataType.categorical, 0);
-		dimHandles.add(dim);
+		//TODO: Iterate classMap and add all dimensions
+		TableDimension tableDimension = new TableDimension(Feature.class, null, "f0", "featureId");
+		dimHandles.add(new GenoSetsDimensionHandle("Type", "featureType1", "featureType", tableDimension, DataType.categorical, 0));
+		tableDimension = new TableDimension(Organism.class, "organism", "o1", "organismId");
+		dimHandles.add(new GenoSetsDimensionHandle("species", "species1", "species", tableDimension, DataType.categorical, 1));
 	}
 
 	public CategoryTree getTree(List<DimensionHandle> dimensions){
@@ -64,20 +68,44 @@ public class GenoSetsDataSet extends DataSet{
 		}
 		
 		//Iterate classMap, lookup tabledimension, and add dimensionhandles to query
-		StatelessSession session = GenoSetsSessionManager.getStatelessSession();
-		Criteria crit = null;
-		crit = recursiveCriteria(rootTableDimension, crit, handleParentMap);
-		
-        crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        crit.list();
+		ProjectionList projList = Projections.projectionList();
+		Criteria crit = recursiveCriteria(rootTableDimension, null, projList, handleParentMap);
+        crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);        
+        List<Map> resultList = crit.list();        
         
-		return null;
+        CategoryTree tree = new CategoryTree(dimensions.size()+1);
+		CategoryNode root = new CategoryNode(null, null, 0);
+		tree.addtoLevel(0, root);       
+        //Now add nodes to tree
+		int i = 0;
+        for (Iterator it = resultList.iterator(); it.hasNext();) {
+			Map map = (Map) it.next();
+			if(i == 0){
+				System.out.println(map.size());
+				Set s = map.keySet();
+				System.out.println(s + "\t");
+				i++;
+			}
+			Set s = map.entrySet();
+			System.out.println(s + "\t");
+		}   
+		return tree;
 	}
 	
-	private Criteria recursiveCriteria(TableDimension tableDim, Criteria criteria, Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap){
+	private Criteria recursiveCriteria(TableDimension tableDim, Criteria criteria, ProjectionList projList, Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap){
 		if(criteria == null){
 			StatelessSession session = GenoSetsSessionManager.getStatelessSession();
-			criteria = session.createCriteria(tableDim.getClass(), tableDim.getAlias());
+			criteria = session.createCriteria(tableDim.getEntityClass(), tableDim.getAlias());
+			List<GenoSetsDimensionHandle> selectedDims = handleParentMap.get(tableDim);
+			if(selectedDims != null){
+				for (Iterator it2 = selectedDims.iterator(); it2.hasNext();) {
+					GenoSetsDimensionHandle dimHandle = (GenoSetsDimensionHandle) it2.next();	
+					projList.add(Projections.count(tableDim.getAlias() + "." + tableDim.getIdPropertyName()), "count");
+					projList.add(Projections.groupProperty(tableDim.getAlias() + "." + dimHandle.getPropertyName()), dimHandle.getHandle());
+					System.out.println("Adding " + dimHandle.getHandle());
+					criteria.setProjection(projList);
+				}				
+			}
 		}
 		List<TableDimension> childList = classMap.get(tableDim);
 		if(childList != null){
@@ -86,17 +114,15 @@ public class GenoSetsDataSet extends DataSet{
 				List<GenoSetsDimensionHandle> selectedDims = handleParentMap.get(childDim);
 				if(selectedDims != null){ //then add to criteria					
 					System.out.println("Adding tableDim " + childDim.getPropertyName());
-					Criteria subCriteria = criteria.createCriteria(childDim.getPropertyName());
-					ProjectionList projList = Projections.projectionList();
+					Criteria subCriteria = criteria.createCriteria(childDim.getPropertyName(), childDim.getAlias());
 					for (Iterator it2 = selectedDims.iterator(); it2
 							.hasNext();) {
 						GenoSetsDimensionHandle dimHandle = (GenoSetsDimensionHandle) it2.next();	
-						projList.add(Projections.groupProperty(dimHandle.getPropertyName()));
-						projList.add(Projections.property(dimHandle.getPropertyName()), dimHandle.getHandle());
-						subCriteria.setProjection(projList);
+						//projList.add(Projections.groupProperty(childDim.getAlias() + "." + dimHandle.getPropertyName()));
+						//subCriteria.setProjection(projList);
 					}
 				}
-				recursiveCriteria(childDim, criteria, handleParentMap);
+				recursiveCriteria(childDim, criteria, projList, handleParentMap);
 			}
 		}
 		return criteria;
