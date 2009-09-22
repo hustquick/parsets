@@ -5,15 +5,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.StatelessSession;
-import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.transform.Transformers;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import genosetsdb.GenoSetsClassMap;
 import genosetsdb.GenoSetsSessionManager;
 import genosetsdb.TableDimension;
@@ -47,13 +46,15 @@ public class GenoSetsDataSet extends DataSet{
 		dimHandles = new ArrayList<DimensionHandle>();
 		//TODO: Iterate classMap and add all dimensions
 		TableDimension tableDimension = new TableDimension(Feature.class, null, "f0", "featureId");
-		dimHandles.add(new GenoSetsDimensionHandle("Type", "featureType1", "featureType", tableDimension, DataType.categorical, 0));
+		dimHandles.add(new GenoSetsDimensionHandle("Type", "featureType1", "featureType", String.class, tableDimension, DataType.categorical, 0));
 		tableDimension = new TableDimension(Organism.class, "organism", "o1", "organismId");
-		dimHandles.add(new GenoSetsDimensionHandle("species", "species1", "species", tableDimension, DataType.categorical, 1));
+		dimHandles.add(new GenoSetsDimensionHandle("species", "species1", "species", String.class, tableDimension, DataType.categorical, 1));
 	}
 
 	public CategoryTree getTree(List<DimensionHandle> dimensions){
 		//Put all dimensions in a list with their parent table this avoids multiple joins
+		//While iterating also create projection
+		ProjectionList projList = Projections.projectionList();
 		Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap = new HashMap<TableDimension, List<GenoSetsDimensionHandle>>();
 		for (Iterator it = dimensions.iterator(); it.hasNext();) {
 			GenoSetsDimensionHandle dimensionHandle = (GenoSetsDimensionHandle) it.next();
@@ -64,31 +65,80 @@ public class GenoSetsDataSet extends DataSet{
 				list.add(dimensionHandle);
 				handleParentMap.put(dimensionHandle.getParentTable(), list);
 			}else
-				list.add(dimensionHandle);			
+				list.add(dimensionHandle);	
+			//Now add to select/group by statement
+			projList.add(Projections.groupProperty(dimensionHandle.getParentTable().getAlias() + "." + dimensionHandle.getPropertyName()), dimensionHandle.getHandle());
+		}
+		projList.add(Projections.count(rootTableDimension.getAlias() + "." + rootTableDimension.getIdPropertyName()), "count");
+		
+		Criteria crit = recursiveCriteria(rootTableDimension, null, projList, handleParentMap);    
+		crit.setResultTransformer(Transformers.TO_LIST);
+		List<List> resultList = crit.list();
+		for (Iterator iterator = resultList.iterator(); iterator.hasNext();) {
+			List columnList = (List) iterator.next();
+			for (Iterator iterator2 = columnList.iterator(); iterator2
+					.hasNext();) {
+				Object item = (Object) iterator2.next();
+				System.out.print(item + "\t");
+			}
+			System.out.println();
 		}
 		
-		//Iterate classMap, lookup tabledimension, and add dimensionhandles to query
-		ProjectionList projList = Projections.projectionList();
-		Criteria crit = recursiveCriteria(rootTableDimension, null, projList, handleParentMap);
-        crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);        
-        List<Map> resultList = crit.list();        
-        
         CategoryTree tree = new CategoryTree(dimensions.size()+1);
+        CategoryNode[] thisLine = new CategoryNode[dimensions.size()+1];
+        CategoryNode[] previousLine = new CategoryNode[dimensions.size()+1];
 		CategoryNode root = new CategoryNode(null, null, 0);
-		tree.addtoLevel(0, root);       
-        //Now add nodes to tree
-		int i = 0;
-        for (Iterator it = resultList.iterator(); it.hasNext();) {
-			Map map = (Map) it.next();
-			if(i == 0){
-				System.out.println(map.size());
-				Set s = map.keySet();
-				System.out.println(s + "\t");
-				i++;
+		tree.addtoLevel(0, root); 	
+		
+		for (Iterator iterator = resultList.iterator(); iterator.hasNext();) {
+			List columnList = (List) iterator.next();
+			int column = 1;
+			CategoryNode previousNode = root;
+			for (Iterator dimIt = dimensions.iterator(); dimIt.hasNext();) {
+				GenoSetsDimensionHandle dim = (GenoSetsDimensionHandle) dimIt.next();
+				//TODO: not the best way to handle different values other than String name
+				Class categoryClass = dim.getPropertyClass();
+				String name;
+				if(categoryClass.getSimpleName().equals("String"))
+					name = (String)columnList.get(column);
+				else if(categoryClass.getSimpleName().equals("Integer"))
+					name = ((Integer)columnList.get(column)).toString();
+				else //TODO: implement
+					throw new NotImplementedException();
+				CategoryHandle cat = dim.name2Handle(name);
+				CategoryNode node = null;
+				if (previousLine[column] != null && cat == previousLine[column].getToCategory()) {
+					node = previousLine[column];
+				} else {
+					if (column == dimensions.size())
+						node = new CategoryNode(previousNode, cat, (Integer)columnList.get(column+1));
+					else {
+						node = new CategoryNode(previousNode, cat, 0);
+						for (int i = column+1; i <= dimensions.size(); i++)
+							previousLine[i] = null;
+					}
+					tree.addtoLevel(column, node);
+				}
+				previousNode = node;
+				thisLine[column] = node;
+				
+				column++;
 			}
-			Set s = map.entrySet();
-			System.out.println(s + "\t");
-		}   
+			CategoryNode temp[] = thisLine;
+			thisLine = previousLine;
+			previousLine = temp;
+
+		}
+        
+		for (Iterator<List<CategoryNode>> iterator = tree.iterator(); iterator.hasNext();) {
+			List<CategoryNode> list = (List) iterator.next();
+			for (Iterator iterator2 = list.iterator(); iterator2.hasNext();) {
+				CategoryNode node = (CategoryNode) iterator2.next();
+				if(node.getToCategory() != null)
+					System.out.println(node.getToCategory().getName() + " " + node.getCount());
+			}
+		}
+   
 		return tree;
 	}
 	
@@ -96,16 +146,7 @@ public class GenoSetsDataSet extends DataSet{
 		if(criteria == null){
 			StatelessSession session = GenoSetsSessionManager.getStatelessSession();
 			criteria = session.createCriteria(tableDim.getEntityClass(), tableDim.getAlias());
-			List<GenoSetsDimensionHandle> selectedDims = handleParentMap.get(tableDim);
-			if(selectedDims != null){
-				for (Iterator it2 = selectedDims.iterator(); it2.hasNext();) {
-					GenoSetsDimensionHandle dimHandle = (GenoSetsDimensionHandle) it2.next();	
-					projList.add(Projections.count(tableDim.getAlias() + "." + tableDim.getIdPropertyName()), "count");
-					projList.add(Projections.groupProperty(tableDim.getAlias() + "." + dimHandle.getPropertyName()), dimHandle.getHandle());
-					System.out.println("Adding " + dimHandle.getHandle());
-					criteria.setProjection(projList);
-				}				
-			}
+		    criteria.setProjection(projList);
 		}
 		List<TableDimension> childList = classMap.get(tableDim);
 		if(childList != null){
@@ -114,13 +155,7 @@ public class GenoSetsDataSet extends DataSet{
 				List<GenoSetsDimensionHandle> selectedDims = handleParentMap.get(childDim);
 				if(selectedDims != null){ //then add to criteria					
 					System.out.println("Adding tableDim " + childDim.getPropertyName());
-					Criteria subCriteria = criteria.createCriteria(childDim.getPropertyName(), childDim.getAlias());
-					for (Iterator it2 = selectedDims.iterator(); it2
-							.hasNext();) {
-						GenoSetsDimensionHandle dimHandle = (GenoSetsDimensionHandle) it2.next();	
-						//projList.add(Projections.groupProperty(childDim.getAlias() + "." + dimHandle.getPropertyName()));
-						//subCriteria.setProjection(projList);
-					}
+					criteria.createCriteria(childDim.getPropertyName(), childDim.getAlias());
 				}
 				recursiveCriteria(childDim, criteria, projList, handleParentMap);
 			}
