@@ -46,15 +46,15 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 	protected DataType dataType;
 
 	protected List<CategoryHandle> categories;
-	protected LocalDBDataSet dataSet;
+	protected DataSet dataSet;
 	protected int num;
 	
-	public DimensionHandle(String name, String handle, DataType dataType, int dimNum, LocalDBDataSet localDBDataSet) {
+	public DimensionHandle(String name, String handle, DataType dataType, int dimNum, DataSet dataSet) {
 		this.name = name;
 		this.handle = handle;
 		this.dataType = dataType;
 		num = dimNum;
-		dataSet = localDBDataSet;
+		this.dataSet = dataSet;
 	}
 	
 	public String getName() {
@@ -82,14 +82,14 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 	private void loadCategories() {
 		categories = new ArrayList<CategoryHandle>();
 		try {
-			Statement stmt = dataSet.getDB().createStatement(DBAccess.FORREADING);
+			Statement stmt = ((LocalDBDataSet)dataSet).getDB().createStatement(DBAccess.FORREADING);
 			ResultSet rs = stmt.executeQuery("select name, handle, number, count from Admin_Categories where dataSet='"+dataSet.getHandle()+"' and dimension='"+handle+"';");
 			while (rs.next())
 				categories.add(new CategoryHandle(rs.getString(1), rs.getString(2), rs.getInt(3), this, rs.getInt(4)));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			dataSet.getDB().releaseReadLock();
+			((LocalDBDataSet)dataSet).getDB().releaseReadLock();
 		}
 	}
 
