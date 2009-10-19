@@ -1,5 +1,6 @@
 package edu.uncc.parsets.gui;
 
+import genosetsdb.entity.Feature;
 import it.cnr.imaa.essi.lablib.gui.checkboxtree.CheckboxTree;
 import it.cnr.imaa.essi.lablib.gui.checkboxtree.DefaultCheckboxTreeCellRenderer;
 import it.cnr.imaa.essi.lablib.gui.checkboxtree.TreeCheckingEvent;
@@ -37,6 +38,7 @@ import net.miginfocom.swing.MigLayout;
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.DimensionHandle;
+import edu.uncc.parsets.data.GenoSetsDataSet;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -191,6 +193,9 @@ public class SideBar extends JPanel implements DataSetListener {
 				mainWin.setDSMenuItemsEnabled(false);
 			}
 		});
+		
+		GenoSetsDataSet dset = new GenoSetsDataSet("dbName", Feature.class);
+		setDataSet(dset);
 	}
 
 	private JPanel makeDataSetTab(MainWindow mainWin) {
