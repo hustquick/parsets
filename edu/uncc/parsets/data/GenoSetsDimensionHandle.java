@@ -21,8 +21,7 @@ public class GenoSetsDimensionHandle extends DimensionHandle{
 	
 	public GenoSetsDimensionHandle(String name, String handle, String propertyName, 
 			Class propertyClass, TableDimension parentTable, DataType dataType, int dimNum) {
-		//TODO: change DimensionHandle constructor doesn't need LocalDBDataSet
-		//the null value is for the LocalDBDataSet 
+		//TODO: pass GenoSetsDataSet to super constructor here! 
 		super(name, handle, dataType, dimNum, null);
 		this.propertyName = propertyName;
 		this.parentTable = parentTable;

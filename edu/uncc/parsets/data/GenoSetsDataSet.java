@@ -51,6 +51,7 @@ public class GenoSetsDataSet extends DataSet{
 		dimHandles.add(new GenoSetsDimensionHandle("species", "species1", "species", String.class, tableDimension, DataType.categorical, 1));
 	}
 
+	@Override
 	public CategoryTree getTree(List<DimensionHandle> dimensions){
 		//Put all dimensions in a list with their parent table this avoids multiple joins
 		//While iterating also create projection

@@ -86,7 +86,7 @@ public abstract class DataSet implements Iterable<DimensionHandle>, Comparable<D
 				
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(d);
 				
-				for (CategoryHandle cat : d.getCategories())
+				for (CategoryHandle cat : d)
 					node.add(new DefaultMutableTreeNode(cat));
 				
 				root.add(node);
