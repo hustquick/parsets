@@ -46,9 +46,9 @@ public class GenoSetsDataSet extends DataSet{
 		dimHandles = new ArrayList<DimensionHandle>();
 		//TODO: Iterate classMap and add all dimensions
 		TableDimension tableDimension = new TableDimension(Feature.class, null, "f0", "featureId");
-		dimHandles.add(new GenoSetsDimensionHandle("Type", "featureType1", "featureType", String.class, tableDimension, DataType.categorical, 0));
+		dimHandles.add(new GenoSetsDimensionHandle("Type", "featureType1", "featureType", String.class, tableDimension, DataType.categorical, 0, this));
 		tableDimension = new TableDimension(Organism.class, "organism", "o1", "organismId");
-		dimHandles.add(new GenoSetsDimensionHandle("species", "species1", "species", String.class, tableDimension, DataType.categorical, 1));
+		dimHandles.add(new GenoSetsDimensionHandle("species", "species1", "species", String.class, tableDimension, DataType.categorical, 1, this));
 	}
 
 	@Override

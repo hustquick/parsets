@@ -20,12 +20,13 @@ public class GenoSetsDimensionHandle extends DimensionHandle{
 	
 	
 	public GenoSetsDimensionHandle(String name, String handle, String propertyName, 
-			Class propertyClass, TableDimension parentTable, DataType dataType, int dimNum) {
+			Class propertyClass, TableDimension parentTable, DataType dataType, int dimNum, GenoSetsDataSet dataSet) {
 		//TODO: pass GenoSetsDataSet to super constructor here! 
 		super(name, handle, dataType, dimNum, null);
 		this.propertyName = propertyName;
 		this.parentTable = parentTable;
 		this.propertyClass = propertyClass;
+		this.dataSet = dataSet;
 	}
 	
 	
@@ -107,6 +108,11 @@ public class GenoSetsDimensionHandle extends DimensionHandle{
 		if (categories == null)
 			loadCategories();
 		return categories.iterator();
+	}
+	
+	@Override
+	public DataSet getDataSet() {
+		return dataSet;
 	}
 
 }
