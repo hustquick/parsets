@@ -60,6 +60,10 @@ public class ColorBrewer {
 	}
 	
 	public static void setColor(int colorNum, boolean darker, float alpha, GL gl) {
+		// TODO: This is a quick fix for a problem where the colorBrewerIndex in VisualConnection
+		// apparently gets set to -1 for large numbers of ribbons.
+		if (colorNum < 0)
+			colorNum = 0;
 		colorNum = colorNum % colors.length;
 		if (darker)
 			gl.glColor4f(colors[colorNum][0]*.75f, colors[colorNum][1]*.75f, colors[colorNum][2]*.75f, alpha);
