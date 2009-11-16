@@ -69,14 +69,41 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 		return ratio;
 	}
 	
+//	public String getTooltipText(int filteredTotal) {		
+//		CategoryNode node = this;
+//		ArrayList<CategoryHandle> cats = new ArrayList<CategoryHandle>();
+//		
+//		while (node.getParent() != null) {			
+//			cats.add(0, node.getToCategory());
+//			node = node.getParent();			
+//		}
+//		String s = "";
+//		for(CategoryHandle category : cats) {
+//			s += category.getName();
+//			if (cats.indexOf(category) < cats.size()-1) {
+//				s += ", ";
+//			}
+//		}
+//		
+//		s += "\n" + count + ", ";
+//		
+//		float percentage = ((float)count/(float)filteredTotal)*100f;
+//		
+//		if (percentage < 1) {			
+//			NumberFormat f = NumberFormat.getInstance();
+//			f.setMaximumFractionDigits(2);			
+//			s += f.format(percentage) + "%";
+//		}
+//		else 
+//			s += (int)percentage + "%";
+//
+//		return s;
+//		
+//	}
+	
 	public String getTooltipText(int filteredTotal) {		
-		CategoryNode node = this;
-		ArrayList<CategoryHandle> cats = new ArrayList<CategoryHandle>();
+		ArrayList<CategoryHandle> cats = getNodePath();
 		
-		while (node.getParent() != null) {			
-			cats.add(0, node.getToCategory());
-			node = node.getParent();			
-		}
 		String s = "";
 		for(CategoryHandle category : cats) {
 			s += category.getName();
@@ -99,6 +126,44 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 
 		return s;
 		
+	}
+	
+	public String getTooltipText(int filteredTotal, ArrayList<CategoryHandle> cats) {			
+		String s = "";
+		for(CategoryHandle category : cats) {
+			s += category.getName();
+			if (cats.indexOf(category) < cats.size()-1) {
+				s += ", ";
+			}
+		}
+		
+		s += "\n" + count + ", ";
+		
+		float percentage = ((float)count/(float)filteredTotal)*100f;
+		
+		if (percentage < 1) {			
+			NumberFormat f = NumberFormat.getInstance();
+			f.setMaximumFractionDigits(2);			
+			s += f.format(percentage) + "%";
+		}
+		else 
+			s += (int)percentage + "%";
+
+		return s;
+		
+	}
+	
+	
+	public ArrayList<CategoryHandle> getNodePath(){
+		CategoryNode node = this;
+		ArrayList<CategoryHandle> cats = new ArrayList<CategoryHandle>();
+		
+		while (node.getParent() != null) {			
+			cats.add(0, node.getToCategory());
+			node = node.getParent();			
+		}
+		
+		return cats;
 	}
 
 	public CategoryHandle getToCategory() {

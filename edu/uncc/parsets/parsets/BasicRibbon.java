@@ -1,9 +1,11 @@
 package edu.uncc.parsets.parsets;
 
 import java.awt.Polygon;
+import java.util.ArrayList;
 
 import javax.media.opengl.GL;
 
+import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.util.AnimatableProperty;
 import edu.uncc.parsets.util.ColorBrewer;
@@ -91,6 +93,10 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	
 	public String getTooltip(int filteredTotal) { 
 		return node.getTooltipText(filteredTotal);
+	}
+	
+	public ArrayList<CategoryHandle> getNodePath(){
+		return node.getNodePath();
 	}
 	
 	public void layout(float parentWidth) {
