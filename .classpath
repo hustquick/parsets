@@ -20,6 +20,6 @@
 	<classpathentry kind="lib" path="libs/jta-1.1.jar"/>
 	<classpathentry kind="lib" path="libs/slf4j-api-1.5.8.jar"/>
 	<classpathentry kind="lib" path="/genosetsdb/lib/hibernate3.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM 1.6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM 1.6.0 (MacOS X Default) (1)"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

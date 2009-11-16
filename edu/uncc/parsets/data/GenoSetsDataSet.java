@@ -49,6 +49,8 @@ public class GenoSetsDataSet extends DataSet{
 		dimHandles.add(new GenoSetsDimensionHandle("Type", "featureType1", "featureType", String.class, tableDimension, DataType.categorical, 0, this));
 		tableDimension = new TableDimension(Organism.class, "organism", "o1", "organismId");
 		dimHandles.add(new GenoSetsDimensionHandle("species", "species1", "species", String.class, tableDimension, DataType.categorical, 1, this));
+		
+		dimHandles.add(new GenoSetsDimensionHandle("genus", "genus1", "genus", String.class, tableDimension, DataType.categorical, 2, this));
 	}
 
 	@Override

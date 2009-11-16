@@ -1,8 +1,10 @@
 package edu.uncc.parsets.parsets;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.event.MouseInputAdapter;
 
+import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
 
@@ -40,7 +42,8 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	private CategoryBar activeCategoryBar = null;
 	private CategoricalAxis activeAxis = null;
 	private int deltaMouseX;
-	private ParSetsView view;
+	private ParSetsView view;	
+	private ArrayList<CategoryHandle> selectedCats;
 	
 	public ParSetsInteraction(ParSetsView parSetsView) {
 		view = parSetsView;
@@ -128,15 +131,17 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			String s = activeCategoryBar.getCategory().getName() + "\n";
 			s += view.getDataTree().getFilteredCount(activeCategoryBar.getCategory()) + ", ";
 			s += (int)(view.getDataTree().getFilteredFrequency(activeCategoryBar.getCategory()) * 100) + "%";
-			view.setTooltip(s, mouseX, mouseY);
-			
+			view.setTooltip(s, mouseX, mouseY);		
 			view.getConnectionTree().selectCategory(activeCategoryBar.getCategory());
 		} else if (activeAxis == null) {
 			String s = view.getConnectionTree().highlightRibbon(mouseX, mouseY, view.getDataTree());
-			if (s != null) 
+			if (s != null){ 
+				//here
 				view.setTooltip(s, mouseX, mouseY);
+			}
 		} else
 			view.getConnectionTree().clearSelection();
+
 
 		// TODO: Change cursor according to type of movement possible
 		// requires hand-drawn cursors, standard types don't seem to include
