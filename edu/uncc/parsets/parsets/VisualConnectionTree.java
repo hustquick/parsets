@@ -274,6 +274,16 @@ public class VisualConnectionTree {
 		}
 	}
 	
+	public VisualConnection getAndHighlightRibbon(int x, int y, CategoryTree dataTree) {
+		clearSelection();
+		VisualConnection selectedRibbon = highlightRibbon(x, y, root);
+		if (selectedRibbon != null) {
+			setSelected(selectedRibbon);
+			return selectedRibbon;
+		}
+		return null;
+	}
+	
 	public String highlightRibbon(int x, int y, CategoryTree dataTree) {
 		clearSelection();
 		VisualConnection selectedRibbon = highlightRibbon(x, y, root);

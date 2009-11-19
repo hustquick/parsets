@@ -44,6 +44,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	private int deltaMouseX;
 	private ParSetsView view;	
 	private ArrayList<CategoryHandle> selectedCats;
+	private VisualConnection selectedRibbon = null;
 	
 	public ParSetsInteraction(ParSetsView parSetsView) {
 		view = parSetsView;
@@ -134,10 +135,11 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			view.setTooltip(s, mouseX, mouseY);		
 			view.getConnectionTree().selectCategory(activeCategoryBar.getCategory());
 		} else if (activeAxis == null) {
-			String s = view.getConnectionTree().highlightRibbon(mouseX, mouseY, view.getDataTree());
-			if (s != null){ 
-				//here
-				view.setTooltip(s, mouseX, mouseY);
+			selectedRibbon = null;
+			selectedRibbon = view.getConnectionTree().getAndHighlightRibbon(mouseX, mouseY, view.getDataTree());
+			if (selectedRibbon != null){ 
+				view.setTooltip(selectedRibbon.getTooltip(view.getDataTree().getFilteredTotal()), 
+						mouseX, mouseY);
 			}
 		} else
 			view.getConnectionTree().clearSelection();
