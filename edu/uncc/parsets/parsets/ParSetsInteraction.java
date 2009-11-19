@@ -67,6 +67,13 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			activeAxis = null;
 			view.layout();
 			AnimatableProperty.commitAnimations();
+		}else{
+			if(selectedRibbon != null){
+				if(e.getButton() == MouseEvent.BUTTON3){
+					GenoSetsPopup menu = new GenoSetsPopup();
+					menu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
 		}
 		if (activeCategoryBar != null) {
 			AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
