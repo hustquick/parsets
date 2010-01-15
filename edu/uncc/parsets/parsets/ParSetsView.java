@@ -271,6 +271,10 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 		clearScreen();
 	}
 	
+	public void fireSelectionChangeEvent(){
+		
+	}
+	
 	public void addAxis(DimensionHandle dimension) {
 
 		if (dimension.getDataType() == DataType.categorical) {
@@ -533,5 +537,9 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 
 	public void setMouseInDisplay(boolean b) {
 		mouseInDisplay = b;
+	}
+	
+	public Controller getController(){
+		return controller;
 	}
 }
