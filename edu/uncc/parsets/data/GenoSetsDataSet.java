@@ -16,7 +16,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import genosetsdb.GenoSetsClassMap;
 import genosetsdb.GenoSetsSessionManager;
 import genosetsdb.TableDimension;
-import genosetsdb.entity.Feature;
+import genosetsdb.entity.AnnoView;
+import genosetsdb.entity.FeatureDesc;
+import genosetsdb.entity.Homologs;
 import genosetsdb.entity.Organism;
 
 /** 
@@ -27,11 +29,13 @@ import genosetsdb.entity.Organism;
 public class GenoSetsDataSet extends DataSet{
 	
 	protected ArrayList<DimensionHandle> dimHandles;
-	protected Class factClass;
+	private Class factClass;
 	protected TableDimension rootTableDimension;
 	protected Map<TableDimension, List<TableDimension>> classMap;
 	protected int numRecords;
 	protected String section = "Genosets";
+	private List<DimensionHandle> currentDims;
+	private Criteria currentCriteria;
 	
 	
 	public GenoSetsDataSet(String dbname, Class factClass){
@@ -45,21 +49,49 @@ public class GenoSetsDataSet extends DataSet{
 	protected void loadDimensions(){
 		dimHandles = new ArrayList<DimensionHandle>();
 		//TODO: Iterate classMap and add all dimensions
-		TableDimension tableDimension = new TableDimension(Feature.class, null, "f0", "featureId");
-		dimHandles.add(new GenoSetsDimensionHandle("Type", "featureType1", "featureType", String.class, tableDimension, DataType.categorical, 0, this));
+		//TableDimension tableDimension = new TableDimension(Feature.class, null, "f0", "featureId");
+		//dimHandles.add(new GenoSetsDimensionHandle("Type", "featureType1", "featureType", String.class, tableDimension, DataType.categorical, 0, this));
+		
+		TableDimension tableDimension = new TableDimension(FeatureDesc.class, "featureDescSet", "fd1", "featureDescId");
+		//dimHandles.add(new GenoSetsDimensionHandle("type", "featureType1", "featureType", String.class, tableDimension, DataType.categorical, 0, this));
 		tableDimension = new TableDimension(Organism.class, "organism", "o1", "organismId");
 		dimHandles.add(new GenoSetsDimensionHandle("species", "species1", "species", String.class, tableDimension, DataType.categorical, 1, this));
-		
 		dimHandles.add(new GenoSetsDimensionHandle("genus", "genus1", "genus", String.class, tableDimension, DataType.categorical, 2, this));
+		dimHandles.add(new GenoSetsDimensionHandle("strain", "strain1", "strain", String.class, tableDimension, DataType.categorical, 5, this));
+		dimHandles.add(new GenoSetsDimensionHandle("biovar", "biovar1", "biovar", String.class, tableDimension, DataType.categorical, 6, this));
+		dimHandles.add(new GenoSetsDimensionHandle("repUnit", "repUnit1", "repUnit", String.class, tableDimension, DataType.categorical, 7, this));
+		tableDimension = new TableDimension(AnnoView.class, "annoView", "av", "featureId");
+		dimHandles.add(new GenoSetsDimensionHandle("GenBank/EMBL", "gb", "genbank", String.class, tableDimension, DataType.categorical, 3, this));
+		dimHandles.add(new GenoSetsDimensionHandle("Patric", "p", "patric", String.class, tableDimension, DataType.categorical, 4, this));
+		
+		tableDimension = new TableDimension(Homologs.class, "homologs", "h", "featureId");
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Melitensis", "speciesMelitensis", "speciesMelitensis", String.class, tableDimension, DataType.categorical, 8, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Suis", "speciesSuis", "speciesSuis", String.class, tableDimension, DataType.categorical, 9, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Abortus", "speciesAbortus", "speciesAbortus", String.class, tableDimension, DataType.categorical, 10, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Ovis", "speciesOvis", "speciesOvis", String.class, tableDimension, DataType.categorical, 11, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Canis", "speciesCanis", "speciesCanis", String.class, tableDimension, DataType.categorical, 12, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Microti", "speciesMicroti", "speciesMicroti", String.class, tableDimension, DataType.categorical, 13, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Abortus9941", "strainAbortus9941", "strainAbortus9941", String.class, tableDimension, DataType.categorical, 14, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain MelitensisBiovarAbortus", "strainMelitensisBiovarAbortus", "strainMelitensisBiovarAbortus", String.class, tableDimension, DataType.categorical, 15, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain AbortusS19", "strainAbortusS19", "strainAbortusS19", String.class, tableDimension, DataType.categorical, 16, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain CanisAtcc", "strainCanisAtcc", "strainCanisAtcc", String.class, tableDimension, DataType.categorical, 17, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Melitensis16m", "strainMelitensis16m", "strainMelitensis16m", String.class, tableDimension, DataType.categorical, 18, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain MelitensisAtcc", "strainMelitensisAtcc", "strainMelitensisAtcc", String.class, tableDimension, DataType.categorical, 19, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Microti", "strainMicroti", "strainMicroti", String.class, tableDimension, DataType.categorical, 20, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain OvisAtcc", "strainOvisAtcc", "strainOvisAtcc", String.class, tableDimension, DataType.categorical, 21, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Suis1330", "strainSuis1330", "strainSuis1330", String.class, tableDimension, DataType.categorical, 22, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog strain SuisAtcc", "strainSuisAtcc", "strainSuisAtcc", String.class, tableDimension, DataType.categorical, 23, this));
 	}
-
-	@Override
-	public CategoryTree getTree(List<DimensionHandle> dimensions){
-		//Put all dimensions in a list with their parent table this avoids multiple joins
+	
+	public Criteria createCriteria(){		
 		//While iterating also create projection
 		ProjectionList projList = Projections.projectionList();
+		
+		//Put all dimensions in a list with their parent table this avoids multiple joins
+		//by creating a map for all Table dimensions with their associated list of all their 
+		//genosetsDimensionHandles that are part of that selection
 		Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap = new HashMap<TableDimension, List<GenoSetsDimensionHandle>>();
-		for (Iterator it = dimensions.iterator(); it.hasNext();) {
+		for (Iterator it = currentDims.iterator(); it.hasNext();) {
 			GenoSetsDimensionHandle dimensionHandle = (GenoSetsDimensionHandle) it.next();
 			List<GenoSetsDimensionHandle> list = handleParentMap
 							.get(dimensionHandle.getParentTable());
@@ -74,18 +106,19 @@ public class GenoSetsDataSet extends DataSet{
 		}
 		projList.add(Projections.count(rootTableDimension.getAlias() + "." + rootTableDimension.getIdPropertyName()), "count");
 		
-		Criteria crit = recursiveCriteria(rootTableDimension, null, projList, handleParentMap);    
+		Criteria crit = recursiveCriteria(rootTableDimension, null, handleParentMap);		
+		crit.setProjection(projList);
 		crit.setResultTransformer(Transformers.TO_LIST);
+		return crit;
+	}
+
+	@Override
+	public CategoryTree getTree(List<DimensionHandle> dimensions){
+		currentDims = dimensions;
+		Criteria crit = createCriteria();
+		currentCriteria = crit;
 		List<List> resultList = crit.list();
-		for (Iterator iterator = resultList.iterator(); iterator.hasNext();) {
-			List columnList = (List) iterator.next();
-			for (Iterator iterator2 = columnList.iterator(); iterator2
-					.hasNext();) {
-				Object item = (Object) iterator2.next();
-				System.out.print(item + "\t");
-			}
-			System.out.println();
-		}
+		
 		
         CategoryTree tree = new CategoryTree(dimensions.size()+1);
         CategoryNode[] thisLine = new CategoryNode[dimensions.size()+1];
@@ -130,27 +163,18 @@ public class GenoSetsDataSet extends DataSet{
 			previousLine = temp;
 
 		}
-        
-		//Print tree
-		int numLevels = dimensions.size()+1;
-		for (int i = 1; i < numLevels; i++) {
-			List<CategoryNode> levelList = tree.getLevelList(i);
-			for (Iterator it = levelList.iterator(); it.hasNext();) {
-				CategoryNode categoryNode = (CategoryNode) it.next();
-				System.out.print(categoryNode.getToCategory().getName() + categoryNode.getCount() + "\t");
-			}
-			System.out.println();
-		}
    
 		return tree;
 	}
 	
-	private Criteria recursiveCriteria(TableDimension tableDim, Criteria criteria, ProjectionList projList, Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap){
+	private Criteria recursiveCriteria(TableDimension tableDim, Criteria criteria, Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap){
+		//Create new criteria if hasn't been created, based on root table dimension
 		if(criteria == null){
 			StatelessSession session = GenoSetsSessionManager.getStatelessSession();
-			criteria = session.createCriteria(tableDim.getEntityClass(), tableDim.getAlias());
-		    criteria.setProjection(projList);
+			criteria = session.createCriteria(rootTableDimension.getEntityClass(), tableDim.getAlias());
 		}
+		
+		//get all tableDimension children of given table dimension, iterate list and see if in the selected list
 		List<TableDimension> childList = classMap.get(tableDim);
 		if(childList != null){
 			for (Iterator it = childList.iterator(); it.hasNext();) {
@@ -160,7 +184,7 @@ public class GenoSetsDataSet extends DataSet{
 					System.out.println("Adding tableDim " + childDim.getPropertyName());
 					criteria.createCriteria(childDim.getPropertyName(), childDim.getAlias());
 				}
-				recursiveCriteria(childDim, criteria, projList, handleParentMap);
+				recursiveCriteria(childDim, criteria, handleParentMap);
 			}
 		}
 		return criteria;
@@ -229,11 +253,21 @@ public class GenoSetsDataSet extends DataSet{
 			loadDimensions();
 		return dimHandles.iterator();
 	}
-	
-	public static void main(String[] args) {
-		System.out.println("okay");
-		GenoSetsDataSet dset = new GenoSetsDataSet("dbName", Feature.class);
-		dset.getTree(dset.dimHandles);
+
+	public void setFactClass(Class factClass) {
+		this.factClass = factClass;
+	}
+
+	public Class getFactClass() {
+		return factClass;
+	}
+
+	public void setCurrentCriteria(Criteria currentCriteria) {
+		this.currentCriteria = currentCriteria;
+	}
+
+	public Criteria getCurrentCriteria() {
+		return currentCriteria;
 	}
 	
 }

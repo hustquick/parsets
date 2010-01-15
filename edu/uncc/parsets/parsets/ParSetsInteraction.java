@@ -1,12 +1,21 @@
 package edu.uncc.parsets.parsets;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.event.MouseInputAdapter;
 
 import edu.uncc.parsets.data.CategoryHandle;
+import edu.uncc.parsets.data.CategoryNode;
+import edu.uncc.parsets.data.GenoSetsDataSet;
+import edu.uncc.parsets.data.GenoSetsDimensionHandle;
+import edu.uncc.parsets.gui.Controller;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
+import genosetsdb.MultipleViewController;
+import genosetsdb.interaction.SelectedDimension;
+import genosetsdb.interaction.SelectedDimensionChangeEvent;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -43,11 +52,12 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	private CategoricalAxis activeAxis = null;
 	private int deltaMouseX;
 	private ParSetsView view;	
-	private ArrayList<CategoryHandle> selectedCats;
 	private VisualConnection selectedRibbon = null;
+	private Controller controller;
 	
 	public ParSetsInteraction(ParSetsView parSetsView) {
 		view = parSetsView;
+		controller = view.getController();
 	}
 	
 	@Override
@@ -70,8 +80,13 @@ public class ParSetsInteraction extends MouseInputAdapter {
 		}else{
 			if(selectedRibbon != null){
 				if(e.getButton() == MouseEvent.BUTTON3){
-					GenoSetsPopup menu = new GenoSetsPopup();
-					menu.show(e.getComponent(), e.getX(), e.getY());
+					//GenoSetsPopup menu = new GenoSetsPopup();
+					//menu.show(e.getComponent(), e.getX(), e.getY());
+					//notifyDependants();
+					createDependant();
+				}else{
+					System.out.println("notifying dependents");
+					notifyDependants();
 				}
 			}
 		}
@@ -171,5 +186,29 @@ public class ParSetsInteraction extends MouseInputAdapter {
 		view.clearTooltip();
 		view.getConnectionTree().clearSelection();
 		view.repaint();
+	}
+	
+	public void createDependant(){
+		MultipleViewController childVisController = new MultipleViewController(createSelectEvent());
+		controller.addSelectedDimListener(childVisController);
+	}
+	
+	public void notifyDependants(){
+		controller.notifySelectedDimListeners(createSelectEvent());
+	}
+	
+	private SelectedDimensionChangeEvent createSelectEvent(){
+		//Get the path to the selected category node and add all category, value pairs and add to list
+		List<SelectedDimension> selectedList = new LinkedList();
+		CategoryNode node = selectedRibbon.getNode();
+		GenoSetsDataSet data = (GenoSetsDataSet) node.getToCategory().getDimension().getDataSet();
+		ArrayList<CategoryHandle> list = node.getNodePath();
+		for (CategoryHandle catHandle : list) {
+			GenoSetsDimensionHandle dh = (GenoSetsDimensionHandle)catHandle.getDimension();
+			SelectedDimension selected = new SelectedDimension(dh.getParentTable(), dh.getName(), dh.getPropertyName(), catHandle.getName());
+			selectedList.add(selected);
+		}
+		
+		return new SelectedDimensionChangeEvent(this, data.createCriteria(), selectedList, data.getFactClass());
 	}
 }

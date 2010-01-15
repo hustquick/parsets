@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.parsets.ParSetsView;
+import genosetsdb.interaction.SelectedDimListener;
+import genosetsdb.interaction.SelectedDimensionChangeEvent;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -43,6 +45,7 @@ import edu.uncc.parsets.parsets.ParSetsView;
 public class Controller {
 
 	private ArrayList<DataSetListener> dsListeners = new ArrayList<DataSetListener>();
+	private ArrayList<SelectedDimListener> selectionListeners = new ArrayList<SelectedDimListener>();
 	public ParSetsView parSetsView;
 	
 	public DBTab dbTab;
@@ -62,5 +65,19 @@ public class Controller {
 	public void setDataSet(DataSet data) {
 		for (DataSetListener l : dsListeners)
 			l.setDataSet(data);
+	}
+	
+	public void addSelectedDimListener(SelectedDimListener listener){
+		selectionListeners.add(listener);
+	}
+	
+	public void removeSelectedDimListener(SelectedDimListener listener){
+		selectionListeners.remove(listener);
+	}
+	
+	public void notifySelectedDimListeners(SelectedDimensionChangeEvent e){
+		for (SelectedDimListener l : selectionListeners) {
+			l.updateParentSelection(e);
+		}	
 	}
 }
