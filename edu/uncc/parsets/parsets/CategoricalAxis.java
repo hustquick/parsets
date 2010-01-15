@@ -88,8 +88,8 @@ public class CategoricalAxis extends VisualAxis {
 	};
 	
 	public static class Buttons {
-		private static final String DESCENDING = "« ";
-		private static final String ASCENDING = " »";
+		private static final String DESCENDING = "\u00ab ";
+		private static final String ASCENDING = " \u00bb";
 		private static final String ALPHA = "alpha";
 		private static final String SIZE = "size";
 		public static final int SPACING = 20;

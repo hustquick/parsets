@@ -66,21 +66,21 @@ public class GenoSetsDataSet extends DataSet{
 		
 		tableDimension = new TableDimension(Homologs.class, "homologs", "h", "featureId");
 		dimHandles.add(new GenoSetsDimensionHandle("homolog species Melitensis", "speciesMelitensis", "speciesMelitensis", String.class, tableDimension, DataType.categorical, 8, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog species Suis", "speciesSuis", "speciesSuis", String.class, tableDimension, DataType.categorical, 9, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog species Abortus", "speciesAbortus", "speciesAbortus", String.class, tableDimension, DataType.categorical, 10, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog species Ovis", "speciesOvis", "speciesOvis", String.class, tableDimension, DataType.categorical, 11, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog species Canis", "speciesCanis", "speciesCanis", String.class, tableDimension, DataType.categorical, 12, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog species Microti", "speciesMicroti", "speciesMicroti", String.class, tableDimension, DataType.categorical, 13, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Abortus9941", "strainAbortus9941", "strainAbortus9941", String.class, tableDimension, DataType.categorical, 14, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain MelitensisBiovarAbortus", "strainMelitensisBiovarAbortus", "strainMelitensisBiovarAbortus", String.class, tableDimension, DataType.categorical, 15, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain AbortusS19", "strainAbortusS19", "strainAbortusS19", String.class, tableDimension, DataType.categorical, 16, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain CanisAtcc", "strainCanisAtcc", "strainCanisAtcc", String.class, tableDimension, DataType.categorical, 17, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Melitensis16m", "strainMelitensis16m", "strainMelitensis16m", String.class, tableDimension, DataType.categorical, 18, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain MelitensisAtcc", "strainMelitensisAtcc", "strainMelitensisAtcc", String.class, tableDimension, DataType.categorical, 19, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Microti", "strainMicroti", "strainMicroti", String.class, tableDimension, DataType.categorical, 20, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain OvisAtcc", "strainOvisAtcc", "strainOvisAtcc", String.class, tableDimension, DataType.categorical, 21, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Suis1330", "strainSuis1330", "strainSuis1330", String.class, tableDimension, DataType.categorical, 22, this));
-		dimHandles.add(new GenoSetsDimensionHandle("homolog strain SuisAtcc", "strainSuisAtcc", "strainSuisAtcc", String.class, tableDimension, DataType.categorical, 23, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog species Suis", "speciesSuis", "speciesSuis", String.class, tableDimension, DataType.categorical, 9, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog species Abortus", "speciesAbortus", "speciesAbortus", String.class, tableDimension, DataType.categorical, 10, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog species Ovis", "speciesOvis", "speciesOvis", String.class, tableDimension, DataType.categorical, 11, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog species Canis", "speciesCanis", "speciesCanis", String.class, tableDimension, DataType.categorical, 12, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog species Microti", "speciesMicroti", "speciesMicroti", String.class, tableDimension, DataType.categorical, 13, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Abortus9941", "strainAbortus9941", "strainAbortus9941", String.class, tableDimension, DataType.categorical, 14, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain MelitensisBiovarAbortus", "strainMelitensisBiovarAbortus", "strainMelitensisBiovarAbortus", String.class, tableDimension, DataType.categorical, 15, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain AbortusS19", "strainAbortusS19", "strainAbortusS19", String.class, tableDimension, DataType.categorical, 16, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain CanisAtcc", "strainCanisAtcc", "strainCanisAtcc", String.class, tableDimension, DataType.categorical, 17, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Melitensis16m", "strainMelitensis16m", "strainMelitensis16m", String.class, tableDimension, DataType.categorical, 18, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain MelitensisAtcc", "strainMelitensisAtcc", "strainMelitensisAtcc", String.class, tableDimension, DataType.categorical, 19, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Microti", "strainMicroti", "strainMicroti", String.class, tableDimension, DataType.categorical, 20, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain OvisAtcc", "strainOvisAtcc", "strainOvisAtcc", String.class, tableDimension, DataType.categorical, 21, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Suis1330", "strainSuis1330", "strainSuis1330", String.class, tableDimension, DataType.categorical, 22, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain SuisAtcc", "strainSuisAtcc", "strainSuisAtcc", String.class, tableDimension, DataType.categorical, 23, this));
 	}
 	
 	public Criteria createCriteria(){		

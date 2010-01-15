@@ -80,8 +80,8 @@ public class ParSetsInteraction extends MouseInputAdapter {
 		}else{
 			if(selectedRibbon != null){
 				if(e.getButton() == MouseEvent.BUTTON3){
-					//GenoSetsPopup menu = new GenoSetsPopup();
-					//menu.show(e.getComponent(), e.getX(), e.getY());
+					GenoSetsPopup menu = new GenoSetsPopup();
+					menu.show(e.getComponent(), e.getX(), e.getY());
 					//notifyDependants();
 					createDependant();
 				}else{
