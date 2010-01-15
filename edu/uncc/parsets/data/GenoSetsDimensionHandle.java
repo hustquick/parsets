@@ -42,6 +42,7 @@ public class GenoSetsDimensionHandle extends DimensionHandle{
 	
     	crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
     	List<Map> list = crit.list();
+    	int catNum = 1;
     	for (Map map : list) {
     		//TODO: typecasting to string might break if integer is returned
     		String categoryName;
@@ -52,7 +53,8 @@ public class GenoSetsDimensionHandle extends DimensionHandle{
     		else //TODO: implement other property class types
     			throw new NotImplementedException();
 			Integer count = (Integer)map.get("count");
-			categories.add(new CategoryHandle(categoryName, categoryName, 0, this, count));		
+			categories.add(new CategoryHandle(categoryName, categoryName, catNum, this, count));		
+			catNum++;
 		}
 	}
 	
