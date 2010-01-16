@@ -1,4 +1,4 @@
-package edu.uncc.parsets.parsets;
+package edu.uncc.parsets.gui;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;

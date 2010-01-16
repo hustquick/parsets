@@ -13,13 +13,13 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.transform.Transformers;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import genosetsdb.GenoSetsClassMap;
-import genosetsdb.GenoSetsSessionManager;
-import genosetsdb.TableDimension;
-import genosetsdb.entity.AnnoView;
-import genosetsdb.entity.FeatureDesc;
-import genosetsdb.entity.Homologs;
-import genosetsdb.entity.Organism;
+import genosets.interaction.GenoSetsClassMap;
+import genosets.interaction.GenoSetsSessionManager;
+import genosets.interaction.TableDimension;
+import genosets.data.entity.AnnoView;
+import genosets.data.entity.FeatureDesc;
+import genosets.data.entity.Homologs;
+import genosets.data.entity.Organism;
 
 /** 
  * Dataset that is backed by GenoSets Database

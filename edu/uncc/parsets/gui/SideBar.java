@@ -1,6 +1,6 @@
 package edu.uncc.parsets.gui;
 
-import genosetsdb.entity.Feature;
+import genosets.data.entity.Feature;
 import it.cnr.imaa.essi.lablib.gui.checkboxtree.CheckboxTree;
 import it.cnr.imaa.essi.lablib.gui.checkboxtree.DefaultCheckboxTreeCellRenderer;
 import it.cnr.imaa.essi.lablib.gui.checkboxtree.TreeCheckingEvent;
