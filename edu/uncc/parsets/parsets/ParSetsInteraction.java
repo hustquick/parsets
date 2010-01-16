@@ -1,9 +1,12 @@
 package edu.uncc.parsets.parsets;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
 import edu.uncc.parsets.data.CategoryHandle;
@@ -11,11 +14,12 @@ import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.data.GenoSetsDataSet;
 import edu.uncc.parsets.data.GenoSetsDimensionHandle;
 import edu.uncc.parsets.gui.Controller;
+import edu.uncc.parsets.gui.GenoSetsPopup;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
-import genosetsdb.MultipleViewController;
-import genosetsdb.interaction.SelectedDimension;
-import genosetsdb.interaction.SelectedDimensionChangeEvent;
+import genosets.interaction.MultipleViewController;
+import genosets.interaction.SelectedDimension;
+import genosets.interaction.SelectedDimensionChangeEvent;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -80,9 +84,17 @@ public class ParSetsInteraction extends MouseInputAdapter {
 		}else{
 			if(selectedRibbon != null){
 				if(e.getButton() == MouseEvent.BUTTON3){
-					GenoSetsPopup menu = new GenoSetsPopup();
-					menu.show(e.getComponent(), e.getX(), e.getY());
+//					GenoSetsPopup menu = new GenoSetsPopup();
+//					menu.show(e.getComponent(), e.getX(), e.getY());
 					//notifyDependants();
+					
+					JPanel panel = new JPanel();
+					panel.setBackground(Color.blue);
+			        JFrame frame = new JFrame("Spawn View");
+			        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			        frame.setContentPane(panel);
+			        frame.pack();
+			        frame.setVisible(true);
 					createDependant();
 				}else{
 					System.out.println("notifying dependents");

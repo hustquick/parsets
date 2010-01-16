@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.parsets.ParSetsView;
-import genosetsdb.interaction.SelectedDimListener;
-import genosetsdb.interaction.SelectedDimensionChangeEvent;
+import genosets.interaction.SelectedDimListener;
+import genosets.interaction.SelectedDimensionChangeEvent;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,

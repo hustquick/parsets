@@ -10,8 +10,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.transform.Transformers;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import genosetsdb.GenoSetsSessionManager;
-import genosetsdb.TableDimension;
+import genosets.interaction.GenoSetsSessionManager;
+import genosets.interaction.TableDimension;
 
 public class GenoSetsDimensionHandle extends DimensionHandle{
 	private TableDimension parentTable;
