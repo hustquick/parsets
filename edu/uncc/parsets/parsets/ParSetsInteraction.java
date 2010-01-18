@@ -84,17 +84,16 @@ public class ParSetsInteraction extends MouseInputAdapter {
 		}else{
 			if(selectedRibbon != null){
 				if(e.getButton() == MouseEvent.BUTTON3){
-//					GenoSetsPopup menu = new GenoSetsPopup();
-//					menu.show(e.getComponent(), e.getX(), e.getY());
-					//notifyDependants();
+					GenoSetsPopup menu = new GenoSetsPopup();
+					menu.show(e.getComponent(), e.getX(), e.getY());
 					
-					JPanel panel = new JPanel();
-					panel.setBackground(Color.blue);
-			        JFrame frame = new JFrame("Spawn View");
-			        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			        frame.setContentPane(panel);
-			        frame.pack();
-			        frame.setVisible(true);
+//					JPanel panel = new JPanel();
+//					panel.setBackground(Color.blue);
+//			        JFrame frame = new JFrame("Spawn View");
+//			        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//			        frame.setContentPane(panel);
+//			        frame.pack();
+//			        frame.setVisible(true);
 					createDependant();
 				}else{
 					System.out.println("notifying dependents");
@@ -216,11 +215,19 @@ public class ParSetsInteraction extends MouseInputAdapter {
 		GenoSetsDataSet data = (GenoSetsDataSet) node.getToCategory().getDimension().getDataSet();
 		ArrayList<CategoryHandle> list = node.getNodePath();
 		for (CategoryHandle catHandle : list) {
+			//Add Dimension to list
 			GenoSetsDimensionHandle dh = (GenoSetsDimensionHandle)catHandle.getDimension();
 			SelectedDimension selected = new SelectedDimension(dh.getParentTable(), dh.getName(), dh.getPropertyName(), catHandle.getName());
 			selectedList.add(selected);
 		}
+		//Add filtered categories
+		ArrayList<SelectedDimension> filteredList = new ArrayList<SelectedDimension>();
+		for(CategoryHandle cat : controller.getFilteredCategories()){
+			GenoSetsDimensionHandle dh = (GenoSetsDimensionHandle)cat.getDimension();
+			SelectedDimension selected = new SelectedDimension(dh.getParentTable(), dh.getName(), dh.getPropertyName(), cat.getName());
+			filteredList.add(selected);
+		}
 		
-		return new SelectedDimensionChangeEvent(this, data.createCriteria(), selectedList, data.getFactClass());
+		return new SelectedDimensionChangeEvent(this, data.createCriteria(), selectedList, filteredList, data.getFactClass());
 	}
 }

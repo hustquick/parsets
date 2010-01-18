@@ -2,6 +2,7 @@ package edu.uncc.parsets.gui;
 
 import java.util.ArrayList;
 
+import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.parsets.ParSetsView;
 import genosets.interaction.SelectedDimListener;
@@ -47,6 +48,7 @@ public class Controller {
 	private ArrayList<DataSetListener> dsListeners = new ArrayList<DataSetListener>();
 	private ArrayList<SelectedDimListener> selectionListeners = new ArrayList<SelectedDimListener>();
 	public ParSetsView parSetsView;
+	private ArrayList<CategoryHandle> filteredCategories = new ArrayList<CategoryHandle>();
 	
 	public DBTab dbTab;
 	
@@ -79,5 +81,13 @@ public class Controller {
 		for (SelectedDimListener l : selectionListeners) {
 			l.updateParentSelection(e);
 		}	
+	}
+	
+	public void addFilteredCategory(CategoryHandle category){
+		filteredCategories.add(category);
+	}
+	
+	public ArrayList<CategoryHandle> getFilteredCategories(){
+		return this.filteredCategories;
 	}
 }

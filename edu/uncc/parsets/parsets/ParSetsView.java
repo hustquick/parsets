@@ -31,6 +31,7 @@ import edu.uncc.parsets.data.CategoryTree;
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.DataType;
 import edu.uncc.parsets.data.DimensionHandle;
+import edu.uncc.parsets.data.GenoSetsDimensionHandle;
 import edu.uncc.parsets.gui.Controller;
 import edu.uncc.parsets.gui.DataSetListener;
 import edu.uncc.parsets.util.AnimationListener;
@@ -416,7 +417,12 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 		}
 		
 		needsLayout = true;
-		canvas.repaint();		
+		canvas.repaint();	
+		
+		//for GenoSets
+		if(category.getDimension() instanceof GenoSetsDimensionHandle){
+			controller.addFilteredCategory(category);
+		}
 	}
 
 	

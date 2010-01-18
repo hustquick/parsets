@@ -40,6 +40,8 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 	// dimensions doesn't look like the same handle
 	private String categoryID;
 	
+	private boolean isFiltered = false;
+	
 	public CategoryHandle(String name, String handle, int num, DimensionHandle dim, int count) {
 		this.name = name;
 		this.handle = handle;
@@ -76,6 +78,14 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 	
 	public DimensionHandle getDimension() {
 		return dimension;
+	}
+	
+	public boolean getIsFiltered(){
+		return this.isFiltered;
+	}
+	
+	public void setIsFiltered(boolean isFiltered){
+		this.isFiltered = isFiltered;
 	}
 	
 	public int compareTo(CategoryHandle o) {
