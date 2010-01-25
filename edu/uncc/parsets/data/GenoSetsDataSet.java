@@ -13,13 +13,14 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.transform.Transformers;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import genosets.data.entity.AnnoView;
+import genosets.data.entity.FeatureDesc;
+import genosets.data.entity.GenBankType;
+import genosets.data.entity.Homologs;
+import genosets.data.entity.Organism;
 import genosets.interaction.GenoSetsClassMap;
 import genosets.interaction.GenoSetsSessionManager;
 import genosets.interaction.TableDimension;
-import genosets.data.entity.AnnoView;
-import genosets.data.entity.FeatureDesc;
-import genosets.data.entity.Homologs;
-import genosets.data.entity.Organism;
 
 /** 
  * Dataset that is backed by GenoSets Database
@@ -81,6 +82,10 @@ public class GenoSetsDataSet extends DataSet{
 //		dimHandles.add(new GenoSetsDimensionHandle("homolog strain OvisAtcc", "strainOvisAtcc", "strainOvisAtcc", String.class, tableDimension, DataType.categorical, 21, this));
 //		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Suis1330", "strainSuis1330", "strainSuis1330", String.class, tableDimension, DataType.categorical, 22, this));
 //		dimHandles.add(new GenoSetsDimensionHandle("homolog strain SuisAtcc", "strainSuisAtcc", "strainSuisAtcc", String.class, tableDimension, DataType.categorical, 23, this));
+	
+		tableDimension = new TableDimension(GenBankType.class, "genBankType", "gt", "featureId", 2);
+		dimHandles.add(new GenoSetsDimensionHandle("GenBankType", "gbType", "featureType", String.class, tableDimension, DataType.categorical, 24, this));
+	
 	}
 	
 	public Criteria createCriteria(){		
@@ -182,7 +187,12 @@ public class GenoSetsDataSet extends DataSet{
 				List<GenoSetsDimensionHandle> selectedDims = handleParentMap.get(childDim);
 				if(selectedDims != null){ //then add to criteria					
 					System.out.println("Adding tableDim " + childDim.getPropertyName());
-					criteria.createCriteria(childDim.getPropertyName(), childDim.getAlias());
+					if(childDim.getJoinType() != 0)
+						criteria.createCriteria(childDim.getPropertyName(), childDim.getAlias());
+					else{
+						criteria.createCriteria(childDim.getPropertyName(), childDim.getAlias(), 1);
+						System.out.println("Criteria ");
+					}
 				}
 				recursiveCriteria(childDim, criteria, handleParentMap);
 			}
