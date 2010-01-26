@@ -11,6 +11,7 @@ import javax.swing.event.MouseInputAdapter;
 
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
+import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.data.GenoSetsDataSet;
 import edu.uncc.parsets.data.GenoSetsDimensionHandle;
 import edu.uncc.parsets.gui.Controller;
@@ -200,12 +201,26 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	}
 	
 	public void createDependant(){
-		MultipleViewController childVisController = new MultipleViewController(createSelectEvent());
+		MultipleViewController childVisController = 
+			new MultipleViewController(getAllShownDimensions(), createSelectEvent());
 		controller.addSelectedDimListener(childVisController);
 	}
 	
 	public void notifyDependants(){
 		controller.notifySelectedDimListeners(createSelectEvent());
+	}
+	
+	private List<SelectedDimension> getAllShownDimensions(){
+		//Create a list of all displayed dimensions
+		List<SelectedDimension> shownList = new LinkedList();
+		List<DimensionHandle> dims = view.getDimensionList();
+		for(DimensionHandle d : dims){
+			GenoSetsDimensionHandle dh = (GenoSetsDimensionHandle)d;
+			SelectedDimension shown = new SelectedDimension(dh.getParentTable(), dh.getName(), dh.getPropertyName(), null);
+			shownList.add(shown);
+		}
+		
+		return shownList;
 	}
 	
 	private SelectedDimensionChangeEvent createSelectEvent(){

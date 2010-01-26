@@ -548,4 +548,8 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 	public Controller getController(){
 		return controller;
 	}
+
+	public ArrayList<DimensionHandle> getDimensionList() {
+		return dimensionList;
+	}
 }
