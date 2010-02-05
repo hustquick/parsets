@@ -172,7 +172,8 @@ public class GenoSetsDataSet extends DataSet{
 		return tree;
 	}
 	
-	private Criteria recursiveCriteria(TableDimension tableDim, Criteria criteria, Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap){
+	private Criteria recursiveCriteria(TableDimension tableDim, Criteria criteria, 
+			Map<TableDimension, List<GenoSetsDimensionHandle>> handleParentMap){
 		//Create new criteria if hasn't been created, based on root table dimension
 		if(criteria == null){
 			StatelessSession session = GenoSetsSessionManager.getStatelessSession();
