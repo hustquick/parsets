@@ -17,6 +17,7 @@ import genosets.data.entity.AnnoType;
 import genosets.data.entity.AnnoView;
 import genosets.data.entity.FeatureDesc;
 import genosets.data.entity.Homologs;
+import genosets.data.entity.Homologs2;
 import genosets.data.entity.Organism;
 import genosets.interaction.GenoSetsClassMap;
 import genosets.interaction.GenoSetsSessionManager;
@@ -83,6 +84,24 @@ public class GenoSetsDataSet extends DataSet{
 		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Suis1330", "strainSuis1330", "strainSuis1330", String.class, tableDimension, DataType.categorical, 22, this));
 		dimHandles.add(new GenoSetsDimensionHandle("homolog strain SuisAtcc", "strainSuisAtcc", "strainSuisAtcc", String.class, tableDimension, DataType.categorical, 23, this));
 	
+		tableDimension = new TableDimension(Homologs2.class, "homologs2", "h2", "featureId");
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Melitensis 2", "speciesMelitensis2", "speciesMelitensis", String.class, tableDimension, DataType.categorical, 8, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Suis 2", "speciesSuis2", "speciesSuis", String.class, tableDimension, DataType.categorical, 9, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Abortus 2", "speciesAbortus2", "speciesAbortus", String.class, tableDimension, DataType.categorical, 10, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Ovis 2", "speciesOvis2", "speciesOvis", String.class, tableDimension, DataType.categorical, 11, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Canis 2", "speciesCanis2", "speciesCanis", String.class, tableDimension, DataType.categorical, 12, this));
+		dimHandles.add(new GenoSetsDimensionHandle("homolog species Microti 2", "speciesMicroti2", "speciesMicroti", String.class, tableDimension, DataType.categorical, 13, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Abortus9941 2", "strainAbortus99412", "strainAbortus9941", String.class, tableDimension, DataType.categorical, 14, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain MelitensisBiovarAbortus 2", "strainMelitensisBiovarAbortus", "strainMelitensisBiovarAbortus", String.class, tableDimension, DataType.categorical, 15, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain AbortusS19 2", "strainAbortusS192", "strainAbortusS19", String.class, tableDimension, DataType.categorical, 16, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain CanisAtcc 2", "strainCanisAtcc2", "strainCanisAtcc", String.class, tableDimension, DataType.categorical, 17, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Melitensis16m 2", "strainMelitensis16m2", "strainMelitensis16m", String.class, tableDimension, DataType.categorical, 18, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain MelitensisAtcc 2", "strainMelitensisAtcc2", "strainMelitensisAtcc", String.class, tableDimension, DataType.categorical, 19, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Microti 2", "strainMicroti", "strainMicroti2", String.class, tableDimension, DataType.categorical, 20, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain OvisAtcc 2", "strainOvisAtcc", "strainOvisAtcc2", String.class, tableDimension, DataType.categorical, 21, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain Suis1330 2", "strainSuis1330", "strainSuis13302", String.class, tableDimension, DataType.categorical, 22, this));
+//		dimHandles.add(new GenoSetsDimensionHandle("homolog strain SuisAtcc 2", "strainSuisAtcc", "strainSuisAtcc2", String.class, tableDimension, DataType.categorical, 23, this));
+		
 		tableDimension = new TableDimension(AnnoType.class, "annoType", "at", "featureId");
 		dimHandles.add(new GenoSetsDimensionHandle("GenBankType", "gbType", "gfeatureType", String.class, tableDimension, DataType.categorical, 25, this));
 		dimHandles.add(new GenoSetsDimensionHandle("PatricType", "pType", "pfeatureType", String.class, tableDimension, DataType.categorical, 26, this));
