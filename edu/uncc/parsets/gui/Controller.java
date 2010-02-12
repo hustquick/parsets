@@ -87,6 +87,10 @@ public class Controller {
 		filteredCategories.add(category);
 	}
 	
+	public void removeFilteredCategory(CategoryHandle category){
+		filteredCategories.remove(category);
+	}
+	
 	public ArrayList<CategoryHandle> getFilteredCategories(){
 		return this.filteredCategories;
 	}

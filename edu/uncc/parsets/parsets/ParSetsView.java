@@ -419,7 +419,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 		needsLayout = true;
 		canvas.repaint();	
 		
-		//for GenoSets
+		//for GenoSets - sounds reverse, but GenoSets only stores removed or filtered categories
 		if(category.getDimension() instanceof GenoSetsDimensionHandle){
 			controller.addFilteredCategory(category);
 		}
@@ -429,6 +429,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 	public void addCategory(DimensionHandle dimension,
 			CategoryHandle category) {
 		
+		//Add a category from that is already displayed as axis
 		if (dimensionList.contains(dimension)) {
 		
 			for (VisualAxis axis : axes) {
@@ -445,6 +446,7 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 
 		}
 		
+		//for GenoSets - sounds reverse, but GenoSets only stores removed or filtered categories
 		else {
 			
 			addAxis(dimension);
@@ -455,7 +457,11 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 			}
 			
 		}
-			
+		//for GenoSets
+		if(category.getDimension() instanceof GenoSetsDimensionHandle){
+			controller.removeFilteredCategory(category);
+		}
+				
 		needsLayout = true;
 		canvas.repaint();		
 	}

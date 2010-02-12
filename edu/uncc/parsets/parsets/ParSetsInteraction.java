@@ -235,6 +235,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			SelectedDimension selected = new SelectedDimension(dh.getParentTable(), dh.getName(), dh.getPropertyName(), catHandle.getName());
 			selectedList.add(selected);
 		}
+		
 		//Add filtered categories
 		ArrayList<SelectedDimension> filteredList = new ArrayList<SelectedDimension>();
 		for(CategoryHandle cat : controller.getFilteredCategories()){
