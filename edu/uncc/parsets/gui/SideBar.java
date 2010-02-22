@@ -8,6 +8,7 @@ import it.cnr.imaa.essi.lablib.gui.checkboxtree.TreeCheckingListener;
 import it.cnr.imaa.essi.lablib.gui.checkboxtree.TreeCheckingModel.CheckingMode;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -16,13 +17,17 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -90,6 +95,12 @@ public class SideBar extends JPanel implements DataSetListener {
 	private OnlineDataTab onlineDataTab;
 
 	private JLabel dsLabel;
+	
+	private JCheckBox treeMapCheck;
+	private JCheckBox hierCheck;
+	private JCheckBox featureCheck;
+	private JLabel helpLabel;
+	private int numCheckSelected = 0;
 	
 	// from http://www.codeguru.com/java/articles/199.shtml
 	private static class VerticalLabelUI extends BasicLabelUI {
@@ -217,9 +228,80 @@ public class SideBar extends JPanel implements DataSetListener {
 			}
 		});
 		p.add(clearButton, "center");
+		
+		treeMapCheck = new JCheckBox("TreeMap of GO Annotations");
+		treeMapCheck.setBackground(Color.WHITE);
+		treeMapCheck.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            	viewCheckBoxClicked(evt);
+            }
+        });
+		hierCheck = new JCheckBox("Hierarchy Tree");
+		hierCheck.setBackground(Color.WHITE);
+		hierCheck.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            	viewCheckBoxClicked(evt);
+            }
+        });
+		featureCheck = new JCheckBox("Table of Features");
+		featureCheck.setBackground(Color.WHITE);
+		featureCheck.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            	viewCheckBoxClicked(evt);
+            }
+        });
+		helpLabel = new JLabel("Now double click ribbon.");
+		helpLabel.setVisible(false);
+		
+		Box b2 = new Box(BoxLayout.Y_AXIS);
+		b2.setBorder((BorderFactory.createTitledBorder("Create View")));
+		b2.setOpaque(false);
+		b2.add(treeMapCheck);
+		b2.add(hierCheck);
+		b2.add(featureCheck);
+		b2.add(helpLabel);
+		p.add(b2, "growx");
+		
+		controller.setSideBar(this);
+		
+		
 		return p;
 	}
-
+	
+	private void viewCheckBoxClicked(MouseEvent evt){
+		JCheckBox checkBox = (JCheckBox)evt.getSource();
+		if(checkBox.isSelected())
+			numCheckSelected++;
+		else
+			numCheckSelected++;
+		if(numCheckSelected > 0){
+			helpLabel.setVisible(true);
+			controller.setSpawnSelected(true);
+		}else{
+			helpLabel.setVisible(false);
+			controller.setSpawnSelected(false);
+		}
+	}
+	
+	public List getCheckBoxViews(){
+		ArrayList list = new ArrayList(3);
+		if(treeMapCheck.isSelected())
+			list.add("treeMap");
+		if(hierCheck.isSelected())
+			list.add("hier");
+		if(featureCheck.isSelected())
+			list.add("feature");
+		
+		return list;
+	}
+	
+	public void resetViewChecks(){
+		treeMapCheck.setSelected(false);
+		hierCheck.setSelected(false);
+		featureCheck.setSelected(false);
+		helpLabel.setVisible(false);
+	}
+	
 	private JLabel makeRotatedLabel(JTabbedPane tabs, int index, String tabtitle) {
 		if (!AbstractOS.getCurrentOS().isMacOSX()) {
 			JLabel label = new JLabel(tabtitle);
