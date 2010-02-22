@@ -49,6 +49,8 @@ public class Controller {
 	private ArrayList<SelectedDimListener> selectionListeners = new ArrayList<SelectedDimListener>();
 	public ParSetsView parSetsView;
 	private ArrayList<CategoryHandle> filteredCategories = new ArrayList<CategoryHandle>();
+	private boolean spawnSelected = false;
+	private SideBar sideBar; //TODO: Gross
 	
 	public DBTab dbTab;
 	
@@ -93,5 +95,21 @@ public class Controller {
 	
 	public ArrayList<CategoryHandle> getFilteredCategories(){
 		return this.filteredCategories;
+	}
+
+	public boolean isSpawnSelected() {
+		return spawnSelected;
+	}
+
+	public void setSpawnSelected(boolean spawnSelected) {
+		this.spawnSelected = spawnSelected;
+	}
+
+	public SideBar getSideBar() {
+		return sideBar;
+	}
+
+	public void setSideBar(SideBar sideBar) {
+		this.sideBar = sideBar;
 	}
 }

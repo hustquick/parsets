@@ -1,12 +1,9 @@
 package edu.uncc.parsets.parsets;
-import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
 import edu.uncc.parsets.data.CategoryHandle;
@@ -15,7 +12,7 @@ import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.data.GenoSetsDataSet;
 import edu.uncc.parsets.data.GenoSetsDimensionHandle;
 import edu.uncc.parsets.gui.Controller;
-import edu.uncc.parsets.gui.GenoSetsPopup;
+import edu.uncc.parsets.gui.SideBar;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
 import genosets.interaction.MultipleViewController;
@@ -84,17 +81,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			AnimatableProperty.commitAnimations();
 		}else{
 			if(selectedRibbon != null){
-				if(e.getButton() == MouseEvent.BUTTON3){
-					GenoSetsPopup menu = new GenoSetsPopup();
-					menu.show(e.getComponent(), e.getX(), e.getY());
-					
-//					JPanel panel = new JPanel();
-//					panel.setBackground(Color.blue);
-//			        JFrame frame = new JFrame("Spawn View");
-//			        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//			        frame.setContentPane(panel);
-//			        frame.pack();
-//			        frame.setVisible(true);
+				if(e.getClickCount() > 1 && controller.isSpawnSelected()){
 					createDependant();
 				}else{
 					System.out.println("notifying dependents");
@@ -201,8 +188,23 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	}
 	
 	public void createDependant(){
+		SideBar sideBar = controller.getSideBar();
+		List<String> views = sideBar.getCheckBoxViews();
+		sideBar.resetViewChecks();
 		MultipleViewController childVisController = 
 			new MultipleViewController(getAllShownDimensions(), createSelectEvent());
+		for(String s : views){
+			if(s.equals("treeMap")){
+				childVisController.createGraph();
+			}
+			if(s.equals("hier")){
+				
+			}
+			if(s.equals("feature")){
+				childVisController.createTable();
+			}
+					
+		}
 		controller.addSelectedDimListener(childVisController);
 	}
 	
