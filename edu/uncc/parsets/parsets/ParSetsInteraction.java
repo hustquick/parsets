@@ -1,9 +1,11 @@
 package edu.uncc.parsets.parsets;
+import java.awt.Frame;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.SwingWorker;
 import javax.swing.event.MouseInputAdapter;
 
 import edu.uncc.parsets.data.CategoryHandle;
@@ -12,6 +14,7 @@ import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.data.GenoSetsDataSet;
 import edu.uncc.parsets.data.GenoSetsDimensionHandle;
 import edu.uncc.parsets.gui.Controller;
+import edu.uncc.parsets.gui.MessageDialog;
 import edu.uncc.parsets.gui.SideBar;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
@@ -83,8 +86,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			if(selectedRibbon != null){
 				if(e.getClickCount() > 1 && controller.isSpawnSelected()){
 					createDependant();
-				}else{
-					System.out.println("notifying dependents");
+				}else if(e.getClickCount() == 1){
 					notifyDependants();
 				}
 			}
@@ -189,23 +191,35 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	
 	public void createDependant(){
 		SideBar sideBar = controller.getSideBar();
-		List<String> views = sideBar.getCheckBoxViews();
+		final List<String> views = sideBar.getCheckBoxViews();
 		sideBar.resetViewChecks();
-		MultipleViewController childVisController = 
+		final MultipleViewController childVisController = 
 			new MultipleViewController(getAllShownDimensions(), createSelectEvent());
-		for(String s : views){
-			if(s.equals("treeMap")){
-				childVisController.createGraph();
+		final MessageDialog message = new MessageDialog((Frame)null, false, "Creating New View");
+		message.setVisible(true);
+		SwingWorker worker = new SwingWorker<Boolean, Void>(){
+			@Override
+        	public Boolean doInBackground(){
+				for(String s : views){
+					if(s.equals("treeMap")){
+						childVisController.createGraph();
+					}
+					if(s.equals("hier")){
+						
+					}
+					if(s.equals("feature")){
+						childVisController.createTable();
+					}							
+				}
+				controller.addSelectedDimListener(childVisController);
+				return true;
 			}
-			if(s.equals("hier")){
-				
+			@Override
+        	public void done(){
+				message.dispose();
 			}
-			if(s.equals("feature")){
-				childVisController.createTable();
-			}
-					
-		}
-		controller.addSelectedDimListener(childVisController);
+		};
+		worker.execute();
 	}
 	
 	public void notifyDependants(){
