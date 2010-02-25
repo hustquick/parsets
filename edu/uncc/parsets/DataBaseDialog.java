@@ -11,7 +11,6 @@
 
 package edu.uncc.parsets;
 
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,16 +20,20 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
 import org.hibernate.SessionFactory;
 
+import edu.uncc.parsets.gui.MessageDialog;
 import genosets.interaction.GenoSetsSessionManager;
 
 /**
@@ -409,21 +412,74 @@ public class DataBaseDialog extends javax.swing.JDialog {
    }
     private void connectButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_connectButtonMouseClicked
         statusLabel.setText("Testing Connection...");
-    	String host = hostField.getText();
-        String port = portField.getText();
-        String db = dbField.getText();
-        String user = userField.getText();
-        String encryptedPassword = passwordField.getText();
-        SessionFactory factory = GenoSetsSessionManager.testConnection(host, port, db, user, encryptedPassword);
-        if(factory != null){
-        	statusLabel.setText("Connection Successful");
-        	GenoSetsSessionManager.setSessionFactory(factory);
-        	ParallelSets.main(null);
-        	this.dispose();
-        }else{
-        	statusLabel.setText("Connection Failed");
-        }
+        final JDialog me = this;
+        final MessageDialog message = new MessageDialog(me, false, "Connecting");
+        message.setVisible(true);
+        me.setEnabled(false);
+        SwingWorker worker = new SwingWorker<Boolean, Void>(){
+        	@Override
+        	public Boolean doInBackground(){
+            	String host = hostField.getText();
+                String port = portField.getText();
+                String db = dbField.getText();
+                String user = userField.getText();
+                String encryptedPassword = passwordField.getText();
+                SessionFactory factory = GenoSetsSessionManager.testConnection(host, port, db, user, encryptedPassword);
+                if(factory != null){
+                	statusLabel.setText("Connection Successful");
+                	GenoSetsSessionManager.setSessionFactory(factory);
+                	return true;
+                }else{
+                	statusLabel.setText("Connection Failed");
+                	return false;
+                }
+        	}
+        	@Override
+        	public void done(){
+        		try {
+					Boolean status = get();
+					if(status == true){
+						message.setText("Loading ParallelSets.");
+						SwingWorker w2 = new SwingWorker<Boolean, Void>(){
+				        	@Override
+				        	public Boolean doInBackground(){
+				        		ParallelSets.main(null);
+				        		return true;
+				        	}
+				        	@Override
+				        	public void done(){
+				        		message.dispose();
+				        		me.dispose();
+				        	}
+						};
+						
+						w2.execute();
+					}else{
+						statusLabel.setText("ConnectionFailed");
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
+        };
+        worker.execute();
+
     }//GEN-LAST:event_connectButtonMouseClicked
+    
+    private void runParSets(){
+        SwingWorker worker = new SwingWorker<Boolean, Void>(){
+        	@Override
+        	public Boolean doInBackground(){
+    			ParallelSets.main(null);
+    			return true;
+        	}
+        };
+        worker.execute();
+    }
 
     private void cancelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cancelButtonMouseClicked
         System.exit(0);
@@ -464,17 +520,37 @@ public class DataBaseDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_dbComboBoxActionPerformed
 
     private void testConnectionButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_testConnectionButtonMouseClicked
-        statusLabel.setText("Testing Connection...");
-    	String host = hostField.getText();
-        String port = portField.getText();
-        String db = dbField.getText();
-        String user = userField.getText();
-        String encryptedPassword = passwordField.getText();
-        if(GenoSetsSessionManager.testConnection(host, port, db, user, encryptedPassword) != null){
-        	statusLabel.setText("Connection Successful");
-        }else{
-        	statusLabel.setText("Connection Failed");
-        }    
+    	statusLabel.setText("Testing Connection...");
+    	final JDialog me = this;
+    	me.setEnabled(false);
+    	final MessageDialog dialog = new MessageDialog(this, false, "TestingConnection");
+    	dialog.setAlwaysOnTop(true);
+    	dialog.setVisible(true);
+    	SwingWorker worker = new SwingWorker<Boolean, Void>(){
+        	@Override
+        	public Boolean doInBackground(){
+            	String host = hostField.getText();
+                String port = portField.getText();
+                String db = dbField.getText();
+                String user = userField.getText();
+                String encryptedPassword = passwordField.getText();
+                if(GenoSetsSessionManager.testConnection(host, port, db, user, encryptedPassword) != null){
+                	statusLabel.setText("Connection Successful");
+                	return true;
+                }else{
+                	statusLabel.setText("Connection Failed");
+                	return false;
+                }  
+        	}
+        	@Override
+        	public void done(){
+        		dialog.dispose();
+        		me.setEnabled(true);
+        		//dialog.setVisible(false);
+        	}
+        };
+        worker.execute();
+  
     }//GEN-LAST:event_testConnectionButtonMouseClicked
 
     private void saveButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveButtonMouseClicked
@@ -581,5 +657,7 @@ public class DataBaseDialog extends javax.swing.JDialog {
     private javax.swing.JButton testConnectionButton;
     private javax.swing.JTextField userField;
     // End of variables declaration//GEN-END:variables
-
+    
+    //--------------------------------------------------------------
+    
 }
