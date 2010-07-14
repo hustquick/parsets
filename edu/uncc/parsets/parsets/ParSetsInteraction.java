@@ -1,29 +1,10 @@
 package edu.uncc.parsets.parsets;
-import java.awt.Frame;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
-import javax.swing.SwingWorker;
 import javax.swing.event.MouseInputAdapter;
 
-import edu.uncc.parsets.data.CategoryHandle;
-import edu.uncc.parsets.data.CategoryNode;
-import edu.uncc.parsets.data.DimensionHandle;
-import edu.uncc.parsets.data.GenoSetsDataSet;
-import edu.uncc.parsets.data.GenoSetsDimensionHandle;
-import edu.uncc.parsets.gui.Controller;
-<<<<<<< local
-=======
-import edu.uncc.parsets.gui.MessageDialog;
->>>>>>> other
-import edu.uncc.parsets.gui.SideBar;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
-import genosets.interaction.MultipleViewController;
-import genosets.interaction.SelectedDimension;
-import genosets.interaction.SelectedDimensionChangeEvent;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -59,13 +40,10 @@ public class ParSetsInteraction extends MouseInputAdapter {
 	private CategoryBar activeCategoryBar = null;
 	private CategoricalAxis activeAxis = null;
 	private int deltaMouseX;
-	private ParSetsView view;	
-	private VisualConnection selectedRibbon = null;
-	private Controller controller;
+	private ParSetsView view;
 	
 	public ParSetsInteraction(ParSetsView parSetsView) {
 		view = parSetsView;
-		controller = view.getController();
 	}
 	
 	@Override
@@ -85,19 +63,6 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			activeAxis = null;
 			view.layout();
 			AnimatableProperty.commitAnimations();
-		}else{
-			if(selectedRibbon != null){
-				if(e.getClickCount() > 1 && controller.isSpawnSelected()){
-					createDependant();
-<<<<<<< local
-				}else{
-					System.out.println("notifying dependents");
-=======
-				}else if(e.getClickCount() == 1){
->>>>>>> other
-					notifyDependants();
-				}
-			}
 		}
 		if (activeCategoryBar != null) {
 			AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
@@ -163,18 +128,15 @@ public class ParSetsInteraction extends MouseInputAdapter {
 			String s = activeCategoryBar.getCategory().getName() + "\n";
 			s += view.getDataTree().getFilteredCount(activeCategoryBar.getCategory()) + ", ";
 			s += (int)(view.getDataTree().getFilteredFrequency(activeCategoryBar.getCategory()) * 100) + "%";
-			view.setTooltip(s, mouseX, mouseY);		
+			view.setTooltip(s, mouseX, mouseY);
+			
 			view.getConnectionTree().selectCategory(activeCategoryBar.getCategory());
 		} else if (activeAxis == null) {
-			selectedRibbon = null;
-			selectedRibbon = view.getConnectionTree().getAndHighlightRibbon(mouseX, mouseY, view.getDataTree());
-			if (selectedRibbon != null){ 
-				view.setTooltip(selectedRibbon.getTooltip(view.getDataTree().getFilteredTotal()), 
-						mouseX, mouseY);
-			}
+			String s = view.getConnectionTree().highlightRibbon(mouseX, mouseY, view.getDataTree());
+			if (s != null) 
+				view.setTooltip(s, mouseX, mouseY);
 		} else
 			view.getConnectionTree().clearSelection();
-
 
 		// TODO: Change cursor according to type of movement possible
 		// requires hand-drawn cursors, standard types don't seem to include
@@ -195,107 +157,5 @@ public class ParSetsInteraction extends MouseInputAdapter {
 		view.clearTooltip();
 		view.getConnectionTree().clearSelection();
 		view.repaint();
-	}
-	
-	public void createDependant(){
-		SideBar sideBar = controller.getSideBar();
-<<<<<<< local
-		List<String> views = sideBar.getCheckBoxViews();
-=======
-		final List<String> views = sideBar.getCheckBoxViews();
->>>>>>> other
-		sideBar.resetViewChecks();
-<<<<<<< local
-		MultipleViewController childVisController = 
-=======
-		final MultipleViewController childVisController = 
->>>>>>> other
-			new MultipleViewController(getAllShownDimensions(), createSelectEvent());
-<<<<<<< local
-		for(String s : views){
-			if(s.equals("treeMap")){
-				childVisController.createGraph();
-=======
-		final MessageDialog message = new MessageDialog((Frame)null, false, "Creating New View");
-		message.setVisible(true);
-		SwingWorker worker = new SwingWorker<Boolean, Void>(){
-			@Override
-        	public Boolean doInBackground(){
-				for(String s : views){
-					if(s.equals("treeMap")){
-						childVisController.createGraph();
-					}
-					if(s.equals("hier")){
-						
-					}
-					if(s.equals("feature")){
-						childVisController.createTable();
-					}							
-				}
-				controller.addSelectedDimListener(childVisController);
-				return true;
->>>>>>> other
-			}
-<<<<<<< local
-			if(s.equals("hier")){
-				
-=======
-			@Override
-        	public void done(){
-				message.dispose();
->>>>>>> other
-			}
-<<<<<<< local
-			if(s.equals("feature")){
-				childVisController.createTable();
-			}
-					
-		}
-		controller.addSelectedDimListener(childVisController);
-=======
-		};
-		worker.execute();
->>>>>>> other
-	}
-	
-	public void notifyDependants(){
-		controller.notifySelectedDimListeners(createSelectEvent());
-	}
-	
-	private List<SelectedDimension> getAllShownDimensions(){
-		//Create a list of all displayed dimensions
-		List<SelectedDimension> shownList = new LinkedList();
-		List<DimensionHandle> dims = view.getDimensionList();
-		for(DimensionHandle d : dims){
-			GenoSetsDimensionHandle dh = (GenoSetsDimensionHandle)d;
-			SelectedDimension shown = new SelectedDimension(dh.getParentTable(), dh.getName(), dh.getPropertyName(), null);
-			shownList.add(shown);
-		}
-		
-		return shownList;
-	}
-	
-	private SelectedDimensionChangeEvent createSelectEvent(){
-		//Get the path to the selected category node and add all category, value pairs and add to list
-		List<SelectedDimension> selectedList = new LinkedList();
-		CategoryNode node = selectedRibbon.getNode();
-		GenoSetsDataSet data = (GenoSetsDataSet) node.getToCategory().getDimension().getDataSet();
-		ArrayList<CategoryHandle> list = node.getNodePath();
-		for (CategoryHandle catHandle : list) {
-			//Add Dimension to list
-			GenoSetsDimensionHandle dh = (GenoSetsDimensionHandle)catHandle.getDimension();
-			SelectedDimension selected = new SelectedDimension(dh.getParentTable(), dh.getName(), dh.getPropertyName(), catHandle.getName());
-			selectedList.add(selected);
-		}
-		
-		//Add filtered categories
-		ArrayList<SelectedDimension> filteredList = new ArrayList<SelectedDimension>();
-		for(CategoryHandle cat : controller.getFilteredCategories()){
-			GenoSetsDimensionHandle dh = (GenoSetsDimensionHandle)cat.getDimension();
-			SelectedDimension selected = new SelectedDimension(dh.getParentTable(), dh.getName(), dh.getPropertyName(), cat.getName());
-			filteredList.add(selected);
-		}
-		
-		return new SelectedDimensionChangeEvent(this, data.createCriteria(), selectedList, filteredList, data.getFactClass());
 	}
 }
