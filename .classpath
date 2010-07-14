@@ -1,8 +1,6 @@
-<<<<<<< local
-<<<<<<< local
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="libs/|docs/|resources/" kind="src" path=""/>
+	<classpathentry kind="src" path=""/>
 	<classpathentry kind="lib" path="libs/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="libs/jdom.jar"/>
 	<classpathentry kind="lib" path="libs/jna.jar"/>
@@ -14,51 +12,6 @@
 	<classpathentry kind="lib" path="libs/miglayout-3.7-swing.jar"/>
 	<classpathentry kind="lib" path="libs/opencsv-1.8.jar"/>
 	<classpathentry kind="lib" path="libs/sqlitejdbc-v056.jar"/>
-	<classpathentry kind="lib" path="/Users/rkosara/Documents/workspace/ParallelSets/libs/antlr-2.7.6.jar"/>
-	<classpathentry kind="lib" path="/Users/rkosara/Documents/workspace/ParallelSets/libs/commons-collections-3.1.jar"/>
-	<classpathentry kind="lib" path="/Users/rkosara/Documents/workspace/ParallelSets/libs/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="/Users/rkosara/Documents/workspace/ParallelSets/libs/javassist-3.9.0.GA.jar"/>
-	<classpathentry kind="lib" path="/Users/rkosara/Documents/workspace/ParallelSets/libs/jta-1.1.jar"/>
-	<classpathentry kind="lib" path="/Users/rkosara/Documents/workspace/ParallelSets/libs/slf4j-api-1.5.8.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
-=======
-=======
->>>>>>> other
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry excluding="libs/|docs/|resources/" kind="src" path=""/>
-	<classpathentry combineaccessrules="false" kind="src" path="/genosetsdb"/>
-	<classpathentry kind="lib" path="libs/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="libs/jdom.jar"/>
-	<classpathentry kind="lib" path="libs/jna.jar"/>
-<<<<<<< local
-	<classpathentry kind="lib" path="libs/jogl.jar"/>
-=======
->>>>>>> other
-	<classpathentry kind="lib" path="libs/json_simple-1.1.jar"/>
-	<classpathentry kind="lib" path="libs/junit.jar"/>
-	<classpathentry kind="lib" path="libs/lablib-checkboxtree-3.0.2.jar"/>
-	<classpathentry kind="lib" path="libs/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="libs/miglayout-3.7-swing.jar"/>
-	<classpathentry kind="lib" path="libs/opencsv-1.8.jar"/>
-	<classpathentry kind="lib" path="libs/sqlitejdbc-v056.jar"/>
-	<classpathentry kind="lib" path="libs/antlr-2.7.6.jar"/>
-	<classpathentry kind="lib" path="libs/commons-collections-3.1.jar"/>
-	<classpathentry kind="lib" path="libs/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="libs/javassist-3.9.0.GA.jar"/>
-	<classpathentry kind="lib" path="libs/jta-1.1.jar"/>
-	<classpathentry kind="lib" path="libs/slf4j-api-1.5.8.jar"/>
-	<classpathentry kind="lib" path="/genosetsdb/lib/hibernate3.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-<<<<<<< local
-=======
-	<classpathentry kind="lib" path="libs/jogl.jar"/>
->>>>>>> other
-	<classpathentry kind="output" path="bin"/>
-</classpath>
-<<<<<<< local
->>>>>>> other
-=======
->>>>>>> other
