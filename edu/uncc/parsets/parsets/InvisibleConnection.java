@@ -42,6 +42,7 @@ public class InvisibleConnection extends VisualConnection {
 	}
 		
 	public void layout(float parentWidth) {		
+		// TODO: wtf?
 		try {
 			width = parentWidth * node.getRatio();
 		} catch (NullPointerException e) {
