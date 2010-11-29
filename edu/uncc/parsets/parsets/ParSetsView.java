@@ -31,6 +31,7 @@ import edu.uncc.parsets.data.CategoryTree;
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.DataType;
 import edu.uncc.parsets.data.DimensionHandle;
+import edu.uncc.parsets.gui.AbstractMainView;
 import edu.uncc.parsets.gui.Controller;
 import edu.uncc.parsets.gui.DataSetListener;
 import edu.uncc.parsets.util.AnimationListener;
@@ -104,9 +105,9 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 	boolean antialias = true;
 	private boolean strongerSelection = true;
 	private boolean mouseInDisplay = false;
-	private Window window;
+	private AbstractMainView window;
 	
-	public ParSetsView(Component canv, Window win, Controller ctrl) {
+	public ParSetsView(Component canv, AbstractMainView win, Controller ctrl) {
 		canvas = canv;
 		window = win;
 		controller = ctrl;
@@ -527,11 +528,15 @@ public class ParSetsView implements GLEventListener, DataSetListener, AnimationL
 		return dataTree;
 	}
 
-	public Window getWindow() {
+	public AbstractMainView getWindow() {
 		return window;
 	}
 
 	public void setMouseInDisplay(boolean b) {
 		mouseInDisplay = b;
 	}
+        
+        public Controller getController(){
+            return this.controller;
+        }
 }

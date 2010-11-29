@@ -1,10 +1,14 @@
 package edu.uncc.parsets.parsets;
+
+import edu.uncc.parsets.data.CategoryHandle;
+import edu.uncc.parsets.data.CategoryNode;
 import java.awt.event.MouseEvent;
 
 import javax.swing.event.MouseInputAdapter;
 
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
+import java.util.ArrayList;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -34,128 +38,151 @@ import edu.uncc.parsets.util.AnimatableProperty;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 public class ParSetsInteraction extends MouseInputAdapter {
 
-	private CategoryBar activeCategoryBar = null;
-	private CategoricalAxis activeAxis = null;
-	private int deltaMouseX;
-	private ParSetsView view;
-	
-	public ParSetsInteraction(ParSetsView parSetsView) {
-		view = parSetsView;
-	}
-	
-	@Override
-	public final void mousePressed(MouseEvent e) {
-		if (activeCategoryBar != null) {
-			deltaMouseX = e.getX()-activeCategoryBar.getLeftX();
-		}
-	}
+    private CategoryBar activeCategoryBar = null;
+    private CategoricalAxis activeAxis = null;
+    private int deltaMouseX;
+    private ParSetsView view;
+    VisualConnection selectedRibbon = null;
 
-	@Override
-	public final void mouseReleased(MouseEvent e) {
-		if (activeAxis != null) {
-			AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
-			activeAxis.setActive(false);
-			if (activeAxis.getButtonAction() != ButtonAction.None)
-				activeAxis.sort(view.getDataTree(), view.getConnectionTree(), activeAxis.getButtonAction());
-			activeAxis = null;
-			view.layout();
-			AnimatableProperty.commitAnimations();
-		}
-		if (activeCategoryBar != null) {
-			AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
-			activeCategoryBar.setActive(false);
-			activeCategoryBar = null;
-			AnimatableProperty.commitAnimations();
-		}
-		view.repaint();
-	}
+    public ParSetsInteraction(ParSetsView parSetsView) {
+        view = parSetsView;
+    }
 
-	@Override
-	public final void mouseDragged(MouseEvent e) {
-		view.clearTooltip();
-		if (activeCategoryBar != null) {
-			activeCategoryBar.setLeftX(e.getX()-deltaMouseX);
-			int index = activeAxis.moveCategoryBar(e.getX(), activeCategoryBar);
-			if (index != -1) {
-				// animation leads to odd layout issues.
+    @Override
+    public final void mousePressed(MouseEvent e) {
+        if (activeCategoryBar != null) {
+            deltaMouseX = e.getX() - activeCategoryBar.getLeftX();
+        }
+    }
+
+    @Override
+    public final void mouseReleased(MouseEvent e) {
+        if (activeAxis != null) {
+            AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
+            activeAxis.setActive(false);
+            if (activeAxis.getButtonAction() != ButtonAction.None) {
+                activeAxis.sort(view.getDataTree(), view.getConnectionTree(), activeAxis.getButtonAction());
+            }
+            activeAxis = null;
+            view.layout();
+            AnimatableProperty.commitAnimations();
+        } else {
+            if (selectedRibbon != null) {
+                if (e.getClickCount() == 1) {
+                    fireSelectionChangeEvent(SelectionChangeEvent.SELECTION_CHANGE);
+                }
+            }
+        }
+        if (activeCategoryBar != null) {
+            AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
+            activeCategoryBar.setActive(false);
+            activeCategoryBar = null;
+            AnimatableProperty.commitAnimations();
+        }
+        view.repaint();
+    }
+
+    @Override
+    public final void mouseDragged(MouseEvent e) {
+        view.clearTooltip();
+        if (activeCategoryBar != null) {
+            activeCategoryBar.setLeftX(e.getX() - deltaMouseX);
+            int index = activeAxis.moveCategoryBar(e.getX(), activeCategoryBar);
+            if (index != -1) {
+                // animation leads to odd layout issues.
 //				AnimatableProperty.beginAnimations(2, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
-				view.moveCategory(activeAxis, activeCategoryBar.getCategory(), index);
-				view.layout();
+                view.moveCategory(activeAxis, activeCategoryBar.getCategory(), index);
+                view.layout();
 //				AnimatableProperty.commitAnimations();
-			}
-			view.repaint();
-		} else if (activeAxis != null) {
-			activeAxis.setBarY(view.getHeight() - e.getY());
-			
-			int index = view.getAxisPosition(view.getHeight() - e.getY(), activeAxis);
-			if (index != -1) {
-				view.moveAxis(index, activeAxis);
-				view.layout();
-			}
-			
-			view.repaint();
-		}
-	}
+            }
+            view.repaint();
+        } else if (activeAxis != null) {
+            activeAxis.setBarY(view.getHeight() - e.getY());
 
-	@Override
-	public final void mouseMoved(MouseEvent e) {
-		int mouseX = e.getX();
-		int mouseY = view.getHeight()-e.getY();
-		
-		view.clearTooltip();
+            int index = view.getAxisPosition(view.getHeight() - e.getY(), activeAxis);
+            if (index != -1) {
+                view.moveAxis(index, activeAxis);
+                view.layout();
+            }
 
-		if (activeCategoryBar != null)
-			activeCategoryBar.setActive(false);
+            view.repaint();
+        }
+    }
 
-		if (activeAxis != null)
-			activeAxis.setActive(false);
+    @Override
+    public final void mouseMoved(MouseEvent e) {
+        int mouseX = e.getX();
+        int mouseY = view.getHeight() - e.getY();
 
-		activeCategoryBar = null;
-		activeAxis = null;
-		for (VisualAxis va : view.getAxes()) {
-			if (va.containsY(mouseY)) {
-				activeAxis = (CategoricalAxis)va;
-				activeAxis.setActive(true);
-				activeCategoryBar = va.findBar(mouseX, mouseY);
-			}
-		}
-		if (activeCategoryBar != null) {			
-			activeCategoryBar.setActive(true);
-			
-			String s = activeCategoryBar.getCategory().getName() + "\n";
-			s += view.getDataTree().getFilteredCount(activeCategoryBar.getCategory()) + ", ";
-			s += (int)(view.getDataTree().getFilteredFrequency(activeCategoryBar.getCategory()) * 100) + "%";
-			view.setTooltip(s, mouseX, mouseY);
-			
-			view.getConnectionTree().selectCategory(activeCategoryBar.getCategory());
-		} else if (activeAxis == null) {
-			String s = view.getConnectionTree().highlightRibbon(mouseX, mouseY, view.getDataTree());
-			if (s != null) 
-				view.setTooltip(s, mouseX, mouseY);
-		} else
-			view.getConnectionTree().clearSelection();
+        view.clearTooltip();
 
-		// TODO: Change cursor according to type of movement possible
-		// requires hand-drawn cursors, standard types don't seem to include
-		// up-down or left-right movement.
-		
-		view.repaint();
-	}
-	
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		view.setMouseInDisplay(true);
-		view.repaint();
-	}
+        if (activeCategoryBar != null) {
+            activeCategoryBar.setActive(false);
+        }
 
-	@Override
-	public void mouseExited(MouseEvent e) {
-		view.setMouseInDisplay(false);
-		view.clearTooltip();
-		view.getConnectionTree().clearSelection();
-		view.repaint();
-	}
+        if (activeAxis != null) {
+            activeAxis.setActive(false);
+        }
+
+        activeCategoryBar = null;
+        activeAxis = null;
+        for (VisualAxis va : view.getAxes()) {
+            if (va.containsY(mouseY)) {
+                activeAxis = (CategoricalAxis) va;
+                activeAxis.setActive(true);
+                activeCategoryBar = va.findBar(mouseX, mouseY);
+            }
+        }
+        if (activeCategoryBar != null) {
+            activeCategoryBar.setActive(true);
+
+            String s = activeCategoryBar.getCategory().getName() + "\n";
+            s += view.getDataTree().getFilteredCount(activeCategoryBar.getCategory()) + ", ";
+            s += (int) (view.getDataTree().getFilteredFrequency(activeCategoryBar.getCategory()) * 100) + "%";
+            view.setTooltip(s, mouseX, mouseY);
+
+            view.getConnectionTree().selectCategory(activeCategoryBar.getCategory());
+        } else if (activeAxis == null) {
+            selectedRibbon = view.getConnectionTree().getRibbon(mouseX, mouseY, view.getDataTree());
+            if (selectedRibbon != null) {
+                view.setTooltip(selectedRibbon.getTooltip(view.getDataTree().getFilteredTotal()),
+                        mouseX, mouseY);
+            }
+        } else {
+            view.getConnectionTree().clearSelection();
+        }
+
+        // TODO: Change cursor according to type of movement possible
+        // requires hand-drawn cursors, standard types don't seem to include
+        // up-down or left-right movement.
+
+        view.repaint();
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        view.setMouseInDisplay(true);
+        view.repaint();
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        view.setMouseInDisplay(false);
+        view.clearTooltip();
+        view.getConnectionTree().clearSelection();
+        view.repaint();
+    }
+
+    private void fireSelectionChangeEvent(String selectionType) {
+        CategoryNode node = selectedRibbon.getNode();
+        ArrayList<CategoryHandle> cats = new ArrayList<CategoryHandle>();
+
+        while (node.getParent() != null) {
+            cats.add(0, node.getToCategory());
+            node = node.getParent();
+        }
+        view.getController().setSelected(new SelectionChangeEvent(selectionType, cats, null));
+    }
 }

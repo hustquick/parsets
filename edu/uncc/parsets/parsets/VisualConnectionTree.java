@@ -283,6 +283,16 @@ public class VisualConnectionTree {
 		}
 		return null;
 	}
+        
+        public VisualConnection getRibbon(int x, int y, CategoryTree dataTree) {
+		clearSelection();
+		VisualConnection selectedRibbon = highlightRibbon(x, y, root);
+		if (selectedRibbon != null) {
+                        setSelected(selectedRibbon);
+			return selectedRibbon;
+		}
+		return null;
+	}
 	
 	private VisualConnection highlightRibbon(int x, int y, VisualConnection node) {
 		

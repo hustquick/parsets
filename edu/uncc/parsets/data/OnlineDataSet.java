@@ -1,5 +1,6 @@
 package edu.uncc.parsets.data;
 
+import edu.uncc.parsets.parsets.SelectionChangeEvent;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -113,4 +114,7 @@ public class OnlineDataSet extends DataSet {
 		return null;
 	}
 
+    public void selectionChanged(SelectionChangeEvent event) {
+        
+    }
 }

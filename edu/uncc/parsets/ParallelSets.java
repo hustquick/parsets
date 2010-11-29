@@ -72,7 +72,7 @@ public class ParallelSets {
 	public static void main(String[] args) {
 		AbstractOS.determineOS();
 		
-		if (args.length == 0)
+		if (args == null || args.length == 0)
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {

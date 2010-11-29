@@ -49,7 +49,7 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 
 	private String pathName;
 	
-	protected CategoryNode(CategoryNode parent, CategoryHandle toCategory, int count) {
+	public CategoryNode(CategoryNode parent, CategoryHandle toCategory, int count) {
 		this.parent = parent;
 		this.toCategory = toCategory;
 		this.count = count;

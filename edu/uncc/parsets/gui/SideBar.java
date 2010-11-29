@@ -67,223 +67,247 @@ import edu.uncc.parsets.util.osabstraction.AbstractOS;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 @SuppressWarnings("serial")
 public class SideBar extends JPanel implements DataSetListener {
 
-	private static final String DATASETTABTITLE = "Data Set";
+    private static final String DATASETTABTITLE = "Data Set";
+    private static int dataSetTabNumber = 2;
+    private CheckboxTree dimTree;
+    private Controller controller;
+    private JTabbedPane tabs;
+    private JPanel dataSetTab;
+    private DBTab dbTab;
+    private OnlineDataTab onlineDataTab;
+    private JLabel dsLabel;
 
-	private static final int DATASETTABNUM = 2;
-	
-	private CheckboxTree dimTree;
+    // from http://www.codeguru.com/java/articles/199.shtml
+    private static class VerticalLabelUI extends BasicLabelUI {
 
-	private Controller controller;
+        private static final int PADDING = 5;
 
-	private JTabbedPane tabs;
+        VerticalLabelUI() {
+            super();
+        }
 
-	private JPanel dataSetTab;
-	
-	private DBTab dbTab;
+        public Dimension getPreferredSize(JComponent c) {
+            Dimension dim = super.getPreferredSize(c);
+            return new Dimension(dim.height, dim.width + 2 * PADDING + 2);
+        }
+        private Rectangle paintIconR = new Rectangle();
+        private Rectangle paintTextR = new Rectangle();
+        private Rectangle paintViewR = new Rectangle();
+        private Insets paintViewInsets = new Insets(0, 0, 0, 0);
 
-	private OnlineDataTab onlineDataTab;
+        public void paint(Graphics g, JComponent c) {
 
-	private JLabel dsLabel;
-	
-	// from http://www.codeguru.com/java/articles/199.shtml
-	private static class VerticalLabelUI extends BasicLabelUI {
+            JLabel label = (JLabel) c;
+            String text = label.getText();
+            Icon icon = (label.isEnabled()) ? label.getIcon() : label.getDisabledIcon();
 
-		private static final int PADDING = 5;
+            if ((icon == null) && (text == null)) {
+                return;
+            }
 
-		VerticalLabelUI() {
-			super();
-		}
+            FontMetrics fm = g.getFontMetrics();
+            paintViewInsets = c.getInsets(paintViewInsets);
 
-		public Dimension getPreferredSize(JComponent c) {
-			Dimension dim = super.getPreferredSize(c);
-			return new Dimension(dim.height, dim.width+2*PADDING+2);
-		}
+            paintViewR.x = paintViewInsets.left;
+            paintViewR.y = paintViewInsets.top;
 
-		private Rectangle paintIconR = new Rectangle();
-		private Rectangle paintTextR = new Rectangle();
-		private Rectangle paintViewR = new Rectangle();
-		private Insets paintViewInsets = new Insets(0, 0, 0, 0);
+            // Use inverted height & width
+            paintViewR.height = c.getWidth()
+                    - (paintViewInsets.left + paintViewInsets.right);
+            paintViewR.width = c.getHeight()
+                    - (paintViewInsets.top + paintViewInsets.bottom);
 
-		public void paint(Graphics g, JComponent c) {
+            paintIconR.x = paintIconR.y = paintIconR.width = paintIconR.height = 0;
+            paintTextR.x = paintTextR.y = paintTextR.width = paintTextR.height = 0;
 
-			JLabel label = (JLabel) c;
-			String text = label.getText();
-			Icon icon = (label.isEnabled()) ? label.getIcon() : label
-					.getDisabledIcon();
+            String clippedText = layoutCL(label, fm, text, icon, paintViewR,
+                    paintIconR, paintTextR);
 
-			if ((icon == null) && (text == null))
-				return;
+            Graphics2D g2 = (Graphics2D) g;
+            AffineTransform tr = g2.getTransform();
+            g2.rotate(-Math.PI / 2);
+            g2.translate(-c.getHeight(), 0);
 
-			FontMetrics fm = g.getFontMetrics();
-			paintViewInsets = c.getInsets(paintViewInsets);
+            if (icon != null) {
+                icon.paintIcon(c, g, paintIconR.x, paintIconR.y);
+            }
 
-			paintViewR.x = paintViewInsets.left;
-			paintViewR.y = paintViewInsets.top;
+            int textX = paintTextR.x + PADDING;
+            int textY = paintTextR.y + fm.getAscent();
 
-			// Use inverted height & width
-			paintViewR.height = c.getWidth()
-					- (paintViewInsets.left + paintViewInsets.right);
-			paintViewR.width = c.getHeight()
-					- (paintViewInsets.top + paintViewInsets.bottom);
+            if (label.isEnabled()) {
+                paintEnabledText(label, g, clippedText, textX, textY);
+            } else {
+                paintDisabledText(label, g, clippedText, textX, textY);
+            }
 
-			paintIconR.x = paintIconR.y = paintIconR.width = paintIconR.height = 0;
-			paintTextR.x = paintTextR.y = paintTextR.width = paintTextR.height = 0;
+            g2.setTransform(tr);
+        }
+    }
 
-			String clippedText = layoutCL(label, fm, text, icon, paintViewR,
-					paintIconR, paintTextR);
+    public SideBar(final MainWindow mainWin, Controller mainController) {
+        super(new BorderLayout());
 
-			Graphics2D g2 = (Graphics2D) g;
-			AffineTransform tr = g2.getTransform();
-			g2.rotate(-Math.PI / 2);
-			g2.translate(-c.getHeight(), 0);
+        controller = mainController;
+        controller.addDataSetListener(this);
 
-			if (icon != null)
-				icon.paintIcon(c, g, paintIconR.x, paintIconR.y);
+        tabs = new JTabbedPane();
+        tabs.setTabPlacement(JTabbedPane.LEFT);
+        add(tabs, BorderLayout.CENTER);
 
-			int textX = paintTextR.x+PADDING;
-			int textY = paintTextR.y + fm.getAscent();
+        onlineDataTab = new OnlineDataTab(mainWin);
+        tabs.addTab(OnlineDataTab.TABTITLE, onlineDataTab);
+        makeRotatedLabel(tabs, 0, OnlineDataTab.TABTITLE);
 
-			if (label.isEnabled())
-				paintEnabledText(label, g, clippedText, textX, textY);
-			else
-				paintDisabledText(label, g, clippedText, textX, textY);
+        dbTab = new DBTab(mainWin, controller);
+        tabs.addTab(DBTab.TABTITLE, dbTab);
+        makeRotatedLabel(tabs, 1, DBTab.TABTITLE);
 
-			g2.setTransform(tr);
-		}
-	}
+        dataSetTab = makeDataSetTab();
+
+        tabs.addTab(DATASETTABTITLE, dataSetTab);
+        dsLabel = makeRotatedLabel(tabs, 2, DATASETTABTITLE);
+        if (dsLabel != null) {
+            dsLabel.setEnabled(false);
+        }
+        tabs.setEnabledAt(dataSetTabNumber, false);
+        tabs.setSelectedIndex(1);
+
+        tabs.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                mainWin.setDSMenuItemsEnabled(false);
+            }
+        });
+    }
+
+    public SideBar(DataSet dataset, final AbstractMainView mainPanel, Controller mainController) {
+        super(new BorderLayout());
+
+        controller = mainController;
+        controller.addDataSetListener(this);
+
+        tabs = new JTabbedPane();
+        tabs.setTabPlacement(JTabbedPane.LEFT);
+        add(tabs, BorderLayout.CENTER);
+        dataSetTabNumber = 0;
+
+        dataSetTab = makeDataSetTab();
+
+        tabs.addTab(DATASETTABTITLE, dataSetTab);
+        dsLabel = makeRotatedLabel(tabs, 0, DATASETTABTITLE);
+        if (dsLabel != null) {
+            dsLabel.setEnabled(true);
+        }
+        //tabs.setEnabledAt(0, false);
+        tabs.setSelectedIndex(dataSetTabNumber);
 
 
-	
-	public SideBar(final MainWindow mainWin, Controller mainController) {
-		super(new BorderLayout());
+        tabs.addChangeListener(new ChangeListener() {
 
-		controller = mainController;
-		controller.addDataSetListener(this);
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                mainPanel.setDSMenuItemsEnabled(false);
+            }
+        });
 
-		tabs = new JTabbedPane();
-		tabs.setTabPlacement(JTabbedPane.LEFT);
-		add(tabs, BorderLayout.CENTER);
+        setDataSet(dataset);
+    }
 
-		onlineDataTab = new OnlineDataTab(mainWin);
-		tabs.addTab(OnlineDataTab.TABTITLE, onlineDataTab);
-		makeRotatedLabel(tabs, 0, OnlineDataTab.TABTITLE);
-		
-		dbTab = new DBTab(mainWin, controller);
-		tabs.addTab(DBTab.TABTITLE, dbTab);
-		makeRotatedLabel(tabs, 1, DBTab.TABTITLE);
+    private JPanel makeDataSetTab() {
+        JPanel p = new JPanel(new MigLayout("wrap 1,fillx,insets 0", "[]", "[grow,fill]r[]r"));
+        p.setOpaque(false);
 
-		dataSetTab = makeDataSetTab(mainWin);
+        Box b = new Box(BoxLayout.Y_AXIS);
+        b.setBorder(BorderFactory.createTitledBorder("Dimensions"));
+        b.setOpaque(false);
 
-		tabs.addTab(DATASETTABTITLE, dataSetTab);
-		dsLabel = makeRotatedLabel(tabs, 2, DATASETTABTITLE);
-		if (dsLabel != null)
-			dsLabel.setEnabled(false);
-		tabs.setEnabledAt(DATASETTABNUM, false);
-		tabs.setSelectedIndex(1);
-		
-		tabs.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				mainWin.setDSMenuItemsEnabled(false);
-			}
-		});
-	}
+        b.add(createDimensionsBox());
+        p.add(b, "growx");
 
-	private JPanel makeDataSetTab(MainWindow mainWin) {
-		JPanel p = new JPanel(new MigLayout("wrap 1,fillx,insets 0", "[]", "[grow,fill]r[]r"));
-		p.setOpaque(false);
-		
-		Box b = new Box(BoxLayout.Y_AXIS);
-		b.setBorder(BorderFactory.createTitledBorder("Dimensions"));
-		b.setOpaque(false);
-		
-		b.add(createDimensionsBox());
-		p.add(b, "growx");
-				
-		JButton clearButton = new JButton("Clear Canvas");
-		clearButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.parSetsView.clearScreen();
-				dimTree.clearChecking();
-			}
-		});
-		p.add(clearButton, "center");
-		return p;
-	}
+        JButton clearButton = new JButton("Clear Canvas");
+        clearButton.addActionListener(new ActionListener() {
 
-	private JLabel makeRotatedLabel(JTabbedPane tabs, int index, String tabtitle) {
-		if (!AbstractOS.getCurrentOS().isMacOSX()) {
-			JLabel label = new JLabel(tabtitle);
-			label.setUI(new VerticalLabelUI());
-			tabs.setTabComponentAt(index, label);
-			return label;
-		} else
-			return null;
-	}
+            public void actionPerformed(ActionEvent e) {
+                controller.parSetsView.clearScreen();
+                dimTree.clearChecking();
+            }
+        });
+        p.add(clearButton, "center");
+        return p;
+    }
 
-	public void setDataSet(DataSet data) {
-		dimTree.setModel(new DefaultTreeModel(data.getCategoricalDimensionsAsTree()));
-		tabs.setEnabledAt(DATASETTABNUM, true);
-		String name  = data.getName();
-		if (name.length() > 10) {
-			tabs.setToolTipTextAt(DATASETTABNUM, name);
-			name = name.substring(0, 10)+"\u2026";
-		} else {
-			tabs.setToolTipTextAt(DATASETTABNUM, null);
-		}
-		tabs.setTitleAt(DATASETTABNUM, name);
-		if (dsLabel != null) {
-			dsLabel.setText(name);
-			dsLabel.setEnabled(true);
-		}
-		tabs.setSelectedComponent(dataSetTab);
-	}
-			
-	private JComponent createDimensionsBox() {
+    private JLabel makeRotatedLabel(JTabbedPane tabs, int index, String tabtitle) {
+        if (!AbstractOS.getCurrentOS().isMacOSX()) {
+            JLabel label = new JLabel(tabtitle);
+            label.setUI(new VerticalLabelUI());
+            tabs.setTabComponentAt(index, label);
+            return label;
+        } else {
+            return null;
+        }
+    }
+
+    public void setDataSet(DataSet data) {
+        dimTree.setModel(new DefaultTreeModel(data.getCategoricalDimensionsAsTree()));
+        tabs.setEnabledAt(dataSetTabNumber, true);
+        String name = data.getName();
+        if (name.length() > 10) {
+            tabs.setToolTipTextAt(dataSetTabNumber, name);
+            name = name.substring(0, 10) + "\u2026";
+        } else {
+            tabs.setToolTipTextAt(dataSetTabNumber, null);
+        }
+        tabs.setTitleAt(dataSetTabNumber, name);
+        if (dsLabel != null) {
+            dsLabel.setText(name);
+            dsLabel.setEnabled(true);
+        }
+        tabs.setSelectedComponent(dataSetTab);
+    }
+
+    private JComponent createDimensionsBox() {
 //		dimBox.setBorder(BorderFactory.createTitledBorder("Categorical"));
-		dimTree = new CheckboxTree(new DefaultMutableTreeNode());
-		dimTree.setRootVisible(false);
-		
-		// Remove the folder and file icons.
-		((DefaultCheckboxTreeCellRenderer)dimTree.getCellRenderer()).setLeafIcon(null);
-		((DefaultCheckboxTreeCellRenderer)dimTree.getCellRenderer()).setClosedIcon(null);
-		((DefaultCheckboxTreeCellRenderer)dimTree.getCellRenderer()).setOpenIcon(null);
-		
-		dimTree.getCheckingModel().setCheckingMode(CheckingMode.PROPAGATE_PRESERVING_UNCHECK);
+        dimTree = new CheckboxTree(new DefaultMutableTreeNode());
+        dimTree.setRootVisible(false);
 
-		dimTree.addTreeCheckingListener(new TreeCheckingListener() {
-			public void valueChanged(TreeCheckingEvent event) {
+        // Remove the folder and file icons.
+        ((DefaultCheckboxTreeCellRenderer) dimTree.getCellRenderer()).setLeafIcon(null);
+        ((DefaultCheckboxTreeCellRenderer) dimTree.getCellRenderer()).setClosedIcon(null);
+        ((DefaultCheckboxTreeCellRenderer) dimTree.getCellRenderer()).setOpenIcon(null);
 
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode)event.getPath().getLastPathComponent();
+        dimTree.getCheckingModel().setCheckingMode(CheckingMode.PROPAGATE_PRESERVING_UNCHECK);
 
-				if (node.isLeaf()) {
-					if (event.isCheckedPath()) {
-						controller.parSetsView.addCategory((DimensionHandle)((DefaultMutableTreeNode) node.getParent()).getUserObject(),
-												(CategoryHandle)node.getUserObject());
-					}					
-					else {
-						controller.parSetsView.removeCategory((DimensionHandle)((DefaultMutableTreeNode) node.getParent()).getUserObject(),
-												(CategoryHandle)node.getUserObject());
-					}
-				}
+        dimTree.addTreeCheckingListener(new TreeCheckingListener() {
 
-				else if (!node.isRoot()) {
-					if (event.isCheckedPath()) {
-						controller.parSetsView.addAxis((DimensionHandle)node.getUserObject());
-					}
-					else {
-						controller.parSetsView.removeAxis((DimensionHandle)node.getUserObject());
-					}
-				}
-			}
-		});	
-		
-		JScrollPane dimPane = new JScrollPane(dimTree);	
-		
-		return dimPane;
-	}	
+            public void valueChanged(TreeCheckingEvent event) {
+
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) event.getPath().getLastPathComponent();
+
+                if (node.isLeaf()) {
+                    if (event.isCheckedPath()) {
+                        controller.parSetsView.addCategory((DimensionHandle) ((DefaultMutableTreeNode) node.getParent()).getUserObject(),
+                                (CategoryHandle) node.getUserObject());
+                    } else {
+                        controller.parSetsView.removeCategory((DimensionHandle) ((DefaultMutableTreeNode) node.getParent()).getUserObject(),
+                                (CategoryHandle) node.getUserObject());
+                    }
+                } else if (!node.isRoot()) {
+                    if (event.isCheckedPath()) {
+                        controller.parSetsView.addAxis((DimensionHandle) node.getUserObject());
+                    } else {
+                        controller.parSetsView.removeAxis((DimensionHandle) node.getUserObject());
+                    }
+                }
+            }
+        });
+
+        JScrollPane dimPane = new JScrollPane(dimTree);
+
+        return dimPane;
+    }
 }

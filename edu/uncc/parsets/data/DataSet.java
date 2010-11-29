@@ -1,5 +1,6 @@
 package edu.uncc.parsets.data;
 
+import edu.uncc.parsets.parsets.SelectionChangeListener;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,7 +38,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 /**
  * A data source that can produce a {@link CategoryTree}.
  */
-public abstract class DataSet implements Iterable<DimensionHandle>, Comparable<DataSet> {
+public abstract class DataSet implements Iterable<DimensionHandle>, Comparable<DataSet>, SelectionChangeListener {
 
 	public abstract Iterator<DimensionHandle> iterator();
 
