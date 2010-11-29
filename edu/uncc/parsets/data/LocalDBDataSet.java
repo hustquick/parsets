@@ -1,5 +1,6 @@
 package edu.uncc.parsets.data;
 
+import edu.uncc.parsets.parsets.SelectionChangeEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -261,4 +262,8 @@ public class LocalDBDataSet extends DataSet {
 		
 		return handles;
 	}
+
+    public void selectionChanged(SelectionChangeEvent event) {
+        
+    }
 }

@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import edu.uncc.parsets.ParallelSets;
+import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.parsets.ParSetsView;
 import edu.uncc.parsets.util.PSLogging;
@@ -55,226 +56,230 @@ import edu.uncc.parsets.util.osabstraction.AbstractOS;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 @SuppressWarnings("serial")
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements AbstractMainView{
 
-	private static final int WINDOWHEIGHT = 600;
+    private static final int WINDOWHEIGHT = 600;
+    private static final int WINDOWWIDTH = 900;
+    public static final String WINDOWTITLE = ParallelSets.PROGRAMNAME + " V" + ParallelSets.VERSION;
+    private static final String ICONFILE = "/support/parsets-512.gif";
+    protected static final String MESSAGE = "Reinitializing the database will delete all datasets.";
+    protected static final String TITLE = "Reinitialize DB";
+    private Controller controller;
+    private JMenuItem openDataSet;
+    private JMenuItem editDataSet;
+    private JMenuItem deleteDataSet;
 
-	private static final int WINDOWWIDTH = 900;
+    private static class PNGFileNameFilter extends CombinedFileNameFilter {
 
-	public static final String WINDOWTITLE = ParallelSets.PROGRAMNAME+" V"+ParallelSets.VERSION;
+        @Override
+        public String getDescription() {
+            return "PNG Files";
+        }
 
-	private static final String ICONFILE = "/support/parsets-512.gif";
+        @Override
+        public String getExtension() {
+            return ".png";
+        }
+    }
 
-	protected static final String MESSAGE = "Reinitializing the database will delete all datasets.";
+    public MainWindow() {
+        super(WINDOWTITLE);
 
-	protected static final String TITLE = "Reinitialize DB";
+        setSize(WINDOWWIDTH, WINDOWHEIGHT);
+        setIconImage(new ImageIcon(ICONFILE).getImage());
+        //f.setLayout(new MigLayout("insets 0,fill", "[min!]0[grow,fill]", "[grow,fill]"));
+        setLayout(new BorderLayout());
 
-	private Controller controller;
+        PSLogging.init(this, PSLogging.DEFAULTLOGLEVEL);
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
-	private JMenuItem openDataSet;
+            public void uncaughtException(Thread t, Throwable e) {
+                PSLogging.logger.fatal("Uncaught exception, program terminating.", e);
+            }
+        });
 
-	private JMenuItem editDataSet;
+        controller = new Controller();
 
-	private JMenuItem deleteDataSet;
+        setJMenuBar(makeMenu(controller));
 
-	private static class PNGFileNameFilter extends CombinedFileNameFilter {
-		@Override
-		public String getDescription() {
-			return "PNG Files";
-		}
+        SideBar sideBar = new SideBar(this, controller);
+        add(sideBar, BorderLayout.WEST);
 
-		@Override
-		public String getExtension() {
-			return ".png";
-		}
-	}
-	
-	public MainWindow() {
-		super(WINDOWTITLE);
-		
-		setSize(WINDOWWIDTH, WINDOWHEIGHT);		
-		setIconImage(new ImageIcon(ICONFILE).getImage());
-		//f.setLayout(new MigLayout("insets 0,fill", "[min!]0[grow,fill]", "[grow,fill]"));
-		setLayout(new BorderLayout());
-		
-		PSLogging.init(this, PSLogging.DEFAULTLOGLEVEL);
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-			public void uncaughtException(Thread t, Throwable e) {
-				PSLogging.logger.fatal("Uncaught exception, program terminating.", e);
-			}
-		});
+        GLCapabilities caps = new GLCapabilities();
+        caps.setSampleBuffers(true);
+        caps.setNumSamples(2);
+        GLCanvas glCanvas = new GLCanvas(caps);
+        glCanvas.addGLEventListener(new ParSetsView(glCanvas, this, controller));
+        add(glCanvas, BorderLayout.CENTER);
 
-		controller = new Controller();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(true);
+    }
 
-		setJMenuBar(makeMenu(controller));
+    private JMenuBar makeMenu(final Controller controller) {
+        JMenuBar menuBar = new JMenuBar();
 
-		SideBar sideBar = new SideBar(this, controller);
-		add(sideBar, BorderLayout.WEST);
+        JMenu dataset = new JMenu("Data Set");
+        openDataSet = new JMenuItem("Open");
+        openDataSet.setEnabled(false);
+        openDataSet.addActionListener(new ActionListener() {
 
-		GLCapabilities caps = new GLCapabilities();
-		caps.setSampleBuffers(true);
-		caps.setNumSamples(2);
-		GLCanvas glCanvas = new GLCanvas(caps);
-		glCanvas.addGLEventListener(new ParSetsView(glCanvas, this, controller));
-		add(glCanvas, BorderLayout.CENTER);
-		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setVisible(true);
-	}
-	
-	private JMenuBar makeMenu(final Controller controller) {
-		JMenuBar menuBar = new JMenuBar();
-		
-		JMenu dataset = new JMenu("Data Set");
-		openDataSet = new JMenuItem("Open");
-		openDataSet.setEnabled(false);
-		openDataSet.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.dbTab.openSelectedDataSet();
-			}
-		});
-		dataset.add(openDataSet);
-		
-		JMenuItem closeDataSet = new JMenuItem("Close");
-		closeDataSet.setEnabled(false);
-		closeDataSet.setAccelerator(KeyStroke.getKeyStroke('W', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		dataset.add(closeDataSet);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.dbTab.openSelectedDataSet();
+            }
+        });
+        dataset.add(openDataSet);
 
-		editDataSet = new JMenuItem("Edit");
-		editDataSet.setEnabled(false);
-		dataset.add(editDataSet);
-		
-		deleteDataSet = new JMenuItem("Delete");
-		deleteDataSet.setEnabled(false);
-		deleteDataSet.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.dbTab.deleteSelectedDataSet();
-			}
-		});
-		deleteDataSet.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		dataset.add(deleteDataSet);
-		
-		dataset.addSeparator();
+        JMenuItem closeDataSet = new JMenuItem("Close");
+        closeDataSet.setEnabled(false);
+        closeDataSet.setAccelerator(KeyStroke.getKeyStroke('W', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        dataset.add(closeDataSet);
 
-		JMenuItem importcsv = new JMenuItem("Import CSV File");
-		importcsv.setAccelerator(KeyStroke.getKeyStroke('O', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		importcsv.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new DataWizard();
-			}
-		});
-		dataset.add(importcsv);
+        editDataSet = new JMenuItem("Edit");
+        editDataSet.setEnabled(false);
+        dataset.add(editDataSet);
 
-		JMenuItem reinit = new JMenuItem("Reinitialize DB");
-		reinit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int choice = JOptionPane.showConfirmDialog(MainWindow.this, MESSAGE,
-						TITLE, JOptionPane.WARNING_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-				if (choice == 0) {
-					LocalDB.getDefaultDB().initializeDB();
-				}
-			}
-		});
-		dataset.add(reinit);
-		
-		dataset.addSeparator();
+        deleteDataSet = new JMenuItem("Delete");
+        deleteDataSet.setEnabled(false);
+        deleteDataSet.addActionListener(new ActionListener() {
 
-		JMenuItem savepng = new JMenuItem("Export PNG");
-		savepng.setAccelerator(KeyStroke.getKeyStroke('P', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
-		savepng.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String fileName = AbstractOS.getCurrentOS().showDialog(MainWindow.this, new PNGFileNameFilter(), FileDialog.SAVE);
-				if (fileName != null)
-					controller.parSetsView.takeScreenShot(fileName);
-			}
-		});
-		dataset.add(savepng);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.dbTab.deleteSelectedDataSet();
+            }
+        });
+        deleteDataSet.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        dataset.add(deleteDataSet);
 
-		if (!AbstractOS.getCurrentOS().isMacOSX()) {
-			dataset.addSeparator();
-			JMenuItem quit = new JMenuItem("Quit");
-			quit.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			quit.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setVisible(false);
-					dispose();
-				}
-			});
-			dataset.add(quit);
-		}
-		
-		menuBar.add(dataset);
-				
-		JMenu view = new JMenu("View");
-		final JMenuItem tooltips = new JCheckBoxMenuItem("Show Tooltips", true);
-		tooltips.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.parSetsView.setShowTooltips(tooltips.isSelected());
-			}
-		});
-		view.add(tooltips);
+        dataset.addSeparator();
 
-		final JCheckBoxMenuItem strong = new JCheckBoxMenuItem("Stronger Highlights", true);
-		strong.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.parSetsView.setStrongerSelection(strong.isSelected());
-			}
-		});
-		view.add(strong);
-		
-		final JCheckBoxMenuItem antialiasing = new JCheckBoxMenuItem("Anti-Aliasing", true);
-		antialiasing.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.parSetsView.setAntiAlias(antialiasing.isSelected());
-			}
-		});
-		view.add(antialiasing);
-		
-		
-		menuBar.add(view);
-		
-		JMenu help = new JMenu("Help");
-		if (!AbstractOS.getCurrentOS().isMacOSX()) {
-			JMenuItem about = new JMenuItem("About Parallel Sets");
-			help.add(about);
-		}
+        JMenuItem importcsv = new JMenuItem("Import CSV File");
+        importcsv.setAccelerator(KeyStroke.getKeyStroke('O', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        importcsv.addActionListener(new ActionListener() {
 
-		JMenuItem website = new JMenuItem("Visit Website");
-		website.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				try {
-					Desktop.getDesktop().browse(new URI(ParallelSets.WEBSITE));
-				} catch (Exception e) {
-					PSLogging.logger.error("Could not open website", e);
-				}
-			}
-		});
-		help.add(website);
-		
-		menuBar.add(help);
-		
-		return menuBar;
-	}
-	
-	public void setDSMenuItemsEnabled(boolean enabled) {
-		openDataSet.setEnabled(enabled);
-		editDataSet.setEnabled(enabled);
-		deleteDataSet.setEnabled(enabled);
-	}
-	
-	public Controller getController() {
-		return controller;
-	}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new DataWizard();
+            }
+        });
+        dataset.add(importcsv);
+
+        JMenuItem reinit = new JMenuItem("Reinitialize DB");
+        reinit.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int choice = JOptionPane.showConfirmDialog(MainWindow.this, MESSAGE,
+                        TITLE, JOptionPane.WARNING_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+                if (choice == 0) {
+                    LocalDB.getDefaultDB().initializeDB();
+                }
+            }
+        });
+        dataset.add(reinit);
+
+        dataset.addSeparator();
+
+        JMenuItem savepng = new JMenuItem("Export PNG");
+        savepng.setAccelerator(KeyStroke.getKeyStroke('P', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
+        savepng.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fileName = AbstractOS.getCurrentOS().showDialog(MainWindow.this, new PNGFileNameFilter(), FileDialog.SAVE);
+                if (fileName != null) {
+                    controller.parSetsView.takeScreenShot(fileName);
+                }
+            }
+        });
+        dataset.add(savepng);
+
+        if (!AbstractOS.getCurrentOS().isMacOSX()) {
+            dataset.addSeparator();
+            JMenuItem quit = new JMenuItem("Quit");
+            quit.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            quit.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    setVisible(false);
+                    dispose();
+                }
+            });
+            dataset.add(quit);
+        }
+
+        menuBar.add(dataset);
+
+        JMenu view = new JMenu("View");
+        final JMenuItem tooltips = new JCheckBoxMenuItem("Show Tooltips", true);
+        tooltips.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.parSetsView.setShowTooltips(tooltips.isSelected());
+            }
+        });
+        view.add(tooltips);
+
+        final JCheckBoxMenuItem strong = new JCheckBoxMenuItem("Stronger Highlights", true);
+        strong.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.parSetsView.setStrongerSelection(strong.isSelected());
+            }
+        });
+        view.add(strong);
+
+        final JCheckBoxMenuItem antialiasing = new JCheckBoxMenuItem("Anti-Aliasing", true);
+        antialiasing.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.parSetsView.setAntiAlias(antialiasing.isSelected());
+            }
+        });
+        view.add(antialiasing);
+
+
+        menuBar.add(view);
+
+        JMenu help = new JMenu("Help");
+        if (!AbstractOS.getCurrentOS().isMacOSX()) {
+            JMenuItem about = new JMenuItem("About Parallel Sets");
+            help.add(about);
+        }
+
+        JMenuItem website = new JMenuItem("Visit Website");
+        website.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    Desktop.getDesktop().browse(new URI(ParallelSets.WEBSITE));
+                } catch (Exception e) {
+                    PSLogging.logger.error("Could not open website", e);
+                }
+            }
+        });
+        help.add(website);
+
+        menuBar.add(help);
+
+        return menuBar;
+    }
+
+    public void setDSMenuItemsEnabled(boolean enabled) {
+        openDataSet.setEnabled(enabled);
+        editDataSet.setEnabled(enabled);
+        deleteDataSet.setEnabled(enabled);
+    }
+
+    public Controller getController() {
+        return controller;
+    }
+
 }

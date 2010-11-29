@@ -48,7 +48,10 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 	private List<CategoryHandle> categories;
 	private LocalDBDataSet dataSet;
 	private int num;
-	
+
+        public DimensionHandle(){
+
+        }
 	public DimensionHandle(String name, String handle, DataType dataType, int dimNum, LocalDBDataSet localDBDataSet) {
 		this.name = name;
 		this.handle = handle;
@@ -130,6 +133,5 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 			return null;
 		}
 			
-	}
-	
+	}	
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.parsets.ParSetsView;
+import edu.uncc.parsets.parsets.SelectionChangeEvent;
+import edu.uncc.parsets.parsets.SelectionChangeListener;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -33,7 +35,6 @@ import edu.uncc.parsets.parsets.ParSetsView;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 /**
  * The controller mostly notifies a variety of listeners of changes to the
  * database, also lets other objects talk to the view. This will need to be
@@ -42,25 +43,32 @@ import edu.uncc.parsets.parsets.ParSetsView;
  */
 public class Controller {
 
-	private ArrayList<DataSetListener> dsListeners = new ArrayList<DataSetListener>();
-	public ParSetsView parSetsView;
-	
-	public DBTab dbTab;
-	
-	public Controller() {
-		
-	}
-	
-	public void addDataSetListener(DataSetListener l) {
-		dsListeners.add(l);
-	}
+    private ArrayList<DataSetListener> dsListeners = new ArrayList<DataSetListener>();
+    public ParSetsView parSetsView;
+    private ArrayList<SelectionChangeListener> selectionListeners = new ArrayList<SelectionChangeListener>();
+    public DBTab dbTab;
 
-	public void removeDataSetListener(DataSetListener l) {
-		dsListeners.remove(l);
-	}
+    public Controller() {
+    }
 
-	public void setDataSet(DataSet data) {
-		for (DataSetListener l : dsListeners)
-			l.setDataSet(data);
-	}
+    public void addDataSetListener(DataSetListener l) {
+        dsListeners.add(l);
+    }
+
+    public void removeDataSetListener(DataSetListener l) {
+        dsListeners.remove(l);
+    }
+
+    public void setDataSet(DataSet data) {
+        for (DataSetListener l : dsListeners) {
+            l.setDataSet(data);
+        }
+        selectionListeners.add(data);
+    }
+    
+    public void setSelected(SelectionChangeEvent event){
+        for (SelectionChangeListener l : selectionListeners) {
+            l.selectionChanged(event);
+        }
+    }
 }

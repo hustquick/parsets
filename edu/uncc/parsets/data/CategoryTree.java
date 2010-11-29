@@ -51,7 +51,7 @@ public class CategoryTree implements Iterable<List<CategoryNode>> {
 		}
 	}
 	
-	protected void addtoLevel(int level, CategoryNode node) {
+	public void addtoLevel(int level, CategoryNode node) {
 		List<CategoryNode> levelList = levels.get(level);
 		levelList.add(node);
 		TreeMap<CategoryHandle, List<CategoryNode>> group = catGroups.get(level);
