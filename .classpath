@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path=""/>
+	<classpathentry excluding="docs/|libs/|resources/" kind="src" path=""/>
 	<classpathentry kind="lib" path="libs/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="libs/jdom.jar"/>
 	<classpathentry kind="lib" path="libs/jna.jar"/>
@@ -12,6 +12,7 @@
 	<classpathentry kind="lib" path="libs/miglayout-3.7-swing.jar"/>
 	<classpathentry kind="lib" path="libs/opencsv-1.8.jar"/>
 	<classpathentry kind="lib" path="libs/sqlitejdbc-v056.jar"/>
+	<classpathentry kind="lib" path="libs/gnujpdf.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
