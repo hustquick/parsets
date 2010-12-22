@@ -182,7 +182,10 @@ public class MainWindow extends JFrame implements AbstractMainView{
 
         dataset.addSeparator();
 
-        JMenuItem savepng = new JMenuItem("Export PNG");
+        JMenu export = new JMenu("Export ...");
+        dataset.add(export);
+        
+        JMenuItem savepng = new JMenuItem("Screenshot as PNG");
         savepng.setAccelerator(KeyStroke.getKeyStroke('P', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
         savepng.addActionListener(new ActionListener() {
 
@@ -194,8 +197,23 @@ public class MainWindow extends JFrame implements AbstractMainView{
                 }
             }
         });
-        dataset.add(savepng);
+        export.add(savepng);
 
+        JMenuItem savepdf = new JMenuItem("Screenshot as PDF");
+        savepdf.setAccelerator(KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
+        savepdf.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fileName = AbstractOS.getCurrentOS().showDialog(MainWindow.this, new PNGFileNameFilter(), FileDialog.SAVE);
+                if (fileName != null) {
+                    controller.parSetsView.takeScreenShot(fileName);
+                }
+            }
+        });
+        export.add(savepdf);
+        
+        
         if (!AbstractOS.getCurrentOS().isMacOSX()) {
             dataset.addSeparator();
             JMenuItem quit = new JMenuItem("Quit");
