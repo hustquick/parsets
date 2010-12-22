@@ -1,0 +1,28 @@
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Parallel Sets Installation\parallel_sets.jar</jar>
+  <outfile>C:\Parallel Sets Installation\Parallel Sets Files\Parallel Sets.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <customProcName>true</customProcName>
+  <stayAlive>false</stayAlive>
+  <manifest></manifest>
+  <icon>C:\Parallel Sets Installation\parsets-512.ico</icon>
+  <classPath>
+    <mainClass>edu.uncc.parsets.ParallelSets</mainClass>
+    <cp>.</cp>
+  </classPath>
+  <jre>
+    <path></path>
+    <minVersion>1.6.0_00</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <opt>-Dparsets.use_installed_db=true</opt>
+    <opt>-Xmx1G</opt>
+  </jre>
+</launch4jConfig>
