@@ -311,8 +311,8 @@ public class PDFTest extends JFrame implements ActionListener
     System.out.println("Printing..");
     JobAttributes jobAttributes = new JobAttributes(); 
     //jobAttributes.setDialog(JobAttributes.DialogType.NONE); 
-    // CRAP!! - This doesn't work with jdk1.2.2 - fix it
     Toolkit toolkit = Toolkit.getDefaultToolkit();
+    // CRAP!! - This doesn't work with jdk1.2.2 - fix it
     PrintJob pjob = toolkit.getPrintJob(this, 
                                         "PDF Test Print", 
                                         jobAttributes,  
