@@ -22,7 +22,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import edu.uncc.parsets.ParallelSets;
-import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.parsets.ParSetsView;
 import edu.uncc.parsets.util.PSLogging;
