@@ -1,10 +1,8 @@
 package edu.uncc.parsets.parsets;
 
+import java.awt.Font;
 import java.awt.FontMetrics;
-
-import javax.media.opengl.GL;
-
-import com.sun.opengl.util.j2d.TextRenderer;
+import java.awt.Graphics2D;
 
 import edu.uncc.parsets.data.CategoryTree;
 import edu.uncc.parsets.data.DimensionHandle;
@@ -47,8 +45,8 @@ public abstract class VisualAxis {
 		this.barY.setValue(barY);
 	}
 
-	public abstract void display(GL gl, TextRenderer dimFont, FontMetrics dimFontMetrics,
-			TextRenderer catFont, FontMetrics catFontMetrics);
+	public abstract void display(Graphics2D g, Font dimFont, FontMetrics dimFontMetrics,
+			Font catFont, FontMetrics catFontMetrics);
 
 	public abstract void layout(int y, int xOffset, int width, int gap, int barHeight, CategoryTree dataTree);
 		
@@ -56,8 +54,8 @@ public abstract class VisualAxis {
 	
 	public abstract DimensionHandle getDimension();
 
-	public float getBarY() {
-		return barY.getValue();
+	public int getBarY() {
+		return (int) barY.getValue();
 	}
 	
 	public abstract CategoryBar findBar(int x, int y);

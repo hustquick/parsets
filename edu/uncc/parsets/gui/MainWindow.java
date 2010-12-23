@@ -10,8 +10,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.net.URI;
 
-import javax.media.opengl.GLCanvas;
-import javax.media.opengl.GLCapabilities;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -56,7 +54,7 @@ import edu.uncc.parsets.util.osabstraction.AbstractOS;
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 @SuppressWarnings("serial")
-public class MainWindow extends JFrame implements AbstractMainView{
+public class MainWindow extends JFrame implements AbstractMainView {
 
     private static final int WINDOWHEIGHT = 600;
     private static final int WINDOWWIDTH = 900;
@@ -87,7 +85,6 @@ public class MainWindow extends JFrame implements AbstractMainView{
 
         setSize(WINDOWWIDTH, WINDOWHEIGHT);
         setIconImage(new ImageIcon(ICONFILE).getImage());
-        //f.setLayout(new MigLayout("insets 0,fill", "[min!]0[grow,fill]", "[grow,fill]"));
         setLayout(new BorderLayout());
 
         PSLogging.init(this, PSLogging.DEFAULTLOGLEVEL);
@@ -105,12 +102,8 @@ public class MainWindow extends JFrame implements AbstractMainView{
         SideBar sideBar = new SideBar(this, controller);
         add(sideBar, BorderLayout.WEST);
 
-        GLCapabilities caps = new GLCapabilities();
-        caps.setSampleBuffers(true);
-        caps.setNumSamples(2);
-        GLCanvas glCanvas = new GLCanvas(caps);
-        glCanvas.addGLEventListener(new ParSetsView(glCanvas, this, controller));
-        add(glCanvas, BorderLayout.CENTER);
+        ParSetsView parSetsView = new ParSetsView(controller);
+        add(parSetsView, BorderLayout.CENTER);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);

@@ -1,6 +1,8 @@
 package edu.uncc.parsets.util;
 
-import javax.media.opengl.GL;
+import java.awt.Color;
+import java.awt.Graphics;
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -37,34 +39,37 @@ import javax.media.opengl.GL;
  */
 public class ColorBrewer {
 	
-	public final static float colors[][] = {
-			{ 141f / 255f, 211f / 255f, 199f / 255f },
-			{ 190f / 255f, 186f / 255f, 218f / 255f },
-			{ 251f / 255f, 128f / 255f, 114f / 255f },
-			{ 128f / 255f, 177f / 255f, 211f / 255f },
-			{ 253f / 255f, 180f / 255f, 98f / 255f },
-			{ 179f / 255f, 222f / 255f, 105f / 255f },
-			{ 252f / 255f, 205f / 255f, 229f / 255f },
-			{ 217f / 255f, 217f / 255f, 217f / 255f },
-			{ 188f / 255f, 128f / 255f, 189f / 255f },
-			{ 204f / 255f, 235f / 255f, 197f / 255f },
-			{ 255f / 255f, 237f / 255f, 111f / 255f },
-			{ 255f / 255f, 255f / 255f, 179f / 255f }};
+	public final static Color colors[] = {
+			new Color(141f / 255f, 211f / 255f, 199f / 255f),
+			new Color(190f / 255f, 186f / 255f, 218f / 255f),
+			new Color(251f / 255f, 128f / 255f, 114f / 255f),
+			new Color(128f / 255f, 177f / 255f, 211f / 255f),
+			new Color(253f / 255f, 180f / 255f,  98f / 255f),
+			new Color(179f / 255f, 222f / 255f, 105f / 255f),
+			new Color(252f / 255f, 205f / 255f, 229f / 255f),
+			new Color(217f / 255f, 217f / 255f, 217f / 255f),
+			new Color(188f / 255f, 128f / 255f, 189f / 255f),
+			new Color(204f / 255f, 235f / 255f, 197f / 255f),
+			new Color(255f / 255f, 237f / 255f, 111f / 255f),
+			new Color(255f / 255f, 255f / 255f, 179f / 255f)};
 
-	public static void setColor(int colorNum, boolean darker, GL gl) {
+	public static void setColor(int colorNum, boolean darker, Graphics g) {
 		colorNum = colorNum % colors.length;
 		if (darker)
-			gl.glColor3f(colors[colorNum][0]*.75f, colors[colorNum][1]*.75f, colors[colorNum][2]*.75f);
+			g.setColor(colors[colorNum].darker());
 		else
-			gl.glColor3f(colors[colorNum][0], colors[colorNum][1], colors[colorNum][2]);
+			g.setColor(colors[colorNum]);
 	}
 	
-	public static void setColor(int colorNum, boolean darker, float alpha, GL gl) {
+	public static void setColor(int colorNum, boolean darker, float alpha, Graphics g) {
 		colorNum = colorNum % colors.length;
+		Color c = null;
 		if (darker)
-			gl.glColor4f(colors[colorNum][0]*.75f, colors[colorNum][1]*.75f, colors[colorNum][2]*.75f, alpha);
+			c = colors[colorNum].darker();
 		else
-			gl.glColor4f(colors[colorNum][0], colors[colorNum][1], colors[colorNum][2], alpha);
+			c = colors[colorNum];
+
+		g.setColor(new Color(c.getRed()/255f, c.getGreen()/255f, c.getBlue()/255f, alpha));
 	}
 	
 }

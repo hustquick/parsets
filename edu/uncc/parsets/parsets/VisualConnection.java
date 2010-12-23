@@ -1,9 +1,8 @@
 package edu.uncc.parsets.parsets;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
-
-import javax.media.opengl.GL;
 
 import edu.uncc.parsets.data.CategoryNode;
 
@@ -46,7 +45,7 @@ public class VisualConnection {
 	protected VisualConnection parent;
 	protected CategoryNode node;
 	
-	protected float width;
+	protected int width;
 	protected int colorBrewerIndex;	
 	protected boolean isSelected = false;
 	
@@ -89,7 +88,7 @@ public class VisualConnection {
 	 * 
 	 * @param gl: The graphics instance to paint to.
 	 */
-	public void display(GL gl, float alpha) {
+	public void display(Graphics2D g, float alpha) {
 		
 	}
 	
@@ -116,7 +115,7 @@ public class VisualConnection {
 	/**
 	 * @param width the width to set
 	 */
-	public void setWidth(float width) {
+	public void setWidth(int width) {
 		this.width = width;
 	}
 
@@ -142,7 +141,7 @@ public class VisualConnection {
 		
 	}
 	
-	public void displaySelected(GL gl) {
+	public void displaySelected(Graphics2D g) {
 		
 	}
 
