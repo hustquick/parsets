@@ -42,6 +42,7 @@ import edu.uncc.parsets.util.PSLogging;
 
 // http://developer.apple.com/documentation/Java/Conceptual/Java14Development/07-NativePlatformIntegration/NativePlatformIntegration.html
 // http://developer.apple.com/technotes/tn2007/tn2196.html
+@SuppressWarnings("rawtypes")
 public class MacOSX extends AbstractOS {
 
 	// based on http://www.velocityreviews.com/forums/t151722-class-loading-on-different-opperating-systems.html
@@ -134,9 +135,7 @@ public class MacOSX extends AbstractOS {
 			return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static final Class fmParamTypes[] = { Short.TYPE, Integer.TYPE };
-	@SuppressWarnings("unchecked")
 	private static final Class os2iParamTypes[] = { String.class };
 
 	// Based on code from
