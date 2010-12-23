@@ -22,7 +22,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import edu.uncc.parsets.ParallelSets;
-import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.parsets.ParSetsView;
 import edu.uncc.parsets.util.PSLogging;
@@ -182,10 +181,7 @@ public class MainWindow extends JFrame implements AbstractMainView{
 
         dataset.addSeparator();
 
-        JMenu export = new JMenu("Export ...");
-        dataset.add(export);
-        
-        JMenuItem savepng = new JMenuItem("Screenshot as PNG");
+        JMenuItem savepng = new JMenuItem("Export PNG");
         savepng.setAccelerator(KeyStroke.getKeyStroke('P', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
         savepng.addActionListener(new ActionListener() {
 
@@ -197,23 +193,8 @@ public class MainWindow extends JFrame implements AbstractMainView{
                 }
             }
         });
-        export.add(savepng);
+        dataset.add(savepng);
 
-        JMenuItem savepdf = new JMenuItem("Screenshot as PDF");
-        savepdf.setAccelerator(KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
-        savepdf.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String fileName = AbstractOS.getCurrentOS().showDialog(MainWindow.this, new PNGFileNameFilter(), FileDialog.SAVE);
-                if (fileName != null) {
-                    controller.parSetsView.takeScreenShot(fileName);
-                }
-            }
-        });
-        export.add(savepdf);
-        
-        
         if (!AbstractOS.getCurrentOS().isMacOSX()) {
             dataset.addSeparator();
             JMenuItem quit = new JMenuItem("Quit");
