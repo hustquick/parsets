@@ -210,8 +210,9 @@ public class CSVParser {
 						values[i] = 0;
 						break;
 					}
-					return values;
+					// return statement was here earlier, makes no sense
 				}
+				return values;
 			}
 		} catch (Exception e) {
 			PSLogging.logger.error("Error reading line", e);
