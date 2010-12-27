@@ -1,8 +1,7 @@
 package edu.uncc.parsets.parsets;
 
+import java.awt.Graphics2D;
 import java.awt.Polygon;
-
-import javax.media.opengl.GL;
 
 import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.util.AnimatableProperty;
@@ -108,56 +107,48 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		}
 	}
 	
-	public void display(GL gl, float alpha) {
+	public void paint(Graphics2D g, float alpha) {
 		
 		if (width == 0 || isSelected)
 			return;
 
-		ColorBrewer.setColor(colorBrewerIndex, false, alpha, gl);
+		ColorBrewer.setColor(colorBrewerIndex, false, alpha, g);
 		if (width >= 1) {
-			gl.glBegin(GL.GL_QUADS);
-				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
-				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue() + width, upperBar.getOutRibbonY());
-				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + width, lowerBar.getInRibbonY());
-				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue(), lowerBar.getInRibbonY());
-			gl.glEnd();
+			int xPoints[] = new int[4];
+			int yPoints[] = new int[4];
+			
+			xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); yPoints[0] = upperBar.getOutRibbonY();
+			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width); yPoints[1] = upperBar.getOutRibbonY();
+			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width); yPoints[2] = lowerBar.getInRibbonY();
+			xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); yPoints[3] = lowerBar.getInRibbonY();
+
+			g.fillPolygon(xPoints, yPoints, 4);
 		} else {
-			gl.glBegin(GL.GL_LINES);
-			gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
-			gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + (int)width, lowerBar.getInRibbonY());
-			gl.glEnd();
+			g.drawLine(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width, lowerBar.getInRibbonY());
 		}
 	}
 	
-	public void displaySelected(GL gl) {
+	public void paintSelected(Graphics2D g) {
 		
 		if (width == 0)
 			return;
 	
 		if (width >= 1) {
-			ColorBrewer.setColor(colorBrewerIndex, false, 1f, gl);
-			gl.glBegin(GL.GL_QUADS);
-				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
-				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue() + width, upperBar.getOutRibbonY());
-				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + width, lowerBar.getInRibbonY());
-				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue(), lowerBar.getInRibbonY());
-			gl.glEnd();
-			
-			ColorBrewer.setColor(colorBrewerIndex, true, .8f, gl);
-			gl.glBegin(GL.GL_LINE_LOOP);
-				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
-				gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue() + width, upperBar.getOutRibbonY());
-				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + width, lowerBar.getInRibbonY());
-				gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue(), lowerBar.getInRibbonY());
-			gl.glEnd();
+			ColorBrewer.setColor(colorBrewerIndex, false, g);
+			int xPoints[] = new int[4];
+			int yPoints[] = new int[4];
+
+			xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); yPoints[0] = upperBar.getOutRibbonY();
+			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width); yPoints[1] = upperBar.getOutRibbonY();
+			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width); yPoints[2] = lowerBar.getInRibbonY();
+			xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); yPoints[3] = lowerBar.getInRibbonY();
+			g.fillPolygon(xPoints, yPoints, 4);
+				
+			ColorBrewer.setColor(colorBrewerIndex, true, .8f, g);
+			g.drawPolygon(xPoints, yPoints, 4);
 		} else {
-			ColorBrewer.setColor(colorBrewerIndex, true, 1f, gl);
-			gl.glEnable(GL.GL_LINE_SMOOTH);
-			gl.glBegin(GL.GL_LINES);
-			gl.glVertex2f(upperBar.getLeftX() + upperOffset.getValue(), upperBar.getOutRibbonY());
-			gl.glVertex2f(lowerBar.getLeftX() + lowerOffset.getValue() + (int)width, lowerBar.getInRibbonY());
-			gl.glEnd();
-			gl.glDisable(GL.GL_LINE_SMOOTH);
+			ColorBrewer.setColor(colorBrewerIndex, true, g);
+			g.drawLine(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width, lowerBar.getInRibbonY());
 		}
 	}
 	

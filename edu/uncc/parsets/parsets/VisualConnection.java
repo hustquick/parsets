@@ -1,9 +1,8 @@
 package edu.uncc.parsets.parsets;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
-
-import javax.media.opengl.GL;
 
 import edu.uncc.parsets.data.CategoryNode;
 
@@ -89,7 +88,7 @@ public class VisualConnection {
 	 * 
 	 * @param gl: The graphics instance to paint to.
 	 */
-	public void display(GL gl, float alpha) {
+	public void paint(Graphics2D g, float alpha) {
 		
 	}
 	
@@ -142,7 +141,7 @@ public class VisualConnection {
 		
 	}
 	
-	public void displaySelected(GL gl) {
+	public void paintSelected(Graphics2D g) {
 		
 	}
 

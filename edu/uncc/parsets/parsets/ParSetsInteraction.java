@@ -1,14 +1,14 @@
 package edu.uncc.parsets.parsets;
 
-import edu.uncc.parsets.data.CategoryHandle;
-import edu.uncc.parsets.data.CategoryNode;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.event.MouseInputAdapter;
 
+import edu.uncc.parsets.data.CategoryHandle;
+import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
-import java.util.ArrayList;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -66,7 +66,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
                 activeAxis.sort(view.getDataTree(), view.getConnectionTree(), activeAxis.getButtonAction());
             }
             activeAxis = null;
-            view.layout();
+            view.layoutAxes();
             AnimatableProperty.commitAnimations();
         } else {
             if (selectedRibbon != null) {
@@ -94,17 +94,17 @@ public class ParSetsInteraction extends MouseInputAdapter {
                 // animation leads to odd layout issues.
 //				AnimatableProperty.beginAnimations(2, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, view);
                 view.moveCategory(activeAxis, activeCategoryBar.getCategory(), index);
-                view.layout();
+                view.layoutAxes();
 //				AnimatableProperty.commitAnimations();
             }
             view.repaint();
         } else if (activeAxis != null) {
-            activeAxis.setBarY(view.getHeight() - e.getY());
+            activeAxis.setBarY(e.getY());
 
-            int index = view.getAxisPosition(view.getHeight() - e.getY(), activeAxis);
+            int index = view.getAxisPosition(e.getY(), activeAxis);
             if (index != -1) {
                 view.moveAxis(index, activeAxis);
-                view.layout();
+                view.layoutAxes();
             }
 
             view.repaint();
@@ -114,7 +114,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
     @Override
     public final void mouseMoved(MouseEvent e) {
         int mouseX = e.getX();
-        int mouseY = view.getHeight() - e.getY();
+        int mouseY = e.getY();
 
         view.clearTooltip();
 

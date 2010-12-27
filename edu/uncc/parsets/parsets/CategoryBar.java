@@ -1,11 +1,9 @@
 package edu.uncc.parsets.parsets;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
-
-import javax.media.opengl.GL;
-
-import com.sun.opengl.util.j2d.TextRenderer;
+import java.awt.Graphics2D;
 
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryTree;
@@ -90,34 +88,24 @@ public class CategoryBar {
 		return width;
 	}
 
-	public void display(GL gl, TextRenderer catFont, FontMetrics catFontMetrics,
+	public void paint(Graphics2D g, Font catFont, FontMetrics catFontMetrics,
 			int topY, int barHeight) {
 
 		if (active) {		
 			if (topLevel)
-				ColorBrewer.setColor(color, false, 1f, gl);
+				ColorBrewer.setColor(color, false, g);
 			else
-				gl.glColor4f(1f, 1f, 1f, 1f);
+				g.setColor(Color.WHITE);
 
-			gl.glBegin(GL.GL_QUADS);
-			gl.glVertex2f(leftX.getValue(), topY);
-			gl.glVertex2f(leftX.getValue(), topY - barHeight);
-			gl.glVertex2f(leftX.getValue() + width, topY - barHeight);
-			gl.glVertex2f(leftX.getValue() + width, topY);
-			gl.glEnd();
+			g.fillRect((int)leftX.getValue(), topY, (int)width, barHeight);
 		}
 		
 		if (topLevel)
-			ColorBrewer.setColor(color, true, gl);
+			ColorBrewer.setColor(color, true, g);
 		else
-			gl.glColor3f(.3f, .3f, .5f);
+			g.setColor(new Color(.3f, .3f, .5f));
 
-		gl.glLineWidth(2);
-		gl.glBegin(GL.GL_LINES);
-		gl.glVertex2f(leftX.getValue(), topY - barHeight);
-		gl.glVertex2f(leftX.getValue() + width, topY - barHeight);
-		gl.glEnd();
-		gl.glLineWidth(1);
+		g.fillRect((int)leftX.getValue(), topY + barHeight, (int)width, 2);
 				
 		String label = category.getName();
 
@@ -133,13 +121,9 @@ public class CategoryBar {
 			else if (catFontMetrics.stringWidth(category.getName().substring(0, 1)) < width)
 				label = category.getName().substring(0, 1);
 		}
-		
-		catFont.begin3DRendering();
-		catFont.setColor(Color.BLACK);
-		if (label.length() > 0)
-			catFont.draw(label, (int) leftX.getValue(), topY - catFontMetrics.getAscent() - 1);
-		catFont.end3DRendering();
 
+		g.setFont(catFont);
+		g.drawString(label, (int) leftX.getValue(), topY + catFontMetrics.getAscent() + 1);
 	}
 
 	public float getTopIndexPoint() {
@@ -174,12 +158,12 @@ public class CategoryBar {
 		this.bottomIndexPoint = bottomIndexPoint;
 	}
 
-	public float getOutRibbonY() {
-		return axis.getBarY() - axis.getBarHeight() - 1;
+	public int getOutRibbonY() {
+		return axis.getBarY() + axis.getBarHeight() + 1;
 	}
 
-	public float getInRibbonY() {
-		return getOutRibbonY() + 1;
+	public int getInRibbonY() {
+		return getOutRibbonY() - 1;
 	}
 
 	public void setActive(boolean newActive) {

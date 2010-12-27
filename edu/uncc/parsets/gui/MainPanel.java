@@ -9,8 +9,6 @@ package edu.uncc.parsets.gui;
 
 import java.awt.BorderLayout;
 
-import javax.media.opengl.GLCanvas;
-import javax.media.opengl.GLCapabilities;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
@@ -32,7 +30,7 @@ public class MainPanel extends JPanel implements AbstractMainView {
     private JMenuItem editDataSet;
     private JMenuItem deleteDataSet;
     private SideBar sideBar;
-    private GLCanvas glCanvas;
+	private ParSetsView parSetsView;
 
     public String getTitle() {
         return "";
@@ -44,18 +42,16 @@ public class MainPanel extends JPanel implements AbstractMainView {
         controller = new Controller();
         controller.setDataSet(dataset);
         sideBar = new SideBar(dataset, (AbstractMainView)this, controller);
-        GLCapabilities caps = new GLCapabilities();
-        caps.setSampleBuffers(true);
-        caps.setNumSamples(2);
-        glCanvas = new GLCanvas(caps);
-        glCanvas.addGLEventListener(new ParSetsView(glCanvas, (AbstractMainView)this, controller));
+
+        parSetsView = new ParSetsView(controller);
+
         initComponents();
     }
     
     private void initComponents(){
         setLayout(new BorderLayout());
         add(sideBar, BorderLayout.WEST);
-        add(glCanvas, BorderLayout.CENTER);
+        add(parSetsView, BorderLayout.CENTER);
 
     }
 
