@@ -140,7 +140,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 
 			xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); yPoints[0] = upperBar.getOutRibbonY();
 			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + width; yPoints[1] = upperBar.getOutRibbonY();
-			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + width; yPoints[1] = lowerBar.getInRibbonY();
+			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + width; yPoints[2] = lowerBar.getInRibbonY();
 			xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); yPoints[3] = lowerBar.getInRibbonY();
 			g.fillPolygon(xPoints, yPoints, 4);
 				

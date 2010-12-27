@@ -181,18 +181,16 @@ public class ParSetsView extends JPanel implements DataSetListener, AnimationLis
 	}
 
 	protected void layoutAxes() {
-		float y = height-10;
-		float axisSpacing;
-		if (axes.size() < 2)
-			axisSpacing = 0;
-		else if (axes.size() == 2)
-			axisSpacing = ((float)(y - 42) / 2);
-		else
-			axisSpacing = ((float)(y - 42) / (float)(axes.size()-1));
+		float y = 10;
+		float axisSpacing = 0;
+		if (axes.size() == 2)
+			axisSpacing = ((float)(height - 52) / 2);
+		else if (axes.size() > 2)
+			axisSpacing = ((float)(height - 52) / (float)(axes.size()-1));
 		
 		for (VisualAxis axis : axes) {
 			axis.layout((int)y, 10, width-20-40, 40, categoryFontMetrics.getHeight() + 2, dataTree);
-			y -= axisSpacing;
+			y += axisSpacing;
 		}
 		connectionTree.doLayout(10, width-20-30);
 		needsLayout = false;
@@ -274,14 +272,14 @@ public class ParSetsView extends JPanel implements DataSetListener, AnimationLis
 	// TODO: This needs to be rewritten and combined with moveAxis
 	public int getAxisPosition(int yPos, VisualAxis axis) {
 
-		int newIndex = (height - yPos) / (height / (axes.size()-1));
+		int newIndex = yPos / (height / (axes.size()-1));
 		int oldIndex = dimensionList.indexOf(axis.getDimension());
 
 		// up movements create unnecessary reconfigurations.
 		// this is to catch this special case where the movement has not
 		// been far enough
 		if (newIndex < oldIndex) {
-			if (axes.get(newIndex).getBarY() > yPos)
+			if (axes.get(newIndex).getBarY() < yPos)
 				newIndex++;
 		}
 		
