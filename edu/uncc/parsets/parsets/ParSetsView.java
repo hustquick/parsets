@@ -119,7 +119,10 @@ public class ParSetsView extends JPanel implements DataSetListener, AnimationLis
 		
 		Graphics2D g2 = (Graphics2D) g;
 
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); 
+		if (antialias)
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); 
+		else
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF); 			
 
 		if (needsLayout) {
 			componentResized(null);
@@ -142,10 +145,10 @@ public class ParSetsView extends JPanel implements DataSetListener, AnimationLis
 
 			// passing all those values isn't very pretty, but it'll do for now.
 			for (VisualAxis axis : axes)
-				axis.display(g2, DIMENSIONFONT, dimensionFontMetrics, CATEGORYFONT, categoryFontMetrics);
+				axis.paint(g2, DIMENSIONFONT, dimensionFontMetrics, CATEGORYFONT, categoryFontMetrics);
 			
 			if (tooltip != null && showTooltips) 
-				tooltip.display(g2, CATEGORYFONT, categoryFontMetrics, width);
+				tooltip.paint(g2, CATEGORYFONT, categoryFontMetrics, width);
 			
 		}
 		

@@ -88,7 +88,7 @@ public class CategoryBar {
 		return width;
 	}
 
-	public void display(Graphics2D g, Font catFont, FontMetrics catFontMetrics,
+	public void paint(Graphics2D g, Font catFont, FontMetrics catFontMetrics,
 			int topY, int barHeight) {
 
 		if (active) {		

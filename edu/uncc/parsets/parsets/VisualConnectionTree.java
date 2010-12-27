@@ -238,7 +238,7 @@ public class VisualConnectionTree {
 	
 	private void display(Graphics2D g, VisualConnection node, float alpha) {
 		
-		node.display(g, alpha);
+		node.paint(g, alpha);
 		
 		for (VisualConnection child : node.getChildren())
 			if (child.getNode().isVisible()) 
@@ -247,7 +247,7 @@ public class VisualConnectionTree {
 	
 	private void displaySelected(Graphics2D g, VisualConnection node) {
 		if (node.isSelected())
-			node.displaySelected(g);
+			node.paintSelected(g);
 		
 		for (VisualConnection child : node.getChildren())
 			if (child.getNode().isVisible())

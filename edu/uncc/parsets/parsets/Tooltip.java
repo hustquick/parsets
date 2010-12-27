@@ -46,7 +46,7 @@ public class Tooltip {
 		this.y = y;
 	}
 	
-	public void display(Graphics2D g, Font tooltipFont, FontMetrics tooltipFontMetrics, int width) {
+	public void paint(Graphics2D g, Font tooltipFont, FontMetrics tooltipFontMetrics, int width) {
 		
 		if (text == null)
 			return;

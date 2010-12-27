@@ -88,7 +88,7 @@ public class VisualConnection {
 	 * 
 	 * @param gl: The graphics instance to paint to.
 	 */
-	public void display(Graphics2D g, float alpha) {
+	public void paint(Graphics2D g, float alpha) {
 		
 	}
 	
@@ -141,7 +141,7 @@ public class VisualConnection {
 		
 	}
 	
-	public void displaySelected(Graphics2D g) {
+	public void paintSelected(Graphics2D g) {
 		
 	}
 
