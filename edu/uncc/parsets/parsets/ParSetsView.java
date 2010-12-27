@@ -464,6 +464,7 @@ public class ParSetsView extends JPanel implements DataSetListener, AnimationLis
 		width = getWidth();
 		height = getHeight();
 		needsLayout = true;
+		repaint();
 	}
 
 	@Override
