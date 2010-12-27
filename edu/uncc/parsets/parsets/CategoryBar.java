@@ -114,10 +114,10 @@ public class CategoryBar {
 		if (labelWidth > width) {
 			while (labelWidth > width && label.length() > 0) {
 				label = label.substring(0, label.length() - 1);
-				labelWidth = catFontMetrics.stringWidth(label+"\u2026"); // unicode code for ellipsis
+				labelWidth = catFontMetrics.stringWidth(label+"...");
 			}
 			if (label.length() > 0)
-				label = label.concat("\u2026"); // unicode code for ellipsis
+				label = label.concat("...");
 			else if (catFontMetrics.stringWidth(category.getName().substring(0, 1)) < width)
 				label = category.getName().substring(0, 1);
 		}
