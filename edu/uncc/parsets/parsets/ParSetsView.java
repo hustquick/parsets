@@ -12,6 +12,7 @@ import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +88,6 @@ public class ParSetsView extends JPanel implements DataSetListener, AnimationLis
 	
 	private boolean needsLayout = true;
 	
-	private String screenShotFileName = null;
 	private boolean showTooltips = true;
 
 	boolean antialias = true;
@@ -152,14 +152,6 @@ public class ParSetsView extends JPanel implements DataSetListener, AnimationLis
 			
 		}
 		
-		if (screenShotFileName != null) {
-//			try {
-//				Screenshot.writeToFile(new File(screenShotFileName), width, height);
-//			} catch (Exception e) {
-//				PSLogging.logger.error("Error taking screenshot", e);
-//			}
-//			screenShotFileName = null;
-		}
 	}
 
 	private void renderSplashScreen(Graphics2D g) {
@@ -402,8 +394,14 @@ public class ParSetsView extends JPanel implements DataSetListener, AnimationLis
 	}
 		
 	public void takeScreenShot(String filename) {
-		screenShotFileName = filename;
-		repaint();
+		BufferedImage screenshot = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		Graphics g = screenshot.getGraphics();
+		paint(g);
+		try {
+			ImageIO.write(screenshot, "png", new File(filename));
+		} catch (Exception e) {
+			PSLogging.logger.error("Error taking screenshot", e);
+		}
 	}
 		
 	public List<VisualAxis> getAxes() {
