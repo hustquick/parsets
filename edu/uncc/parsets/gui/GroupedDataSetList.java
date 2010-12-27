@@ -119,10 +119,16 @@ public class GroupedDataSetList extends JList implements ListSelectionListener, 
 			dsPanel = new JPanel();
 			dsPanel.setLayout(new GridLayout(2, 1));
 			dsPanel.setOpaque(true);
-			dsPanel.add(titleLabel = new JLabel("DataSet Name"));
+			Box b = new Box(BoxLayout.X_AXIS);
+			b.add(Box.createHorizontalStrut(2));
+			b.add(titleLabel = new JLabel("DataSet Name"));
 			titleLabel.setFont(TITLELABELFONT);
-			dsPanel.add(detailsLabel = new JLabel("DataSet Details"));
+			dsPanel.add(b);
+			b = new Box(BoxLayout.X_AXIS);
+			b.add(Box.createHorizontalStrut(2));
+			b.add(detailsLabel = new JLabel("DataSet Details"));
 			detailsLabel.setFont(DETAILSLABELFONT);
+			dsPanel.add(b);
 			
 			labelPanel = new JPanel() {
 				protected void paintComponent(Graphics g) {
@@ -138,7 +144,9 @@ public class GroupedDataSetList extends JList implements ListSelectionListener, 
 			labelPanel.setOpaque(true);
 			labelPanel.setBackground(Color.WHITE);
 			labelPanel.add(Box.createVerticalStrut(5));
-			labelPanel.add(sectionLabel = new JLabel("Heading"));
+			b = new Box(BoxLayout.X_AXIS);
+			b.add(sectionLabel = new JLabel("Heading"));
+			labelPanel.add(b);
 			labelPanel.add(Box.createVerticalStrut(5));
 			sectionLabel.setFont(SECTIONLABELFONT);
 		}
