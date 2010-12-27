@@ -105,7 +105,7 @@ public class CategoryBar {
 		else
 			g.setColor(new Color(.3f, .3f, .5f));
 
-		g.fillRect((int)leftX.getValue(), topY - barHeight, (int)width, 2);
+		g.fillRect((int)leftX.getValue(), topY + barHeight, (int)width, 2);
 				
 		String label = category.getName();
 
@@ -122,7 +122,8 @@ public class CategoryBar {
 				label = category.getName().substring(0, 1);
 		}
 
-		g.drawString(label, (int) leftX.getValue(), topY - catFontMetrics.getAscent() - 1);
+		g.setFont(catFont);
+		g.drawString(label, (int) leftX.getValue(), topY + catFontMetrics.getAscent() + 1);
 	}
 
 	public float getTopIndexPoint() {
@@ -158,11 +159,11 @@ public class CategoryBar {
 	}
 
 	public int getOutRibbonY() {
-		return axis.getBarY() - axis.getBarHeight() - 1;
+		return axis.getBarY() + axis.getBarHeight() + 1;
 	}
 
 	public int getInRibbonY() {
-		return getOutRibbonY() + 1;
+		return getOutRibbonY() - 1;
 	}
 
 	public void setActive(boolean newActive) {

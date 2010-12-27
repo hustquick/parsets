@@ -217,9 +217,9 @@ public class CategoricalAxis extends VisualAxis {
 	@Override
 	public void layout(int y, int xOffset, int width, int gap, int barHeight, CategoryTree dataTree) {
 		if (isActive)
-			newBarY = y - barHeight;
+			newBarY = y + barHeight;
 		else
-			barY.setValue(y - barHeight);
+			barY.setValue(y + barHeight);
 		int visibleSize = 0;
 		for (CategoryBar bar : bars) 
 			if (bar.isVisible()) 
@@ -252,19 +252,19 @@ public class CategoricalAxis extends VisualAxis {
 		
 		if (isActive) {
 			g.setColor(new Color(1, 1, 1, .5f));
-			g.fillRect(xOffset, (int)barY.getValue() + textHeight + 5, displayWidth, 2 * textHeight);
+			g.fillRect(xOffset, (int)barY.getValue() - textHeight - 3, displayWidth, 2 * textHeight + 3);
 			g.setColor(Color.BLACK);
 		} else
 			g.setColor(Color.LIGHT_GRAY.darker());
 
 		g.setFont(dimFont);
-		g.drawString(dimension.getName(), (int)xOffset, (int)barY.getValue()+5);
+		g.drawString(dimension.getName(), (int)xOffset, (int)barY.getValue()-5);
 
 		if (handleActive) {
 			if (buttons == null)
 				buttons = new Buttons(catFontMetrics);
 			buttons.display(g, catFont, (int)xOffset+textWidth+2*Buttons.SPACING,
-					(int)barY.getValue()+textHeight/2-catFontMetrics.getDescent());
+					(int)barY.getValue()-textHeight/2+catFontMetrics.getDescent());
 		}
 		
 		for (CategoryBar bar : bars)
@@ -296,7 +296,7 @@ public class CategoricalAxis extends VisualAxis {
 
 	@Override
 	public boolean containsY(int y) {
-		return (y < barY.getValue() + textHeight + 5) && (y >= barY.getValue() - textHeight-1);
+		return (y > barY.getValue() - textHeight - 5) && (y < barY.getValue() + textHeight + 1);
 	}
 	
 	public int getBarHeight() {
@@ -306,7 +306,7 @@ public class CategoricalAxis extends VisualAxis {
 	@Override
 	public CategoryBar findBar(int x, int y) {
 		handleActive = false;
-		if (y < barY.getValue()) {
+		if (y > barY.getValue()) {
 			for (CategoryBar bar : bars)
 				if (bar.containsX(x))
 					return bar;

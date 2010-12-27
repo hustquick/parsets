@@ -63,16 +63,16 @@ public class Tooltip {
 		if (x + maxWidth > width) 
 			x -= maxWidth;
 		
-		if (y - tooltipFontMetrics.getAscent()*(tok.length+1) - 13 < 0) 
-			y += (tooltipFontMetrics.getAscent()*(tok.length+1) + 13);
+		if (y - 13 < 0) 
+			y += 13;
 
-		g.fillRect(x, y - tooltipFontMetrics.getAscent() - 10, maxWidth + 5, tooltipFontMetrics.getAscent()*(tok.length+1) + 3);
+		g.fillRect(x, y + 10, maxWidth + 5, tooltipFontMetrics.getHeight()*tok.length + 3);
 		
 		g.setFont(tooltipFont);
 		g.setColor(Color.BLACK);
 		if (text.length() > 0) {
-			for (int i=0; i<tok.length; i++) {
-				g.drawString(tok[i], (int) x + 2, y - tooltipFontMetrics.getAscent()*(i+2) - 10);
+			for (int i = 0; i < tok.length; i++) {
+				g.drawString(tok[i], x + 2, y + tooltipFontMetrics.getHeight()*(i+1) + 8);
 			}
 		}
 	}
