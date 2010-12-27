@@ -1,16 +1,14 @@
 package edu.uncc.parsets.parsets;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.media.opengl.GL;
-
-import com.sun.opengl.util.j2d.TextRenderer;
 
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryTree;
@@ -112,54 +110,54 @@ public class CategoricalAxis extends VisualAxis {
 			arrowWidth = fm.stringWidth(ASCENDING);
 		}
 
-		public void display(GL gl, TextRenderer renderer, int x, int y) {
+		public void display(Graphics2D g, Font navigationFont, int x, int y) {
 			alphaButtonsX = x;
-			renderer.begin3DRendering();
 
+			g.setFont(navigationFont);
+			
 			if (activeButton == ButtonAction.Alpha_Desc)
-				renderer.setColor(DARK_COLOR);
+				g.setColor(DARK_COLOR);
 			else
-				renderer.setColor(LIGHT_COLOR);
-			renderer.draw(DESCENDING, x, y);
+				g.setColor(LIGHT_COLOR);
+			g.drawString(DESCENDING, x, y);
 			x += arrowWidth;
 			
 			if (activeButton == ButtonAction.Alpha_Asc || activeButton == ButtonAction.Alpha_Desc)
-				renderer.setColor(DARK_COLOR);
+				g.setColor(DARK_COLOR);
 			else
-				renderer.setColor(LIGHT_COLOR);
-			renderer.draw(ALPHA, x, y);
+				g.setColor(LIGHT_COLOR);
+			g.drawString(ALPHA, x, y);
 			x += alphaWidth;
 			
 			if (activeButton == ButtonAction.Alpha_Asc)
-				renderer.setColor(DARK_COLOR);
+				g.setColor(DARK_COLOR);
 			else
-				renderer.setColor(LIGHT_COLOR);
-			renderer.draw(ASCENDING, x, y);
+				g.setColor(LIGHT_COLOR);
+			g.drawString(ASCENDING, x, y);
 			x += arrowWidth+SPACING;
 			
 			sizeButtonsX = x;
 			
 			if (activeButton == ButtonAction.Size_Desc)
-				renderer.setColor(DARK_COLOR);
+				g.setColor(DARK_COLOR);
 			else
-				renderer.setColor(LIGHT_COLOR);
-			renderer.draw(DESCENDING, x, y);
+				g.setColor(LIGHT_COLOR);
+			g.drawString(DESCENDING, x, y);
 			x += arrowWidth;
 			
 			if (activeButton == ButtonAction.Size_Asc || activeButton == ButtonAction.Size_Desc)
-				renderer.setColor(DARK_COLOR);
+				g.setColor(DARK_COLOR);
 			else
-				renderer.setColor(LIGHT_COLOR);
-			renderer.draw(SIZE, x, y);
+				g.setColor(LIGHT_COLOR);
+			g.drawString(SIZE, x, y);
 			x += sizeWidth;
 			
 			if (activeButton == ButtonAction.Size_Asc)
-				renderer.setColor(DARK_COLOR);
+				g.setColor(DARK_COLOR);
 			else
-				renderer.setColor(LIGHT_COLOR);
-			renderer.draw(ASCENDING, x, y);
+				g.setColor(LIGHT_COLOR);
+			g.drawString(ASCENDING, x, y);
 			
-			renderer.end3DRendering();
 		}
 		
 		public void mouseOver(int x) {
@@ -190,7 +188,7 @@ public class CategoricalAxis extends VisualAxis {
 	
 	private ArrayList<CategoryBar> bars = new ArrayList<CategoryBar>();
 
-	private float xOffset;
+	private int xOffset;
 
 	private int barHeight;
 	private int textWidth;
@@ -219,9 +217,9 @@ public class CategoricalAxis extends VisualAxis {
 	@Override
 	public void layout(int y, int xOffset, int width, int gap, int barHeight, CategoryTree dataTree) {
 		if (isActive)
-			newBarY = y - barHeight;
+			newBarY = y + barHeight;
 		else
-			barY.setValue(y - barHeight);
+			barY.setValue(y + barHeight);
 		int visibleSize = 0;
 		for (CategoryBar bar : bars) 
 			if (bar.isVisible()) 
@@ -244,8 +242,8 @@ public class CategoricalAxis extends VisualAxis {
 	}
 	
 	@Override
-	public void display(GL gl, TextRenderer dimFont, FontMetrics dimFontMetrics,
-			TextRenderer catFont, FontMetrics catFontMetrics) {
+	public void paint(Graphics2D g, Font dimFont, FontMetrics dimFontMetrics,
+			Font catFont, FontMetrics catFontMetrics) {
 		
 		if (textWidth == 0) {
 			textWidth = dimFontMetrics.stringWidth(dimension.getName());
@@ -253,31 +251,25 @@ public class CategoricalAxis extends VisualAxis {
 		}
 		
 		if (isActive) {
-			gl.glColor4f(1f, 1f, 1f, .5f);
-			gl.glBegin(GL.GL_QUADS);
-			gl.glVertex2f(xOffset, barY.getValue() + textHeight + 5);
-			gl.glVertex2f(xOffset, barY.getValue() - textHeight);
-			gl.glVertex2f(xOffset + displayWidth, barY.getValue() - textHeight);
-			gl.glVertex2f(xOffset + displayWidth, barY.getValue() + textHeight + 5);
-			gl.glEnd();
-			dimFont.setColor(Color.black);
+			g.setColor(new Color(1, 1, 1, .5f));
+			g.fillRect(xOffset, (int)barY.getValue() - textHeight - 3, displayWidth, 2 * textHeight + 3);
+			g.setColor(Color.BLACK);
 		} else
-			dimFont.setColor(Color.LIGHT_GRAY.darker());
+			g.setColor(Color.LIGHT_GRAY.darker());
 
-		dimFont.begin3DRendering();
-		dimFont.draw(dimension.getName(), (int)xOffset, (int)barY.getValue()+5);
-		dimFont.end3DRendering();
+		g.setFont(dimFont);
+		g.drawString(dimension.getName(), (int)xOffset, (int)barY.getValue()-5);
 
 		if (handleActive) {
 			if (buttons == null)
 				buttons = new Buttons(catFontMetrics);
-			buttons.display(gl, catFont, (int)xOffset+textWidth+2*Buttons.SPACING,
-					(int)barY.getValue()+textHeight/2-catFontMetrics.getDescent());
+			buttons.display(g, catFont, (int)xOffset+textWidth+2*Buttons.SPACING,
+					(int)barY.getValue()-textHeight/2+catFontMetrics.getDescent());
 		}
 		
 		for (CategoryBar bar : bars)
 			if (bar.isVisible())
-				bar.display(gl, catFont, catFontMetrics, (int)barY.getValue(), barHeight);
+				bar.paint(g, catFont, catFontMetrics, (int)barY.getValue(), barHeight);
 	}	
 		
 	public CategoryBar getCategoryBar(CategoryHandle handle) {
@@ -304,7 +296,7 @@ public class CategoricalAxis extends VisualAxis {
 
 	@Override
 	public boolean containsY(int y) {
-		return (y < barY.getValue() + textHeight + 5) && (y >= barY.getValue() - textHeight-1);
+		return (y > barY.getValue() - textHeight - 5) && (y < barY.getValue() + textHeight + 1);
 	}
 	
 	public int getBarHeight() {
@@ -314,7 +306,7 @@ public class CategoricalAxis extends VisualAxis {
 	@Override
 	public CategoryBar findBar(int x, int y) {
 		handleActive = false;
-		if (y < barY.getValue()) {
+		if (y > barY.getValue()) {
 			for (CategoryBar bar : bars)
 				if (bar.containsX(x))
 					return bar;

@@ -1,9 +1,8 @@
 package edu.uncc.parsets.parsets;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.media.opengl.GL;
 
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
@@ -143,7 +142,7 @@ public class VisualConnectionTree {
 	
 
 	public void doLayoutBranching(int minX, int maxX) {
-		root.setWidth((float)(maxX - minX));
+		root.setWidth(maxX - minX);
 		layoutChildren(root);
 		setColors(root);
 	}
@@ -232,27 +231,27 @@ public class VisualConnectionTree {
 		return true;
 	}
 	
-	public void display(GL gl, float alpha) {
-		display(gl, root, alpha);
-		displaySelected(gl, root);
+	public void display(Graphics2D g, float alpha) {
+		display(g, root, alpha);
+		displaySelected(g, root);
 	}
 	
-	private void display(GL gl, VisualConnection node, float alpha) {
+	private void display(Graphics2D g, VisualConnection node, float alpha) {
 		
-		node.display(gl, alpha);
+		node.paint(g, alpha);
 		
 		for (VisualConnection child : node.getChildren())
 			if (child.getNode().isVisible()) 
-				display(gl, child, alpha);
+				display(g, child, alpha);
 	}
 	
-	private void displaySelected(GL gl, VisualConnection node) {
+	private void displaySelected(Graphics2D g, VisualConnection node) {
 		if (node.isSelected())
-			node.displaySelected(gl);
+			node.paintSelected(g);
 		
 		for (VisualConnection child : node.getChildren())
 			if (child.getNode().isVisible())
-				displaySelected(gl, child);
+				displaySelected(g, child);
 	}
 
 	public void setColors(VisualConnection connectionNode) {

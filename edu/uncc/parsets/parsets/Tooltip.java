@@ -1,12 +1,9 @@
 package edu.uncc.parsets.parsets;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
-import java.nio.IntBuffer;
-
-import javax.media.opengl.GL;
-
-import com.sun.opengl.util.j2d.TextRenderer;
+import java.awt.Graphics2D;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -49,12 +46,12 @@ public class Tooltip {
 		this.y = y;
 	}
 	
-	public void display(GL gl, TextRenderer tooltipFont, FontMetrics tooltipFontMetrics) {
+	public void paint(Graphics2D g, Font tooltipFont, FontMetrics tooltipFontMetrics, int width) {
 		
 		if (text == null)
 			return;
 		
-		gl.glColor4f(.8f, .8f, .8f, .8f);
+		g.setColor(new Color(.8f, .8f, .8f, .8f));
 
 		String tok[] = text.split("\n");
 		int maxWidth = 0;
@@ -63,31 +60,21 @@ public class Tooltip {
 				maxWidth = tooltipFontMetrics.stringWidth(tok[i]);
 		}	
 		
-		IntBuffer params = IntBuffer.allocate(4);		
-		gl.glGetIntegerv(GL.GL_VIEWPORT, params);
-
-		if (x + maxWidth > params.get(2)) 
+		if (x + maxWidth > width) 
 			x -= maxWidth;
 		
-		if (y - tooltipFontMetrics.getAscent()*(tok.length+1) - 13 < 0) 
-			y += (tooltipFontMetrics.getAscent()*(tok.length+1) + 13);
+		if (y - 13 < 0) 
+			y += 13;
 
-		gl.glBegin(GL.GL_QUADS);
-		gl.glVertex2f(x, y - tooltipFontMetrics.getAscent() - 10);
-		gl.glVertex2f(x, y - tooltipFontMetrics.getAscent()*(tok.length+1) - 13);
-		gl.glVertex2f(x + maxWidth + 5, y - tooltipFontMetrics.getAscent()*(tok.length+1) - 13);
-		gl.glVertex2f(x + maxWidth + 5, y - tooltipFontMetrics.getAscent() - 10);
-		gl.glEnd();
+		g.fillRect(x, y + 10, maxWidth + 5, tooltipFontMetrics.getHeight()*tok.length + 3);
 		
-		tooltipFont.begin3DRendering();
-		tooltipFont.setColor(Color.BLACK);
+		g.setFont(tooltipFont);
+		g.setColor(Color.BLACK);
 		if (text.length() > 0) {
-			for (int i=0; i<tok.length; i++) {
-				tooltipFont.draw(tok[i], (int) x + 2, y - tooltipFontMetrics.getAscent()*(i+2) - 10);
+			for (int i = 0; i < tok.length; i++) {
+				g.drawString(tok[i], x + 2, y + tooltipFontMetrics.getHeight()*(i+1) + 8);
 			}
 		}
-			
-		tooltipFont.end3DRendering();
 	}
 	
 	public void newValues(String newText, int newX, int newY) {
