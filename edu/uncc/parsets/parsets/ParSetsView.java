@@ -12,9 +12,6 @@ import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -68,7 +65,7 @@ import gnu.jpdf.PDFJob;
 
 @SuppressWarnings("serial")
 public class ParSetsView extends JPanel implements DataSetListener,
-							AnimationListener, ComponentListener, Printable {
+							AnimationListener, ComponentListener {
 
 	private int width;
 	private int height;
@@ -425,31 +422,17 @@ public class ParSetsView extends JPanel implements DataSetListener,
 			else
 				scale = d.height/(float)height;
 			pdfGraphics.scale(scale, scale);
-			print(pdfGraphics, null, 0);
+		    paint(pdfGraphics);
 			pdfGraphics.dispose();
 			job.end();
 			fileOutputStream.close();
 		} catch (FileNotFoundException e) {
 			PSLogging.logger.error("Error exporting PDF", e);
-		} catch (PrinterException e) {
-			PSLogging.logger.error("Error exporting PDF", e);
 		} catch (IOException e) {
 			PSLogging.logger.error("Error exporting PDF", e);
 		}
 	}
-	
-	@Override
-	public int print(Graphics g, PageFormat pf, int page) throws PrinterException {
-		if (page > 0)
-			return NO_SUCH_PAGE;
-		else {
-//		    Graphics2D g2d = (Graphics2D)g;
-//		    g2d.translate(pf.getImageableX(), pf.getImageableY());
-		    paint(g);
-			return PAGE_EXISTS;
-		}
-	}
-	
+		
 	public List<VisualAxis> getAxes() {
 		return axes;
 	}
