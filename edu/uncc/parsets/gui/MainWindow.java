@@ -187,10 +187,10 @@ public class MainWindow extends JFrame implements AbstractMainView {
 
         dataset.addSeparator();
 
-        JMenu export = new JMenu("Export ...");
+        JMenu export = new JMenu("Save Screenshot ...");
         dataset.add(export);        
         
-        JMenuItem savepng = new JMenuItem("Screenshot as PNG");
+        JMenuItem savepng = new JMenuItem("as PNG");
         savepng.setAccelerator(KeyStroke.getKeyStroke('P', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
         savepng.addActionListener(new ActionListener() {
 
@@ -204,7 +204,7 @@ public class MainWindow extends JFrame implements AbstractMainView {
         });
         export.add(savepng);
 
-        JMenuItem savepdf = new JMenuItem("Screenshot as PDF");
+        JMenuItem savepdf = new JMenuItem("as PDF");
         savepdf.setAccelerator(KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
         savepdf.addActionListener(new ActionListener() {
 
