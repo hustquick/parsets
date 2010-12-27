@@ -97,7 +97,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		if (node == null || node.getCount() == 0) {
 			width = 0;
 		} else {
-			width = (int)(parentWidth * node.getRatio());
+			width = parentWidth * node.getRatio();
 			
 			upperOffset.setValue(upperBar.getBottomIndexPoint());
 			upperBar.setBottomIndexPoint(upperOffset.getValue() + width);
@@ -118,8 +118,8 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 			int yPoints[] = new int[4];
 			
 			xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); yPoints[0] = upperBar.getOutRibbonY();
-			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + width; yPoints[1] = upperBar.getOutRibbonY();
-			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + width; yPoints[2] = lowerBar.getInRibbonY();
+			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width); yPoints[1] = upperBar.getOutRibbonY();
+			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width); yPoints[2] = lowerBar.getInRibbonY();
 			xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); yPoints[3] = lowerBar.getInRibbonY();
 
 			g.fillPolygon(xPoints, yPoints, 4);
@@ -139,8 +139,8 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 			int yPoints[] = new int[4];
 
 			xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); yPoints[0] = upperBar.getOutRibbonY();
-			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + width; yPoints[1] = upperBar.getOutRibbonY();
-			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + width; yPoints[2] = lowerBar.getInRibbonY();
+			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width); yPoints[1] = upperBar.getOutRibbonY();
+			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width); yPoints[2] = lowerBar.getInRibbonY();
 			xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); yPoints[3] = lowerBar.getInRibbonY();
 			g.fillPolygon(xPoints, yPoints, 4);
 				

@@ -45,7 +45,7 @@ public class VisualConnection {
 	protected VisualConnection parent;
 	protected CategoryNode node;
 	
-	protected int width;
+	protected float width;
 	protected int colorBrewerIndex;	
 	protected boolean isSelected = false;
 	
@@ -115,7 +115,7 @@ public class VisualConnection {
 	/**
 	 * @param width the width to set
 	 */
-	public void setWidth(int width) {
+	public void setWidth(float width) {
 		this.width = width;
 	}
 
