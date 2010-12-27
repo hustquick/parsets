@@ -80,6 +80,19 @@ public class MainWindow extends JFrame implements AbstractMainView {
         }
     }
 
+    private static class PDFFileNameFilter extends CombinedFileNameFilter {
+
+        @Override
+        public String getDescription() {
+            return "PDF Files";
+        }
+
+        @Override
+        public String getExtension() {
+            return ".pdf";
+        }
+    }
+    
     public MainWindow() {
         super(WINDOWTITLE);
 
@@ -185,7 +198,7 @@ public class MainWindow extends JFrame implements AbstractMainView {
             public void actionPerformed(ActionEvent e) {
                 String fileName = AbstractOS.getCurrentOS().showDialog(MainWindow.this, new PNGFileNameFilter(), FileDialog.SAVE);
                 if (fileName != null) {
-                    controller.parSetsView.takeScreenShot(fileName);
+                    controller.parSetsView.takePNGScreenShot(fileName);
                 }
             }
         });
@@ -197,9 +210,9 @@ public class MainWindow extends JFrame implements AbstractMainView {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String fileName = AbstractOS.getCurrentOS().showDialog(MainWindow.this, new PNGFileNameFilter(), FileDialog.SAVE);
+                String fileName = AbstractOS.getCurrentOS().showDialog(MainWindow.this, new PDFFileNameFilter(), FileDialog.SAVE);
                 if (fileName != null) {
-                    controller.parSetsView.takeScreenShot(fileName);
+                    controller.parSetsView.takePDFScreenShot(fileName);
                 }
             }
         });
