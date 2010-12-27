@@ -1,9 +1,11 @@
 package edu.uncc.parsets.parsets;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryTree;
@@ -48,6 +50,8 @@ public class CategoryBar {
 	private boolean topLevel = false;
 	private boolean visible = true;
 
+	Stroke THICKSTROKE = new BasicStroke(2);
+	
 	public boolean isVisible() {
 		return visible;
 	}
@@ -105,7 +109,10 @@ public class CategoryBar {
 		else
 			g.setColor(new Color(.3f, .3f, .5f));
 
-		g.fillRect((int)leftX.getValue(), topY + barHeight, (int)width, 2);
+		Stroke s = g.getStroke();
+		g.setStroke(THICKSTROKE);
+		g.drawLine((int)leftX.getValue(), topY + barHeight, (int)(leftX.getValue()+width), topY + barHeight);
+		g.setStroke(s);
 				
 		String label = category.getName();
 
