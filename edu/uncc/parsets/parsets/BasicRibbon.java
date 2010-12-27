@@ -107,7 +107,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		}
 	}
 	
-	public void display(Graphics2D g, float alpha) {
+	public void paint(Graphics2D g, float alpha) {
 		
 		if (width == 0 || isSelected)
 			return;
@@ -128,7 +128,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		}
 	}
 	
-	public void displaySelected(Graphics2D g) {
+	public void paintSelected(Graphics2D g) {
 		
 		if (width == 0)
 			return;

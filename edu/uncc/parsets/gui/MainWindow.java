@@ -236,7 +236,6 @@ public class MainWindow extends JFrame implements AbstractMainView {
         });
         view.add(antialiasing);
 
-
         menuBar.add(view);
 
         JMenu help = new JMenu("Help");

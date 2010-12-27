@@ -242,7 +242,7 @@ public class CategoricalAxis extends VisualAxis {
 	}
 	
 	@Override
-	public void display(Graphics2D g, Font dimFont, FontMetrics dimFontMetrics,
+	public void paint(Graphics2D g, Font dimFont, FontMetrics dimFontMetrics,
 			Font catFont, FontMetrics catFontMetrics) {
 		
 		if (textWidth == 0) {
@@ -269,7 +269,7 @@ public class CategoricalAxis extends VisualAxis {
 		
 		for (CategoryBar bar : bars)
 			if (bar.isVisible())
-				bar.display(g, catFont, catFontMetrics, (int)barY.getValue(), barHeight);
+				bar.paint(g, catFont, catFontMetrics, (int)barY.getValue(), barHeight);
 	}	
 		
 	public CategoryBar getCategoryBar(CategoryHandle handle) {

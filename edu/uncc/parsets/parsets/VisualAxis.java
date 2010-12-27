@@ -45,7 +45,7 @@ public abstract class VisualAxis {
 		this.barY.setValue(barY);
 	}
 
-	public abstract void display(Graphics2D g, Font dimFont, FontMetrics dimFontMetrics,
+	public abstract void paint(Graphics2D g, Font dimFont, FontMetrics dimFontMetrics,
 			Font catFont, FontMetrics catFontMetrics);
 
 	public abstract void layout(int y, int xOffset, int width, int gap, int barHeight, CategoryTree dataTree);
