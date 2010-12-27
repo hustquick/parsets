@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +105,8 @@ public class GroupedDataSetList extends JList implements ListSelectionListener, 
 
 		private static final Font SECTIONLABELFONT = new Font("Sans-Serif", Font.BOLD, 14);
 
+		DecimalFormat format = new DecimalFormat("###,###,###");
+		
 		
 		private JLabel titleLabel;
 		private JLabel detailsLabel;
@@ -177,7 +180,7 @@ public class GroupedDataSetList extends JList implements ListSelectionListener, 
 				
 				StringBuilder sb = new StringBuilder();
 				sb.append(ds.getNumDimensions()+" dimensions, ");
-				sb.append(ds.getNumRecords()+" items");
+				sb.append(format.format(ds.getNumRecords())+" items");
 				detailsLabel.setText(sb.toString());
 				return dsPanel;
 			} else {
