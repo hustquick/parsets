@@ -216,7 +216,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 			
 			categoryLists.add(catList);
 			
-			dataTree = dimension.getDataSet().getTree(dimensionList);
+			dataTree = dimension.getDataSet().getTree(dimensionList, null);
 			updateVisibility(dataTree.getRootNode(), -1);
 			connectionTree.buildConnectionTree(axes, dataTree);			
 			dataTree.getRootNode().updateValues();
@@ -258,7 +258,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		
 		if (axes.size() > 0) {
 			axes.get(0).setTopLevel(true);
-			dataTree = dimension.getDataSet().getTree(dimensionList);
+			dataTree = dimension.getDataSet().getTree(dimensionList, null);
 			updateVisibility(dataTree.getRootNode(), -1);
 			connectionTree.buildConnectionTree(axes, dataTree);
 			dataTree.getRootNode().updateValues();
@@ -308,7 +308,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		dimensionList.add(newIndex, axis.getDimension());
 		
 		axes.get(0).setTopLevel(true);
-		dataTree = axis.getDimension().getDataSet().getTree(dimensionList);
+		dataTree = axis.getDimension().getDataSet().getTree(dimensionList, null);
 		updateVisibility(dataTree.getRootNode(), -1);
 		connectionTree.buildConnectionTree(axes, dataTree);
 		dataTree.getRootNode().updateValues();

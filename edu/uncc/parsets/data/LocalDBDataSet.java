@@ -114,8 +114,13 @@ public class LocalDBDataSet extends DataSet {
 		return srcURL;
 	}
 	
+	// query for numerical data
+	// select a.buildingsize, a.ownedrented, sum(b.`numpeople`) as numpeople
+	// from householdsnc_dims a, `householdsnc_measures` b
+	// where a.`cellkey` = b.`cellkey`
+	// group by a.buildingsize, a.ownedrented
 	@Override
-	public CategoryTree getTree(List<DimensionHandle> dimensions) {
+	public CategoryTree getTree(List<DimensionHandle> dimensions, DimensionHandle numericalDim) {
 		CategoryTree tree = new CategoryTree(dimensions.size()+1);
 		String dimList = dims2String(dimensions);
 		StringBuffer query = new StringBuffer("select ");
