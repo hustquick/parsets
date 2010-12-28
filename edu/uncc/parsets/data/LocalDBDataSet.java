@@ -125,7 +125,15 @@ public class LocalDBDataSet extends DataSet {
 		String dimList = dims2String(dimensions);
 		StringBuffer query = new StringBuffer("select ");
 		query.append(dimList);
-		query.append(", sum(count) from "+dbHandle+"_dims group by ");
+		if (numericalDim == null) {
+			query.append(", sum(dims.count)");
+			query.append(" from "+dbHandle+"_dims dims");
+		} else {
+			query.append(", sum(measures."+numericalDim.getHandle()+")");
+			query.append(" from "+dbHandle+"_dims dims, "+dbHandle+"_measures measures");
+			query.append(" where dims.key = measures.key");
+		}
+		query.append(" group by ");
 		query.append(dimList);
 		query.append(";");
 
@@ -149,7 +157,7 @@ public class LocalDBDataSet extends DataSet {
 						node = previousLine[column];
 					} else {
 						if (column == dimensions.size())
-							node = new CategoryNode(previousNode, cat, rs.getInt(column+1));
+							node = new CategoryNode(previousNode, cat, rs.getFloat(column+1));
 						else {
 							node = new CategoryNode(previousNode, cat, 0);
 							for (int i = column+1; i <= dimensions.size(); i++)
@@ -184,13 +192,13 @@ public class LocalDBDataSet extends DataSet {
 	 * @return SQL-ready list of dimension handles
 	 */
 	public static String dims2String(List<DimensionHandle> dimensions) {
-		StringBuffer dimList = new StringBuffer();
+		StringBuffer dimList = new StringBuffer("dims.");
 		boolean first = true;
 		for (DimensionHandle handle : dimensions) {
 			if (first)
 				first = false;
 			else
-				dimList.append(", ");
+				dimList.append(", dims.");
 			dimList.append(handle.getHandle());
 		}
 		return dimList.toString();

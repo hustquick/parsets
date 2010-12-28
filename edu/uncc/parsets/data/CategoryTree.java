@@ -95,7 +95,7 @@ public class CategoryTree implements Iterable<List<CategoryNode>> {
 
 		for(CategoryNode node : nodes) {
 			if (node.isVisible()) 
-				total += node.getCount();
+				total += node.getAccumulatedValue();
 		}
 
 		return (float)getFilteredCount(cat)/total;
@@ -110,7 +110,7 @@ public class CategoryTree implements Iterable<List<CategoryNode>> {
 			if (nodes != null)
 				for (CategoryNode node : nodes)
 					if (node.isVisible()) 
-						count += node.getCount();
+						count += node.getAccumulatedValue();
 		}
 		
 		return count;
@@ -123,7 +123,7 @@ public class CategoryTree implements Iterable<List<CategoryNode>> {
 
 		for(CategoryNode node : nodes) {
 			if (node.isVisible()) 
-				total += node.getCount();
+				total += node.getAccumulatedValue();
 		}
 		
 		return total;

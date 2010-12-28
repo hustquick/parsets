@@ -35,7 +35,7 @@ import java.util.Iterator;
 
 public class CategoryNode implements Iterable<CategoryNode>, Comparable<CategoryNode> {
 
-	private float count;
+	private float accumulatedValue;
 	
 	private float ratio;
 	
@@ -49,10 +49,10 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 
 	private String pathName;
 	
-	public CategoryNode(CategoryNode parent, CategoryHandle toCategory, float count) {
+	public CategoryNode(CategoryNode parent, CategoryHandle toCategory, float value) {
 		this.parent = parent;
 		this.toCategory = toCategory;
-		this.count = count;
+		accumulatedValue = value;
 		if (parent != null) {
 			parent.addChild(this);
 			pathName = parent.pathName+"/"+toCategory.getName();
@@ -61,8 +61,8 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 		visible = true;
 	}
 	
-	public float getCount() {
-		return count;
+	public float getAccumulatedValue() {
+		return accumulatedValue;
 	}
 
 	public float getRatio() {
@@ -85,9 +85,9 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 			}
 		}
 		
-		s += "\n" + count + ", ";
+		s += "\n" + accumulatedValue + ", ";
 		
-		float percentage = ((float)count/(float)filteredTotal)*100f;
+		float percentage = (accumulatedValue/(float)filteredTotal)*100f;
 		
 		if (percentage < 1) {			
 			NumberFormat f = NumberFormat.getInstance();
@@ -119,22 +119,22 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 
 	public void updateValues() {
 		if (children.size() > 0) {
-			count = 0;
+			accumulatedValue = 0;
 			for (CategoryNode n : children) {
 				if (n.isVisible()) {
 					n.updateValues();
-					count += n.count;
+					accumulatedValue += n.accumulatedValue;
 				}
 			}
 			for (CategoryNode n : children) {
 				if (n.isVisible()) 
-					n.ratio = (float)n.count/(float)count;
+					n.ratio = n.accumulatedValue/accumulatedValue;
 			}			
 		}
 	}
 	
 	public void print() {
-		System.err.println(pathName+" => "+count);
+		System.err.println(pathName+" => "+accumulatedValue);
 		for (CategoryNode n : children)
 			n.print();
 	}
