@@ -16,17 +16,21 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicLabelUI;
@@ -36,6 +40,7 @@ import javax.swing.tree.DefaultTreeModel;
 import net.miginfocom.swing.MigLayout;
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.DataSet;
+import edu.uncc.parsets.data.DataType;
 import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
 
@@ -79,6 +84,7 @@ public class SideBar extends JPanel implements DataSetListener {
     private DBTab dbTab;
     private OnlineDataTab onlineDataTab;
     private JLabel dsLabel;
+	private JComboBox numDimComboBox;
 
     // from http://www.codeguru.com/java/articles/199.shtml
     private static class VerticalLabelUI extends BasicLabelUI {
@@ -229,6 +235,23 @@ public class SideBar extends JPanel implements DataSetListener {
         b.add(createDimensionsBox());
         p.add(b, "growx");
 
+        JPanel numDimPanel = new JPanel();
+        numDimPanel.setBorder(new TitledBorder("Accumulate by"));
+        numDimComboBox = new JComboBox();
+        numDimComboBox.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (numDimComboBox.getSelectedIndex() == 0)
+					controller.setAccumulationDimension(null);
+				else
+					controller.setAccumulationDimension((DimensionHandle)numDimComboBox.getSelectedItem());
+			}
+		});
+        numDimPanel.add(numDimComboBox);
+        
+        p.add(numDimPanel, "growx");
+        
         JButton clearButton = new JButton("Clear Canvas");
         clearButton.addActionListener(new ActionListener() {
 
@@ -254,6 +277,14 @@ public class SideBar extends JPanel implements DataSetListener {
 
     public void setDataSet(DataSet data) {
         dimTree.setModel(new DefaultTreeModel(data.getCategoricalDimensionsAsTree()));
+
+        Vector<DimensionHandle> dims = new Vector<DimensionHandle>();
+        dims.add(new DimensionHandle("Count", "count", DataType.numerical, -1, null));
+        for (DimensionHandle dim : data.getNumericDimensions())
+        	dims.add(dim);
+        
+        numDimComboBox.setModel(new DefaultComboBoxModel(dims));
+        
         tabs.setEnabledAt(dataSetTabNumber, true);
         String name = data.getName();
         if (name.length() > 10) {

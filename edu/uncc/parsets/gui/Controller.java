@@ -3,6 +3,7 @@ package edu.uncc.parsets.gui;
 import java.util.ArrayList;
 
 import edu.uncc.parsets.data.DataSet;
+import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.parsets.ParSetsView;
 import edu.uncc.parsets.parsets.SelectionChangeEvent;
 import edu.uncc.parsets.parsets.SelectionChangeListener;
@@ -47,6 +48,7 @@ public class Controller {
     public ParSetsView parSetsView;
     private ArrayList<SelectionChangeListener> selectionListeners = new ArrayList<SelectionChangeListener>();
     public DBTab dbTab;
+	private DimensionHandle accumulationDimension;
 
     public Controller() {
     }
@@ -71,4 +73,12 @@ public class Controller {
             l.selectionChanged(event);
         }
     }
+
+	public void setAccumulationDimension(DimensionHandle dim) {
+		accumulationDimension = dim;
+	}
+	
+	public DimensionHandle getAccumulationDimension() {
+		return accumulationDimension;
+	}
 }
