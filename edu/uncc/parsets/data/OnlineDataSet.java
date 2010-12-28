@@ -100,7 +100,7 @@ public class OnlineDataSet extends DataSet {
 	}
 
 	@Override
-	public CategoryTree getTree(List<DimensionHandle> dimensions) {
+	public CategoryTree getTree(List<DimensionHandle> dimensions, DimensionHandle numericalDim) {
 		return null;
 	}
 

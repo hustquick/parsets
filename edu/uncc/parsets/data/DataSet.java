@@ -42,7 +42,7 @@ public abstract class DataSet implements Iterable<DimensionHandle>, Comparable<D
 
 	public abstract Iterator<DimensionHandle> iterator();
 
-	public abstract CategoryTree getTree(List<DimensionHandle> dimensions);
+	public abstract CategoryTree getTree(List<DimensionHandle> dimensions, DimensionHandle numericalDim);
 	
 	protected String name;
 	

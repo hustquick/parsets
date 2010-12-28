@@ -35,7 +35,7 @@ import java.util.Iterator;
 
 public class CategoryNode implements Iterable<CategoryNode>, Comparable<CategoryNode> {
 
-	private int count;
+	private float count;
 	
 	private float ratio;
 	
@@ -49,7 +49,7 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 
 	private String pathName;
 	
-	public CategoryNode(CategoryNode parent, CategoryHandle toCategory, int count) {
+	public CategoryNode(CategoryNode parent, CategoryHandle toCategory, float count) {
 		this.parent = parent;
 		this.toCategory = toCategory;
 		this.count = count;
@@ -61,7 +61,7 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 		visible = true;
 	}
 	
-	public int getCount() {
+	public float getCount() {
 		return count;
 	}
 
