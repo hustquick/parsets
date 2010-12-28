@@ -94,7 +94,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	
 	public void layout(float parentWidth) {
 
-		if (node == null || node.getCount() == 0) {
+		if (node == null || node.getAccumulatedValue() == 0) {
 			width = 0;
 		} else {
 			width = parentWidth * node.getRatio();
