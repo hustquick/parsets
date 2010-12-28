@@ -135,7 +135,8 @@ public class LocalDBDataSet extends DataSet {
 		}
 		query.append(" group by ");
 		query.append(dimList);
-		query.append(";");
+		
+//		System.err.println(query);
 
 		try {
 			Statement stmt = db.createStatement(DBAccess.FORREADING);

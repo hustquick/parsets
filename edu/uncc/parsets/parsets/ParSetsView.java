@@ -216,7 +216,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 			
 			categoryLists.add(catList);
 			
-			dataTree = dimension.getDataSet().getTree(dimensionList, null);
+			dataTree = dimension.getDataSet().getTree(dimensionList, controller.getAccumulationDimension());
 			updateVisibility(dataTree.getRootNode(), -1);
 			connectionTree.buildConnectionTree(axes, dataTree);			
 			dataTree.getRootNode().updateValues();
