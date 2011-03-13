@@ -58,7 +58,7 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 		return name;
 	}
 	
-	protected String getHandle() {
+	public String getHandle() {
 		return handle;
 	}
 	
@@ -69,6 +69,10 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 	public int getCount() {
 		return apriori;
 	}
+
+        public void setCount(int count){
+            this.apriori = count;
+        }
 	
 	public float getMarginalFrequency() {
 		return (float)apriori/dimension.getDataSet().getNumRecords();

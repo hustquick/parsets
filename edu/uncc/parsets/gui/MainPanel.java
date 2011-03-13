@@ -30,7 +30,7 @@ public class MainPanel extends JPanel implements AbstractMainView {
     private JMenuItem editDataSet;
     private JMenuItem deleteDataSet;
     private SideBar sideBar;
-	private ParSetsView parSetsView;
+    private ParSetsView parSetsView;
 
     public String getTitle() {
         return "";
@@ -39,10 +39,21 @@ public class MainPanel extends JPanel implements AbstractMainView {
 
     public MainPanel(DataSet dataset) {
         super();
+        setSize(900, 600);
         controller = new Controller();
         controller.setDataSet(dataset);
         sideBar = new SideBar(dataset, (AbstractMainView)this, controller);
 
+        parSetsView = new ParSetsView(controller);
+
+        initComponents();
+    }
+
+    public MainPanel(Controller controller, DataSet dataset){
+        super();
+        this.controller = controller;
+        controller.setDataSet(dataset);
+        sideBar = new SideBar(dataset, (AbstractMainView) this, controller);
         parSetsView = new ParSetsView(controller);
 
         initComponents();
