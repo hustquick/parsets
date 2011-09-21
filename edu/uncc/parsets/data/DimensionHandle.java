@@ -64,7 +64,7 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 		return name;
 	}
 	
-	protected String getHandle() {
+	public String getHandle() {
 		return handle;
 	}
 
