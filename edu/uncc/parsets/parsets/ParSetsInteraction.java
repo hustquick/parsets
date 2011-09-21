@@ -226,6 +226,11 @@ public class ParSetsInteraction extends MouseInputAdapter {
     			node = node.getParent();			
     		}
 
+    		for (CategoryHandle h : cats)
+    			System.err.print(h.getDimension().getHandle()+"="+h.getCategoryNum()+" and ");
+    		
+    		System.err.println();
+    		
     		// add sql querty here to get the data for table
     		
     		
