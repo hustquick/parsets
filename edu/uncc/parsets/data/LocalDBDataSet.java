@@ -266,4 +266,9 @@ public class LocalDBDataSet extends DataSet {
     public void selectionChanged(SelectionChangeEvent event) {
         
     }
+    
+    // new method
+    public ArrayList<DimensionHandle> getDimensions(){
+    	return dimHandles;
+    }
 }

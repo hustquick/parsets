@@ -1,14 +1,22 @@
 package edu.uncc.parsets.parsets;
 
 import java.awt.event.MouseEvent;
+
 import java.util.ArrayList;
 
 import javax.swing.event.MouseInputAdapter;
 
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
+import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
+
+// new import
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -45,9 +53,22 @@ public class ParSetsInteraction extends MouseInputAdapter {
     private int deltaMouseX;
     private ParSetsView view;
     VisualConnection selectedRibbon = null;
+    
+    // new component
+    private JPopupMenu popmenu = new JPopupMenu();
+    private JMenuItem tableOp1 = new JMenuItem("Create Table");
+
 
     public ParSetsInteraction(ParSetsView parSetsView) {
         view = parSetsView;
+        
+        // don't know if this should go here, new stuff
+        tableOp1.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent a){
+        		executeTable();
+        	}});       
+        popmenu.add(tableOp1);
+
     }
 
     @Override
@@ -55,7 +76,14 @@ public class ParSetsInteraction extends MouseInputAdapter {
         if (activeCategoryBar != null) {
             deltaMouseX = e.getX() - activeCategoryBar.getLeftX();
         }
+        
+        // new stuff
+        if(e.getButton() == MouseEvent.BUTTON3 && selectedRibbon != null)
+        	popmenu.show(e.getComponent(), e.getX(), e.getY());
+
+        
     }
+   
 
     @Override
     public final void mouseReleased(MouseEvent e) {
@@ -185,4 +213,36 @@ public class ParSetsInteraction extends MouseInputAdapter {
         }
         view.getController().setSelected(new SelectionChangeEvent(selectionType, cats, null));
     }
+    
+    
+    private void executeTable()
+    {
+    	if(selectedRibbon != null){
+    		CategoryNode node = selectedRibbon.getNode();
+    		ArrayList<DimensionHandle> dims = node.getToCategory().getDimension().getLocalDataSet().getDimensions();
+    		ArrayList<CategoryHandle> cats = new ArrayList<CategoryHandle>();
+    		while (node.getParent() != null) {			
+    			cats.add(0, node.getToCategory());
+    			node = node.getParent();			
+    		}
+
+    		// add sql querty here to get the data for table
+    		
+    		
+    		String[] columnNames = new String[dims.size()];
+    		int counter = 0;
+    		for(DimensionHandle handle : dims){
+    			columnNames[counter] = handle.getName();
+    			counter++;
+    		}
+    		
+    		
+    		view.addTable(columnNames);
+
+    	}
+    	
+    	
+    }
+
 }
+

@@ -119,6 +119,7 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 	public DataSet getDataSet() {
 		return dataSet;
 	}
+	
 
 	public List<CategoryHandle> getCategories() {
 		
@@ -134,4 +135,28 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 		}
 			
 	}	
+	
+	// new method
+	public LocalDBDataSet getLocalDataSet()
+	{
+		return dataSet;
+	}
+	
+	/*
+	public Object[][] getResults(){
+		try {
+			Statement stmt = dataSet.getDB().createStatement(DBAccess.FORREADING);
+			ResultSet set = stmt.executeQuery("select * from Admin_Categories where dataSet='"+dataSet.getHandle()+"' and dimension='"+handle+"';");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dataSet.getDB().releaseReadLock();
+
+		}
+		//temporary so method will compile
+		Object[][] results = {{"o"}};
+		return results;
+	}
+	*/
+	
 }

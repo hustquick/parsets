@@ -21,6 +21,11 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+// new javax imports
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JFrame;
+
 
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
@@ -98,6 +103,10 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	private boolean strongerSelection = true;
 	private boolean mouseInDisplay = false;
 	private BufferedImage logoImage;
+	
+	
+	// new stuff
+	
 	
 	public ParSetsView(Controller ctrl) {
 		super();
@@ -503,4 +512,20 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	@Override
 	public void componentShown(ComponentEvent e) {	}
 
+	
+	// new method
+	public void addTable(String[] colnames){
+		
+		Object[][] data = {{"zack", "scott", "taylor","smith"}};
+		JFrame frame = new JFrame("Selected Table");
+		JTable table = new JTable(data, colnames);
+		JScrollPane scrollPane = new JScrollPane(table);
+		frame.add(scrollPane);
+		frame.pack();
+		frame.setVisible(true);
+		scrollPane.setVisible(true);
+		
+	}
+
+	
 }
