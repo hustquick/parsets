@@ -9,6 +9,8 @@ import javax.swing.event.MouseInputAdapter;
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.data.DimensionHandle;
+import edu.uncc.parsets.data.LocalDB;
+import edu.uncc.parsets.data.LocalDBDataSet;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
 
@@ -17,6 +19,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import edu.uncc.parsets.data.LocalDB.DBAccess;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -217,37 +223,94 @@ public class ParSetsInteraction extends MouseInputAdapter {
     
     private void executeTable()
     {
+    	
     	if(selectedRibbon != null){
     		CategoryNode node = selectedRibbon.getNode();
     		ArrayList<DimensionHandle> dims = node.getToCategory().getDimension().getLocalDataSet().getDimensions();
+    		System.out.println(dims.get(0));
+    		LocalDBDataSet datab = node.getToCategory().getDimension().getLocalDataSet();
     		ArrayList<CategoryHandle> cats = new ArrayList<CategoryHandle>();
+    		int row = 0;
+    		int col = 0;
     		while (node.getParent() != null) {			
     			cats.add(0, node.getToCategory());
     			node = node.getParent();			
     		}
 
-    		for (CategoryHandle h : cats)
-    			System.err.print(h.getDimension().getHandle()+"="+h.getCategoryNum()+" and ");
+    	//	for (CategoryHandle h : cats)
+    //			System.err.print(h.getDimension().getHandle()+"="+h.getCategoryNum());   		
+    			
+    		String query = "select * from " + datab.getName() + "_dims where ";
+    		for(CategoryHandle c : cats){ 			
+    			query += c.getDimension().getHandle() + " = " + c.getCategoryNum() + " and ";
+    			
+    		}
+    		query = query.substring(0, query.length()-5);
+    		System.err.print(query);
+
     		
-    		System.err.println();
     		
-    		// add sql querty here to get the data for table
+    		try{
+    		Statement stmt = datab.getDB().createStatement(DBAccess.FORREADING);
+    		ResultSet rs = stmt.executeQuery(query);
+    		col = rs.getMetaData().getColumnCount();
+    		while(rs.next()){
+    			row++;
+    			
+    			
+    		}
+    		}
+    		catch(SQLException e) {
+    			e.printStackTrace();
+    		} finally {
+    			datab.getDB().releaseReadLock();
+    		}
+    		  		
+    	
+    		System.out.println("rows " +row + " cols " + col);
+    		String[][] results = new String[row][col];  		
+    		
+    		try{
+    		Statement stmt = datab.getDB().createStatement(DBAccess.FORREADING);
+    		ResultSet rs = stmt.executeQuery(query);
+    		int rowcounter = 0;
+    		while(rs.next()){
+    			for(int i = 1; i <= col; i ++){
+    				String temp = rs.getString(i);
+    				if(i == 2)
+    					results[rowcounter][dims.size()] = temp;
+    				else if(i > 2){
+    					results[rowcounter][i-3] = dims.get(i-3).num2Handle(Integer.parseInt(temp)).getHandle();
+    				}
+    				
+    			}
+    			rowcounter++;
+    			
+    		}
+    		}
+    		catch(SQLException e) {
+    			e.printStackTrace();
+    		} finally {
+    			datab.getDB().releaseReadLock();
+    		}
     		
     		
-    		String[] columnNames = new String[dims.size()];
+    		String[] columnNames = new String[dims.size()+1];
     		int counter = 0;
     		for(DimensionHandle handle : dims){
     			columnNames[counter] = handle.getName();
     			counter++;
     		}
+    		columnNames[dims.size()] = "Count";
     		
-    		
-    		view.addTable(columnNames);
+    		view.addTable(columnNames, results);
 
     	}
     	
     	
     }
+    
+
 
 }
 
