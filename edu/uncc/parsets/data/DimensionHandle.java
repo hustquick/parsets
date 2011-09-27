@@ -102,7 +102,7 @@ public class DimensionHandle implements Iterable<CategoryHandle> {
 	 * @param num The number of the category, from the database
 	 * @return The category handle or null
 	 */
-	protected CategoryHandle num2Handle(int num) {
+	public CategoryHandle num2Handle(int num) {
 		if (categories == null)
 			loadCategories();
 		for (CategoryHandle h : categories)

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -514,9 +515,9 @@ public class ParSetsView extends JPanel implements DataSetListener,
 
 	
 	// new method
-	public void addTable(String[] colnames){
+	public void addTable(String[] colnames, String[][] data){
 		
-		Object[][] data = {{"zack", "scott", "taylor","smith"}};
+	//	String[][] data = {{"zack", "scott", "taylor","smith"}};
 		JFrame frame = new JFrame("Selected Table");
 		JTable table = new JTable(data, colnames);
 		JScrollPane scrollPane = new JScrollPane(table);

@@ -58,7 +58,7 @@ public class CategoryHandle implements Comparable<CategoryHandle> {
 		return name;
 	}
 	
-	protected String getHandle() {
+	public String getHandle() {
 		return handle;
 	}
 	
