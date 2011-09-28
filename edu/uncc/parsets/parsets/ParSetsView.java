@@ -539,7 +539,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 
 	
 	// new method
-	public void addTable(String[] colnames, String[][] data){
+	public void addTable(String[] colnames, String[][] data, final String[] csvlist){
 		
 		final JFrame frame = new JFrame();
 		frame.setLayout(new BorderLayout());
@@ -551,7 +551,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
                 String fileName = AbstractOS.getCurrentOS().showDialog(frame, new CSVFileNameFilter(), FileDialog.SAVE);
                 if (fileName != null) {
                     System.out.println("add csv stuff here");
-          //          exportCSVFile(fileName, 1d array);
+                    exportCSVFile(fileName, csvlist);
                 }
             }
         });
@@ -573,11 +573,12 @@ public class ParSetsView extends JPanel implements DataSetListener,
  * 	
  */
 	
-public void exportCSVFile(String filename,  String[] data){
+public void exportCSVFile(String filename, String[] exportlist){
 		
 		try{
 			 CSVWriter writer = new CSVWriter(new FileWriter(filename), '\t');
-			 writer.writeNext(data);
+			 writer.writeNext(exportlist);
+			 writer.close();
 			
 			
 		}catch (FileNotFoundException e) {

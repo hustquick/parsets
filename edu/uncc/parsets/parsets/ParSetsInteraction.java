@@ -228,9 +228,9 @@ public class ParSetsInteraction extends MouseInputAdapter {
     		CategoryNode node = selectedRibbon.getNode();
     		LocalDBDataSet datab = node.getToCategory().getDimension().getLocalDataSet();
     		ArrayList<DimensionHandle> dims = datab.getDimensions();
-
     		ArrayList<CategoryHandle> cats = new ArrayList<CategoryHandle>();
-    		int row = 0;
+    		
+    		// populate category list
     		int col = 0;
     		while (node.getParent() != null) {			
     			cats.add(0, node.getToCategory());
@@ -238,7 +238,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
     		}
 
 	
-    			
+    		// build the sql query
     		String query = "select * from " + datab.getHandle() + "_dims where ";
     		for(CategoryHandle c : cats){ 			
     			query += c.getDimension().getHandle() + " = " + c.getCategoryNum() + " and ";
@@ -247,16 +247,14 @@ public class ParSetsInteraction extends MouseInputAdapter {
     		query = query.substring(0, query.length()-5);
     		System.err.print(query);
 
-    		System.out.println(datab.getHandle());
-    		
+    		// get row and column count
+    		int row = 0;
     		try{
     		Statement stmt = datab.getDB().createStatement(DBAccess.FORREADING);
     		ResultSet rs = stmt.executeQuery(query);
     		col = rs.getMetaData().getColumnCount();
     		while(rs.next()){
-    			row++;
-    			
-    			
+    			row++;  			
     		}
     		}
     		catch(SQLException e) {
@@ -265,7 +263,8 @@ public class ParSetsInteraction extends MouseInputAdapter {
     			datab.getDB().releaseReadLock();
     		}
     		  		
-    	
+      		
+    		// populate the 2 dim String array
     		String[][] results = new String[row][col]; 
     		System.out.println("columns" + col + " size of dimensions " + dims.size());
     		
@@ -283,8 +282,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
     				}
     				
     			}
-    			rowcounter++;
-    			
+    			rowcounter++;		
     		}
     		}
     		catch(SQLException e) {
@@ -293,6 +291,17 @@ public class ParSetsInteraction extends MouseInputAdapter {
     			datab.getDB().releaseReadLock();
     		}
     		
+    		// populate export csv list
+    		int csvcounter = 0;
+    		String[] csvlist = new String[results.length*(col-1)];
+    		for(int i = 0; i < results.length; i++){
+    			for(int j = 0; j < (col-1); j++){
+    				csvlist[csvcounter] = results[i][j];
+    				csvcounter++;
+    			}
+    		}
+    		
+
     		
     		String[] columnNames = new String[dims.size()+1];
     		int counter = 0;
@@ -302,7 +311,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
     		}
     		columnNames[dims.size()] = "Count";
     		
-    		view.addTable(columnNames, results);
+    		view.addTable(columnNames, results, csvlist);
 
     	}
     	
