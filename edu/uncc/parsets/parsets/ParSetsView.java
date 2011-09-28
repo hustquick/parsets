@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +25,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JFrame;
+import javax.swing.JButton;
+import java.awt.BorderLayout;
 
 
 import edu.uncc.parsets.data.CategoryHandle;
@@ -517,12 +518,14 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	// new method
 	public void addTable(String[] colnames, String[][] data){
 		
-	//	String[][] data = {{"zack", "scott", "taylor","smith"}};
-		JFrame frame = new JFrame("Selected Table");
+		JFrame frame = new JFrame();
+		frame.setLayout(new BorderLayout());
+		JButton export = new JButton("Export to CSV File");
 		JTable table = new JTable(data, colnames);
 		JScrollPane scrollPane = new JScrollPane(table);
 		frame.add(scrollPane);
 		frame.pack();
+		frame.add(export, BorderLayout.SOUTH);
 		frame.setVisible(true);
 		scrollPane.setVisible(true);
 		
