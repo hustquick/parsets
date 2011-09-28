@@ -27,6 +27,12 @@ import javax.swing.JTable;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
+import java.awt.FileDialog;
+import edu.uncc.parsets.util.osabstraction.AbstractOS;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import au.com.bytecode.opencsv.*;
+import java.io.FileWriter;
 
 
 import edu.uncc.parsets.data.CategoryHandle;
@@ -35,8 +41,11 @@ import edu.uncc.parsets.data.CategoryTree;
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.DataType;
 import edu.uncc.parsets.data.DimensionHandle;
+import edu.uncc.parsets.gui.CombinedFileNameFilter;
 import edu.uncc.parsets.gui.Controller;
 import edu.uncc.parsets.gui.DataSetListener;
+//import edu.uncc.parsets.gui.MainWindow;
+//import edu.uncc.parsets.gui.MainWindow.PDFFileNameFilter;
 import edu.uncc.parsets.util.AnimationListener;
 import edu.uncc.parsets.util.PSLogging;
 import gnu.jpdf.PDFJob;
@@ -108,6 +117,20 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	
 	
 	// new stuff
+	
+	private static class CSVFileNameFilter extends CombinedFileNameFilter {
+
+	    @Override
+	    public String getDescription() {
+	        return "CSV Files";
+	    }
+
+	    @Override
+	    public String getExtension() {
+	        return ".csv";
+	    }
+	}
+	
 	
 	
 	public ParSetsView(Controller ctrl) {
@@ -518,9 +541,23 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	// new method
 	public void addTable(String[] colnames, String[][] data){
 		
-		JFrame frame = new JFrame();
+		final JFrame frame = new JFrame();
 		frame.setLayout(new BorderLayout());
 		JButton export = new JButton("Export to CSV File");
+        export.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fileName = AbstractOS.getCurrentOS().showDialog(frame, new CSVFileNameFilter(), FileDialog.SAVE);
+                if (fileName != null) {
+                    System.out.println("add csv stuff here");
+          //          exportCSVFile(fileName, 1d array);
+                }
+            }
+        });
+			
+			
+		
 		JTable table = new JTable(data, colnames);
 		JScrollPane scrollPane = new JScrollPane(table);
 		frame.add(scrollPane);
@@ -530,6 +567,29 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		scrollPane.setVisible(true);
 		
 	}
+	
+/*
+ *  Need to convert 2 dim array into 1 dim array for csv writing
+ * 	
+ */
+	
+public void exportCSVFile(String filename,  String[] data){
+		
+		try{
+			 CSVWriter writer = new CSVWriter(new FileWriter(filename), '\t');
+			 writer.writeNext(data);
+			
+			
+		}catch (FileNotFoundException e) {
+			PSLogging.logger.error("Error exporting CSV", e);
+		} catch (IOException e) {
+			PSLogging.logger.error("Error exporting CSV", e);
+		}
+		
+	}
+	
 
 	
 }
+
+

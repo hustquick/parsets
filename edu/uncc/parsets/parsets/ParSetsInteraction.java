@@ -9,7 +9,6 @@ import javax.swing.event.MouseInputAdapter;
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.data.DimensionHandle;
-import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.data.LocalDBDataSet;
 import edu.uncc.parsets.parsets.CategoricalAxis.ButtonAction;
 import edu.uncc.parsets.util.AnimatableProperty;
@@ -23,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import edu.uncc.parsets.data.LocalDB.DBAccess;
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -226,9 +226,9 @@ public class ParSetsInteraction extends MouseInputAdapter {
     	
     	if(selectedRibbon != null){
     		CategoryNode node = selectedRibbon.getNode();
-    		ArrayList<DimensionHandle> dims = node.getToCategory().getDimension().getLocalDataSet().getDimensions();
-    		System.out.println(dims.get(0));
     		LocalDBDataSet datab = node.getToCategory().getDimension().getLocalDataSet();
+    		ArrayList<DimensionHandle> dims = datab.getDimensions();
+
     		ArrayList<CategoryHandle> cats = new ArrayList<CategoryHandle>();
     		int row = 0;
     		int col = 0;
@@ -237,10 +237,9 @@ public class ParSetsInteraction extends MouseInputAdapter {
     			node = node.getParent();			
     		}
 
-    	//	for (CategoryHandle h : cats)
-    //			System.err.print(h.getDimension().getHandle()+"="+h.getCategoryNum());   		
+	
     			
-    		String query = "select * from " + datab.getName() + "_dims where ";
+    		String query = "select * from " + datab.getHandle() + "_dims where ";
     		for(CategoryHandle c : cats){ 			
     			query += c.getDimension().getHandle() + " = " + c.getCategoryNum() + " and ";
     			
@@ -248,7 +247,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
     		query = query.substring(0, query.length()-5);
     		System.err.print(query);
 
-    		
+    		System.out.println(datab.getHandle());
     		
     		try{
     		Statement stmt = datab.getDB().createStatement(DBAccess.FORREADING);
@@ -267,8 +266,8 @@ public class ParSetsInteraction extends MouseInputAdapter {
     		}
     		  		
     	
-    		System.out.println("rows " +row + " cols " + col);
-    		String[][] results = new String[row][col];  		
+    		String[][] results = new String[row][col]; 
+    		System.out.println("columns" + col + " size of dimensions " + dims.size());
     		
     		try{
     		Statement stmt = datab.getDB().createStatement(DBAccess.FORREADING);

@@ -227,8 +227,9 @@ public class LocalDBDataSet extends DataSet {
 		return name;
 	}
 	
+	// changed protected to public temporary
 	@Override
-	protected String getHandle() {
+	public String getHandle() {
 		return dbHandle;
 	}
 
