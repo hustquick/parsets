@@ -21,18 +21,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-// new javax imports
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import java.awt.BorderLayout;
-import java.awt.FileDialog;
-import edu.uncc.parsets.util.osabstraction.AbstractOS;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import au.com.bytecode.opencsv.*;
-import java.io.FileWriter;
 
 
 import edu.uncc.parsets.data.CategoryHandle;
@@ -538,56 +526,6 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	public void componentShown(ComponentEvent e) {	}
 
 	
-	// new method
-	public void addTable(String[] colnames, String[][] data, final String[] csvlist){
-		
-		final JFrame frame = new JFrame();
-		frame.setLayout(new BorderLayout());
-		JButton export = new JButton("Export to CSV File");
-        export.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String fileName = AbstractOS.getCurrentOS().showDialog(frame, new CSVFileNameFilter(), FileDialog.SAVE);
-                if (fileName != null) {
-                    System.out.println("add csv stuff here");
-                    exportCSVFile(fileName, csvlist);
-                }
-            }
-        });
-			
-			
-		
-		JTable table = new JTable(data, colnames);
-		JScrollPane scrollPane = new JScrollPane(table);
-		frame.add(scrollPane);
-		frame.pack();
-		frame.add(export, BorderLayout.SOUTH);
-		frame.setVisible(true);
-		scrollPane.setVisible(true);
-		
-	}
-	
-/*
- *  Need to convert 2 dim array into 1 dim array for csv writing
- * 	
- */
-	
-public void exportCSVFile(String filename, String[] exportlist){
-		
-		try{
-			 CSVWriter writer = new CSVWriter(new FileWriter(filename), '\t');
-			 writer.writeNext(exportlist);
-			 writer.close();
-			
-			
-		}catch (FileNotFoundException e) {
-			PSLogging.logger.error("Error exporting CSV", e);
-		} catch (IOException e) {
-			PSLogging.logger.error("Error exporting CSV", e);
-		}
-		
-	}
 	
 
 	
