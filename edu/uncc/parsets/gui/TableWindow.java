@@ -15,12 +15,15 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
+import edu.uncc.parsets.data.DataType;
 import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.data.LocalDBDataSet;
 import edu.uncc.parsets.data.LocalDB.DBAccess;
@@ -36,14 +39,20 @@ public class TableWindow extends JFrame{
 	private String query = "";
 	private ArrayList<DimensionHandle> dimensionList;
 	private ArrayList<CategoryHandle> categoryList = new ArrayList<CategoryHandle>();
+	private String[] csvArray;
 	private CategoryNode currentNode;
 	private LocalDBDataSet currentDataSet;
 	private String[] csvlist;
 	
+	private Vector<Object> dataVector = new Vector<Object>();
+	private Vector<Object> columnVector = new Vector<Object>();
+ 	
+	
+	
 	public TableWindow(VisualConnection selectedRibbon){
 		currentRibbon = selectedRibbon;
-	//	fillTable();
-		actualFillTable();
+	//	FillTable();
+		fillTable2();
 		initiateFrame();
 	}
 	
@@ -59,15 +68,16 @@ public class TableWindow extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 String fileName = AbstractOS.getCurrentOS().showDialog(frame, new CSVFileNameFilter(), FileDialog.SAVE);
                 if (fileName != null) {
-                    System.out.println("add csv stuff here");
-                    exportCSVFile(fileName, csvlist);
+                    exportCSVFile(fileName, csvArray);
                 }
             }
         });
 			
 			
 		
-		JTable table = new JTable(tableData, columnNames);
+        JTable table = new JTable(dataVector, columnVector){
+        	  public boolean isCellEditable(int row, int column){
+        		    return false;}};
 		JScrollPane scrollPane = new JScrollPane(table);
 		frame.add(scrollPane);
 		frame.pack();
@@ -75,13 +85,117 @@ public class TableWindow extends JFrame{
 		frame.setVisible(true);
 		scrollPane.setVisible(true);
 		
+		
 	}
 	
-	private void actualFillTable(){
+	private void fillTable2(){
 		
 		if(currentRibbon != null){
 			currentNode = currentRibbon.getNode();
 			currentDataSet = currentNode.getToCategory().getDimension().getLocalDataSet();
+			ArrayList<DimensionHandle> tempDims = currentDataSet.getDimensions();
+			dimensionList = new ArrayList<DimensionHandle>();
+					
+			// fill dimension list with categorical dimensions only
+			for (DimensionHandle d : tempDims){
+					if(d.getDataType() == DataType.categorical)
+						dimensionList.add(0, d);
+			}
+			
+			// fill category list for sql query
+			while(currentNode.getParent() != null){
+				categoryList.add(0, currentNode.getToCategory());
+				currentNode = currentNode.getParent();
+			}
+			
+			// build the sql query string
+			query = "";
+    		query += "select * from " + currentDataSet.getHandle() + "_dims where ";
+    		for(CategoryHandle c : categoryList){ 			
+    			query += c.getDimension().getHandle() + " = " + c.getCategoryNum() + " and ";
+    			
+    		}
+    		query = query.substring(0, query.length()-5);
+    		
+    		int col = 0;
+    		
+    		
+    		try{
+    			Statement stmt = currentDataSet.getDB().createStatement(DBAccess.FORREADING);
+    			ResultSet rs = stmt.executeQuery(query);
+    			ResultSetMetaData meta = rs.getMetaData();
+    			col = meta.getColumnCount();
+    			
+    			// fill column vector
+        		for(int i = 1; i <= col; i++){
+        			if(i >= 2){
+            			String temp = meta.getColumnName(i);
+            			columnVector.add(temp);
+        			}
+
+        		}
+    			
+    			
+    			while(rs.next()){
+    				Vector<Object> tempVector = new Vector<Object>();
+    				for(int i = 1; i<=col; i++){
+    					String temp = rs.getString(i);
+    					if(i == 2){
+    						tempVector.add(temp);
+    					}
+    					if(i >= 2){
+    						String colName = meta.getColumnName(i);
+    						for(DimensionHandle d : dimensionList){
+    							if(d.getHandle().equals(colName)){    							
+    								tempVector.add(d.num2Handle(Integer.parseInt(temp)).getName());
+    							}
+    						}
+    						
+    					}
+    				}
+    				
+    				
+    				dataVector.add(tempVector);
+    			}
+    		}
+    		catch(SQLException e) {
+    			e.printStackTrace();
+    		} finally {
+    			currentDataSet.getDB().releaseReadLock();		
+    		}
+    		
+  		  		
+    		// populate array for csv printing
+    		csvArray = new String[dataVector.size()*(col-1)];
+    		System.out.println(csvArray.length);
+    		int csvcounter = 0;
+			for(Object v : dataVector){
+				Vector temp = (Vector)v;
+				for(Object z : temp){
+					csvArray[csvcounter] = z.toString();
+					csvcounter++;
+				}
+			}		
+		}
+	}	
+	
+	
+	
+	private void FillTable(){
+		
+		if(currentRibbon != null){
+			currentNode = currentRibbon.getNode();
+			currentDataSet = currentNode.getToCategory().getDimension().getLocalDataSet();
+	//		ArrayList<DimensionHandle> tempDims = currentDataSet.getDimensions();
+	//		dimensionList = new ArrayList<DimensionHandle>();
+	//		for (DimensionHandle d : tempDims){
+	//			if(d.getDataType() == DataType.categorical)
+	//				dimensionList.add(0, d);
+	//		}
+			
+	//		for(DimensionHandle d2: dimensionList)
+	//			System.err.println(d2.getHandle());
+			
 			dimensionList = currentDataSet.getDimensions();
 			
 			// populate category List
@@ -160,7 +274,7 @@ public class TableWindow extends JFrame{
     			counter++;
     		}
     		columnNames[dimensionList.size()] = "Count";
-			
+
 			
 		}
 	}
@@ -183,6 +297,9 @@ public class TableWindow extends JFrame{
 		}
 		
 	}
+	
+
+	
 	
 	private static class CSVFileNameFilter extends CombinedFileNameFilter {
 
