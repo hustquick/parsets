@@ -34,15 +34,20 @@ import edu.uncc.parsets.util.osabstraction.AbstractOS;
 public class TableWindow extends JFrame{
 	
 	private VisualConnection currentRibbon = null;
-	private String[] columnNames;
-	private String[][] tableData;
+
 	private String query = "";
 	private ArrayList<DimensionHandle> dimensionList;
 	private ArrayList<CategoryHandle> categoryList = new ArrayList<CategoryHandle>();
-	private String[] csvArray;
+	private ArrayList<String[]> csvArray;
 	private CategoryNode currentNode;
 	private LocalDBDataSet currentDataSet;
-	private String[] csvlist;
+
+	
+	/* unused stuff atm
+	 * 	private ArrayList<String[]> csvlist;
+	 * 	private String[] columnNames;
+	 *	private String[][] tableData;
+	 */
 	
 	private Vector<Object> dataVector = new Vector<Object>();
 	private Vector<Object> columnVector = new Vector<Object>();
@@ -51,7 +56,6 @@ public class TableWindow extends JFrame{
 	
 	public TableWindow(VisualConnection selectedRibbon){
 		currentRibbon = selectedRibbon;
-	//	FillTable();
 		fillTable2();
 		initiateFrame();
 	}
@@ -166,21 +170,23 @@ public class TableWindow extends JFrame{
     		
   		  		
     		// populate array for csv printing
-    		csvArray = new String[dataVector.size()*(col-1)];
-    		System.out.println(csvArray.length);
+    		csvArray = new ArrayList<String[]>();
     		int csvcounter = 0;
 			for(Object v : dataVector){
 				Vector temp = (Vector)v;
+				String[] temp2 = new String[temp.size()];
 				for(Object z : temp){
-					csvArray[csvcounter] = z.toString();
+					temp2[csvcounter] = z.toString();
 					csvcounter++;
 				}
+				csvArray.add(temp2);
+				csvcounter = 0;
 			}		
 		}
 	}	
 	
 	
-	
+	/*
 	private void FillTable(){
 		
 		if(currentRibbon != null){
@@ -259,10 +265,10 @@ public class TableWindow extends JFrame{
     		
     		// populate export csv list
     		int csvcounter = 0;
-    		csvlist = new String[tableData.length*(col-1)];
+    		csvlist = new ArrayList<String[]>();
     		for(int i = 0; i < tableData.length; i++){
     			for(int j = 0; j < (col-1); j++){
-    				csvlist[csvcounter] = tableData[i][j];
+    	//			csvlist[csvcounter] = tableData[i][j];
     				csvcounter++;
     			}
     		}
@@ -278,15 +284,17 @@ public class TableWindow extends JFrame{
 			
 		}
 	}
-	
+	*/
 	
 
 	
-	public void exportCSVFile(String filename, String[] exportlist){
+	public void exportCSVFile(String filename, ArrayList<String[]> exportlist){
 		
 		try{
 			 CSVWriter writer = new CSVWriter(new FileWriter(filename), ',');
-			 writer.writeNext(exportlist);
+			 for(String[] temp: exportlist){
+				 writer.writeNext(temp);
+			 }
 			 writer.close();
 			
 			
