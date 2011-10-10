@@ -54,6 +54,8 @@ public class ParSetsInteraction extends MouseInputAdapter {
     private int deltaMouseX;
     private ParSetsView view;
     VisualConnection selectedRibbon = null;
+    VisualConnection tableRibbon = null;
+    boolean isOnCategoryBar = false;
     
     // new component
     private JPopupMenu popmenu = new JPopupMenu();
@@ -66,7 +68,9 @@ public class ParSetsInteraction extends MouseInputAdapter {
         // don't know if this should go here, new stuff
         tableOp1.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent a){
-        		TableWindow tab = new TableWindow(selectedRibbon);
+            		TableWindow tab = new TableWindow(tableRibbon, isOnCategoryBar);
+        		
+
         		
         	}});       
         popmenu.add(tableOp1);
@@ -80,8 +84,21 @@ public class ParSetsInteraction extends MouseInputAdapter {
         }
         
         // new stuff
-        if(e.getButton() == MouseEvent.BUTTON3 && selectedRibbon != null)
+        if(e.getButton() == MouseEvent.BUTTON3 && (activeCategoryBar != null || selectedRibbon != null)){
         	popmenu.show(e.getComponent(), e.getX(), e.getY());
+        	if(activeCategoryBar != null){
+        		System.out.println("categorybar ");
+        		tableRibbon = view.getConnectionTree().getCategoryBarNode(activeCategoryBar.getCategory());
+        		isOnCategoryBar = true;
+        		
+        	}
+        	else if(activeAxis == null){
+        		System.out.println("ribbon");
+        		if(selectedRibbon != null)
+        			tableRibbon = selectedRibbon;
+        	}
+        }
+
 
         
     }
