@@ -49,8 +49,10 @@ public class TableWindow extends JFrame{
 	public void initialize(){
 		
 		Vector<Vector<String>> dataVector = new Vector<Vector<String>>();
-		Vector<String> columnVector = new Vector<String>();
+		final Vector<String> columnVector = new Vector<String>();
 		final ArrayList<String[]> csvArray = new ArrayList<String[]>();
+		final String[] csvColumns;
+		final int[] rowCounts;
 		
 		if(currentRibbon != null){
 			CategoryNode currentNode = currentRibbon.getNode();
@@ -138,21 +140,39 @@ public class TableWindow extends JFrame{
     		} finally {
     			currentDataSet.getDB().releaseReadLock();		
     		}
-    		
-  		  		
-    		// populate array for csv printing
-    		int csvcounter = 0;
-			for(Vector<String> v : dataVector){
-				 Vector<String> temp = v;
-				String[] temp2 = new String[temp.size()];
-				for(Object z : temp){
-					temp2[csvcounter] = z.toString();
-					csvcounter++;
-				}
-				csvArray.add(temp2);
-				csvcounter = 0;
-			}		
+    				
+			
 		}
+		
+		// populate array for csv printing
+		rowCounts = new int[dataVector.size()];
+		int csvcounter = 0;
+		int rowcounter = 0;
+		for(Vector<String> v : dataVector){
+			 Vector<String> temp = v;
+			String[] temp2 = new String[(temp.size()-1)];
+			for(String z : temp){
+				if(csvcounter == 0){
+					int tempint = Integer.parseInt(z.trim());
+					rowCounts[rowcounter] = tempint;
+					rowcounter++;
+					
+				}
+				if(csvcounter > 0)
+					temp2[csvcounter-1] = z.toString();
+				csvcounter++;
+			}
+			csvArray.add(temp2);
+			csvcounter = 0;
+		}
+		
+		 csvColumns = new String[(columnVector.size()-1)];
+		 int colCounter = 0;
+		 for(String s : columnVector){
+			 if(colCounter > 0)
+				 csvColumns[colCounter-1] = s;
+			 colCounter++;
+		 }
 		
 		
 		final JFrame frame = new JFrame();
@@ -164,7 +184,7 @@ public class TableWindow extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 String fileName = AbstractOS.getCurrentOS().showDialog(frame, new CSVFileNameFilter(), FileDialog.SAVE);
                 if (fileName != null) {
-                    exportCSVFile(fileName, csvArray);
+                    exportCSVFile(fileName, csvArray, csvColumns, rowCounts);
                 }
             }
         });
@@ -185,12 +205,16 @@ public class TableWindow extends JFrame{
 	}
 	
 	
-	public void exportCSVFile(String filename, ArrayList<String[]> exportlist){
-		
+	public void exportCSVFile(String filename, ArrayList<String[]> exportlist, String[] columnlist, int[] rowcounts){
+		 
 		try{
 			 CSVWriter writer = new CSVWriter(new FileWriter(filename), ',');
+			 writer.writeNext(columnlist);
+			 int rowcounter = 0;
 			 for(String[] temp: exportlist){
-				 writer.writeNext(temp);
+				 for(int i = 0; i < rowcounts[rowcounter]; i++)
+					 writer.writeNext(temp);
+				 rowcounter++;
 			 }
 			 writer.close();
 			
