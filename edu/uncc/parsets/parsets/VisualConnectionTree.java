@@ -41,6 +41,7 @@ import edu.uncc.parsets.data.DimensionHandle;
 public class VisualConnectionTree {
 
 	private VisualConnection root; 
+	private VisualConnection test;
 	private RibbonLayoutStyle style = RibbonLayoutStyle.BRANCHING;
 
 	public VisualConnectionTree() {
@@ -376,7 +377,26 @@ public class VisualConnectionTree {
 		selectCategory(category, root);
 	}
 	
+	
+	// added in for activecategorybar selection instead of one ribbon
+	public VisualConnection getCategoryBarNode(CategoryHandle category){
+		System.out.println("Category is" + category.getName());
+		findCategoryBarNode(category, root);
+		return test;
+		
+	}
+	
+	public void findCategoryBarNode(CategoryHandle category, VisualConnection node){
+		if (!node.equals(root) && node.getNode().getToCategory().equals(category)){
+			test = node;
+		}
+		else
+			for (VisualConnection child : node.getChildren())
+				findCategoryBarNode(category, child);
+	
 
+	}
+	
 	/**
 	 * @param style the style to set
 	 */

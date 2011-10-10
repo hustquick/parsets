@@ -34,34 +34,126 @@ import edu.uncc.parsets.util.osabstraction.AbstractOS;
 public class TableWindow extends JFrame{
 	
 	private VisualConnection currentRibbon = null;
-
-	private String query = "";
-	private ArrayList<DimensionHandle> dimensionList;
-	private ArrayList<CategoryHandle> categoryList = new ArrayList<CategoryHandle>();
-	private ArrayList<String[]> csvArray;
-	private CategoryNode currentNode;
-	private LocalDBDataSet currentDataSet;
-
-	
-	/* unused stuff atm
-	 * 	private ArrayList<String[]> csvlist;
-	 * 	private String[] columnNames;
-	 *	private String[][] tableData;
-	 */
-	
-	private Vector<Object> dataVector = new Vector<Object>();
-	private Vector<Object> columnVector = new Vector<Object>();
- 	
+	private String query = "";	
+	private boolean isOnCategoryBar = false;
+		
 	
 	
-	public TableWindow(VisualConnection selectedRibbon){
+	public TableWindow(VisualConnection selectedRibbon, boolean isOnBar){
 		currentRibbon = selectedRibbon;
-		fillTable2();
-		initiateFrame();
+		isOnCategoryBar = isOnBar;
+		initialize();
 	}
 	
 	
-	private void initiateFrame(){
+	public void initialize(){
+		
+		Vector<Vector<String>> dataVector = new Vector<Vector<String>>();
+		Vector<String> columnVector = new Vector<String>();
+		final ArrayList<String[]> csvArray = new ArrayList<String[]>();
+		
+		if(currentRibbon != null){
+			CategoryNode currentNode = currentRibbon.getNode();
+			LocalDBDataSet currentDataSet = currentNode.getToCategory().getDimension().getLocalDataSet();
+			ArrayList<DimensionHandle> tempDims = currentDataSet.getDimensions();
+			ArrayList<DimensionHandle> dimensionList = new ArrayList<DimensionHandle>();
+					
+			// fill dimension list with categorical dimensions only
+			for (DimensionHandle d : tempDims){
+					if(d.getDataType() == DataType.categorical)
+						dimensionList.add(0, d);
+			}
+			
+			
+			ArrayList<CategoryHandle> categoryList = new ArrayList<CategoryHandle>();
+			// fill category list for sql query
+			if(!isOnCategoryBar){
+				while(currentNode.getParent() != null){
+					categoryList.add(0, currentNode.getToCategory());
+					currentNode = currentNode.getParent();
+				}
+			}
+			else{
+				categoryList.add(0, currentNode.getToCategory());
+			}
+
+			
+			// build the sql query string
+    		query += "select * from " + currentDataSet.getHandle() + "_dims where ";
+    		for(CategoryHandle c : categoryList){ 			
+    			query += c.getDimension().getHandle() + " = " + c.getCategoryNum() + " and ";
+    			System.out.println("dimension is " + c.getDimension().getHandle() + " and value is " + c.getCategoryNum());
+    			
+    		}
+    		query = query.substring(0, query.length()-5);
+    		
+    		int col = 0;
+
+    		
+    		try{
+    			Statement stmt = currentDataSet.getDB().createStatement(DBAccess.FORREADING);
+    			ResultSet rs = stmt.executeQuery(query);
+    			ResultSetMetaData meta = rs.getMetaData();
+    			col = meta.getColumnCount();
+    			
+    			// fill column vector
+    			columnVector.add("Count");
+        		for(int i = 1; i <= col; i++){
+        			if(i >= 2){
+            			String temp = meta.getColumnName(i);
+            			for(DimensionHandle d : dimensionList){
+            				if(d.getHandle().equals(temp)){
+            					columnVector.add(d.getName());
+            				}
+            			}
+        			}
+
+        		}
+    			
+    			
+    			while(rs.next()){
+    				Vector<String> tempVector = new Vector<String>();
+    				for(int i = 1; i<=col; i++){
+    					String temp = rs.getString(i);
+    					if(i == 2){
+    						tempVector.add(temp);
+    					}
+    					if(i >= 2){
+    						String colName = meta.getColumnName(i);
+    						for(DimensionHandle d : dimensionList){
+    							if(d.getHandle().equals(colName)){    							
+    								tempVector.add(d.num2Handle(Integer.parseInt(temp)).getName());
+    							}
+    						}
+    						
+    					}
+    				}
+    				
+    				
+    				dataVector.add(tempVector);
+    			}
+    		}
+    		catch(SQLException e) {
+    			e.printStackTrace();
+    		} finally {
+    			currentDataSet.getDB().releaseReadLock();		
+    		}
+    		
+  		  		
+    		// populate array for csv printing
+    		int csvcounter = 0;
+			for(Vector<String> v : dataVector){
+				 Vector<String> temp = v;
+				String[] temp2 = new String[temp.size()];
+				for(Object z : temp){
+					temp2[csvcounter] = z.toString();
+					csvcounter++;
+				}
+				csvArray.add(temp2);
+				csvcounter = 0;
+			}		
+		}
+		
 		
 		final JFrame frame = new JFrame();
 		frame.setLayout(new BorderLayout());
@@ -92,201 +184,6 @@ public class TableWindow extends JFrame{
 		
 	}
 	
-	private void fillTable2(){
-		
-		if(currentRibbon != null){
-			currentNode = currentRibbon.getNode();
-			currentDataSet = currentNode.getToCategory().getDimension().getLocalDataSet();
-			ArrayList<DimensionHandle> tempDims = currentDataSet.getDimensions();
-			dimensionList = new ArrayList<DimensionHandle>();
-					
-			// fill dimension list with categorical dimensions only
-			for (DimensionHandle d : tempDims){
-					if(d.getDataType() == DataType.categorical)
-						dimensionList.add(0, d);
-			}
-			
-			// fill category list for sql query
-			while(currentNode.getParent() != null){
-				categoryList.add(0, currentNode.getToCategory());
-				currentNode = currentNode.getParent();
-			}
-			
-			// build the sql query string
-			query = "";
-    		query += "select * from " + currentDataSet.getHandle() + "_dims where ";
-    		for(CategoryHandle c : categoryList){ 			
-    			query += c.getDimension().getHandle() + " = " + c.getCategoryNum() + " and ";
-    			
-    		}
-    		query = query.substring(0, query.length()-5);
-    		
-    		int col = 0;
-    		
-    		
-    		try{
-    			Statement stmt = currentDataSet.getDB().createStatement(DBAccess.FORREADING);
-    			ResultSet rs = stmt.executeQuery(query);
-    			ResultSetMetaData meta = rs.getMetaData();
-    			col = meta.getColumnCount();
-    			
-    			// fill column vector
-        		for(int i = 1; i <= col; i++){
-        			if(i >= 2){
-            			String temp = meta.getColumnName(i);
-            			columnVector.add(temp);
-        			}
-
-        		}
-    			
-    			
-    			while(rs.next()){
-    				Vector<Object> tempVector = new Vector<Object>();
-    				for(int i = 1; i<=col; i++){
-    					String temp = rs.getString(i);
-    					if(i == 2){
-    						tempVector.add(temp);
-    					}
-    					if(i >= 2){
-    						String colName = meta.getColumnName(i);
-    						for(DimensionHandle d : dimensionList){
-    							if(d.getHandle().equals(colName)){    							
-    								tempVector.add(d.num2Handle(Integer.parseInt(temp)).getName());
-    							}
-    						}
-    						
-    					}
-    				}
-    				
-    				
-    				dataVector.add(tempVector);
-    			}
-    		}
-    		catch(SQLException e) {
-    			e.printStackTrace();
-    		} finally {
-    			currentDataSet.getDB().releaseReadLock();		
-    		}
-    		
-  		  		
-    		// populate array for csv printing
-    		csvArray = new ArrayList<String[]>();
-    		int csvcounter = 0;
-			for(Object v : dataVector){
-				Vector temp = (Vector)v;
-				String[] temp2 = new String[temp.size()];
-				for(Object z : temp){
-					temp2[csvcounter] = z.toString();
-					csvcounter++;
-				}
-				csvArray.add(temp2);
-				csvcounter = 0;
-			}		
-		}
-	}	
-	
-	
-	/*
-	private void FillTable(){
-		
-		if(currentRibbon != null){
-			currentNode = currentRibbon.getNode();
-			currentDataSet = currentNode.getToCategory().getDimension().getLocalDataSet();
-	//		ArrayList<DimensionHandle> tempDims = currentDataSet.getDimensions();
-	//		dimensionList = new ArrayList<DimensionHandle>();
-	//		for (DimensionHandle d : tempDims){
-	//			if(d.getDataType() == DataType.categorical)
-	//				dimensionList.add(0, d);
-	//		}
-			
-	//		for(DimensionHandle d2: dimensionList)
-	//			System.err.println(d2.getHandle());
-			
-			dimensionList = currentDataSet.getDimensions();
-			
-			// populate category List
-			while(currentNode.getParent() != null){
-				categoryList.add(0, currentNode.getToCategory());
-				currentNode = currentNode.getParent();
-			}
-			
-			// build the sql query string
-    		query += "select * from " + currentDataSet.getHandle() + "_dims where ";
-    		for(CategoryHandle c : categoryList){ 			
-    			query += c.getDimension().getHandle() + " = " + c.getCategoryNum() + " and ";
-    			
-    		}
-    		query = query.substring(0, query.length()-5);
-    		System.err.print(query);
-    		
-    		// get row and column count
-    		int row = 0;
-    		int col = 0;
-    		try{
-    		Statement stmt = currentDataSet.getDB().createStatement(DBAccess.FORREADING);
-    		ResultSet rs = stmt.executeQuery(query);
-    		col = rs.getMetaData().getColumnCount();
-    		while(rs.next()){
-    			row++;  			
-    		}
-    		}
-    		catch(SQLException e) {
-    			e.printStackTrace();
-    		} finally {
-    			currentDataSet.getDB().releaseReadLock();
-    		}
-    		
-    		// populate the 2 dim String array
-    		tableData = new String[row][col]; 
-    		System.out.println("columns" + col + " size of dimensions " + dimensionList.size());
-    		
-    		try{
-    		Statement stmt = currentDataSet.getDB().createStatement(DBAccess.FORREADING);
-    		ResultSet rs = stmt.executeQuery(query);
-    		int rowcounter = 0;
-    		while(rs.next()){
-    			for(int i = 1; i <= col; i ++){
-    				String temp = rs.getString(i);
-    				if(i == 2)
-    					tableData[rowcounter][dimensionList.size()] = temp;
-    				else if(i > 2){
-    					tableData[rowcounter][i-3] = dimensionList.get(i-3).num2Handle(Integer.parseInt(temp)).getHandle();
-    				}
-    				
-    			}
-    			rowcounter++;		
-    		}
-    		}
-    		catch(SQLException e) {
-    			e.printStackTrace();
-    		} finally {
-    			currentDataSet.getDB().releaseReadLock();
-    		}
-    		
-    		// populate export csv list
-    		int csvcounter = 0;
-    		csvlist = new ArrayList<String[]>();
-    		for(int i = 0; i < tableData.length; i++){
-    			for(int j = 0; j < (col-1); j++){
-    	//			csvlist[csvcounter] = tableData[i][j];
-    				csvcounter++;
-    			}
-    		}
-			
-    		columnNames = new String[dimensionList.size()+1];
-    		int counter = 0;
-    		for(DimensionHandle handle : dimensionList){
-    			columnNames[counter] = handle.getName();
-    			counter++;
-    		}
-    		columnNames[dimensionList.size()] = "Count";
-
-			
-		}
-	}
-	*/
-	
-
 	
 	public void exportCSVFile(String filename, ArrayList<String[]> exportlist){
 		
