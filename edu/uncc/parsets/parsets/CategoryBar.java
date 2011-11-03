@@ -45,6 +45,7 @@ public class CategoryBar {
 
 	private CategoryHandle category;
 	private AnimatableProperty leftX = new AnimatableProperty();
+//	private AnimatableProperty width = new AnimatableProperty();
 	private float width;
 	private int color;
 	private boolean topLevel = false;
@@ -85,10 +86,12 @@ public class CategoryBar {
 		else
 			leftX.setValue(x);
 		width = (dataTree.getFilteredFrequency(category) * (float) totalWidth);
+//		width.setValue(dataTree.getFilteredFrequency(category) * (float) totalWidth);
 
 		topIndexPoint = 0;
 		bottomIndexPoint = 0;
 
+	//	return (float)width.getValue();
 		return width;
 	}
 
