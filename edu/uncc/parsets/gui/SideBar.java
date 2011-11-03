@@ -16,6 +16,9 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import java.awt.Checkbox;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -32,6 +35,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+
 
 import net.miginfocom.swing.MigLayout;
 import edu.uncc.parsets.data.CategoryHandle;
@@ -238,6 +242,15 @@ public class SideBar extends JPanel implements DataSetListener {
             }
         });
         p.add(clearButton, "center");
+        
+        Checkbox mode = new Checkbox("Change Mode");
+        mode.addItemListener(new ItemListener(){
+        	public void itemStateChanged(ItemEvent L) {
+        		// add code to change mode here
+        	}
+        });
+        p.add(mode, "center");
+        
         return p;
     }
 

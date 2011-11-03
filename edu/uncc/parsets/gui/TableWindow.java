@@ -33,6 +33,11 @@ import edu.uncc.parsets.util.osabstraction.AbstractOS;
 
 public class TableWindow extends JFrame{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5745673411488491851L;
+
 	private VisualConnection currentRibbon = null;
 	private String query = "";	
 	private boolean isOnCategoryBar = false;
@@ -84,7 +89,6 @@ public class TableWindow extends JFrame{
     		query += "select * from " + currentDataSet.getHandle() + "_dims where ";
     		for(CategoryHandle c : categoryList){ 			
     			query += c.getDimension().getHandle() + " = " + c.getCategoryNum() + " and ";
-    			System.out.println("dimension is " + c.getDimension().getHandle() + " and value is " + c.getCategoryNum());
     			
     		}
     		query = query.substring(0, query.length()-5);
@@ -192,7 +196,12 @@ public class TableWindow extends JFrame{
 			
 		
         JTable table = new JTable(dataVector, columnVector){
-        	  public boolean isCellEditable(int row, int column){
+        	  /**
+			 * 
+			 */
+			private static final long serialVersionUID = -7633297558064205155L;
+
+			public boolean isCellEditable(int row, int column){
         		    return false;}};
 		JScrollPane scrollPane = new JScrollPane(table);
 		frame.add(scrollPane);
