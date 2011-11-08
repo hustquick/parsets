@@ -44,7 +44,7 @@ public class InvisibleConnection extends VisualConnection {
 	public void layout(float parentWidth) {		
 		// TODO: wtf?
 		try {
-			width = (int)(parentWidth * node.getRatio());
+			width.setValue((int)(parentWidth * node.getRatio()));
 		} catch (NullPointerException e) {
 			System.err.println("Could not get category bar for " 
 								+ node.toString());
