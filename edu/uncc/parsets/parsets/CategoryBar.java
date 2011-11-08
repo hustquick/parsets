@@ -45,8 +45,8 @@ public class CategoryBar {
 
 	private CategoryHandle category;
 	private AnimatableProperty leftX = new AnimatableProperty();
-//	private AnimatableProperty width = new AnimatableProperty();
-	private float width;
+	private AnimatableProperty width = new AnimatableProperty();
+//	private float width;
 	private int color;
 	private boolean topLevel = false;
 	private boolean visible = true;
@@ -85,14 +85,14 @@ public class CategoryBar {
 			newLeftX = x;
 		else
 			leftX.setValue(x);
-		width = (dataTree.getFilteredFrequency(category) * (float) totalWidth);
+		width.setValue(dataTree.getFilteredFrequency(category) * (float) totalWidth);
 //		width.setValue(dataTree.getFilteredFrequency(category) * (float) totalWidth);
 
 		topIndexPoint = 0;
 		bottomIndexPoint = 0;
 
-	//	return (float)width.getValue();
-		return width;
+		return (float)width.getValue();
+	//	return width;
 	}
 
 	public void paint(Graphics2D g, Font catFont, FontMetrics catFontMetrics,
@@ -104,7 +104,7 @@ public class CategoryBar {
 			else
 				g.setColor(Color.WHITE);
 
-			g.fillRect((int)leftX.getValue(), topY, (int)width, barHeight);
+			g.fillRect((int)leftX.getValue(), topY, (int)width.getValue(), barHeight);
 		}
 		
 		if (topLevel)
@@ -114,21 +114,21 @@ public class CategoryBar {
 
 		Stroke s = g.getStroke();
 		g.setStroke(THICKSTROKE);
-		g.drawLine((int)leftX.getValue(), topY + barHeight, (int)(leftX.getValue()+width), topY + barHeight);
+		g.drawLine((int)leftX.getValue(), topY + barHeight, (int)(leftX.getValue()+width.getValue()), topY + barHeight);
 		g.setStroke(s);
 				
 		String label = category.getName();
 
 		int labelWidth = catFontMetrics.stringWidth(label);
 		
-		if (labelWidth > width) {
-			while (labelWidth > width && label.length() > 0) {
+		if (labelWidth > width.getValue()) {
+			while (labelWidth > width.getValue() && label.length() > 0) {
 				label = label.substring(0, label.length() - 1);
 				labelWidth = catFontMetrics.stringWidth(label+"...");
 			}
 			if (label.length() > 0)
 				label = label.concat("...");
-			else if (catFontMetrics.stringWidth(category.getName().substring(0, 1)) < width)
+			else if (catFontMetrics.stringWidth(category.getName().substring(0, 1)) < width.getValue())
 				label = category.getName().substring(0, 1);
 		}
 
@@ -149,11 +149,11 @@ public class CategoryBar {
 	}
 
 	public int getWidth() {
-		return (int)width;
+		return (int)width.getValue();
 	}
 	
 	public boolean containsX(int x) {
-		return (x >= leftX.getValue()) && (x < leftX.getValue()+width);
+		return (x >= leftX.getValue()) && (x < leftX.getValue()+width.getValue());
 	}
 	
 	public CategoryHandle getCategory() {

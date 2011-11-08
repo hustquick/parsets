@@ -380,7 +380,6 @@ public class VisualConnectionTree {
 	
 	// added in for activecategorybar selection instead of one ribbon
 	public VisualConnection getCategoryBarNode(CategoryHandle category){
-		System.out.println("Category is" + category.getName());
 		findCategoryBarNode(category, root);
 		return test;
 		

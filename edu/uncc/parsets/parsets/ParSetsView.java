@@ -103,6 +103,9 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	private boolean mouseInDisplay = false;
 	private BufferedImage logoImage;
 	
+	private enum barState { NORMAL, OTHER };
+	private barState currentState = barState.NORMAL;
+	
 	
 	// new stuff
 	
@@ -525,7 +528,13 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	@Override
 	public void componentShown(ComponentEvent e) {	}
 
-	
+	public void changeState(){
+		if(currentState == barState.NORMAL)
+			currentState = barState.OTHER;
+		else
+			currentState = barState.NORMAL;
+
+	}
 	
 
 	
