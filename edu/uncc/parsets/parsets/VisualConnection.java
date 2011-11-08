@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.util.AnimatableProperty;
+import edu.uncc.parsets.parsets.BarState;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -45,8 +46,6 @@ public class VisualConnection {
 	protected ArrayList<VisualConnection> children;
 	protected VisualConnection parent;
 	protected CategoryNode node;
-	
-//	protected float width;
 	protected AnimatableProperty width = new AnimatableProperty();
 	protected int colorBrewerIndex;	
 	protected boolean isSelected = false;
@@ -82,6 +81,10 @@ public class VisualConnection {
 	 * Initialize the visual parameters for this element.
 	 */
 	public void layout(float parentWidth) {
+		
+	}
+	
+	public void layout(float parentWidth, int totalWidth){
 		
 	}
 	

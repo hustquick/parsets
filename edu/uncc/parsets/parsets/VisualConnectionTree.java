@@ -134,25 +134,31 @@ public class VisualConnectionTree {
 	}
 
 	
-	public void doLayout(int minX, int maxX) {
+	public void doLayout(int minX, int maxX, BarState currentState) {
 		if (style == RibbonLayoutStyle.BRANCHING)
-			doLayoutBranching(minX, maxX);
+			doLayoutBranching(minX, maxX, currentState);
 		else if (style == RibbonLayoutStyle.BUNDLED)
-			doLayoutBundled(minX, maxX);
+			doLayoutBundled(minX, maxX, currentState);
 	}
 	
 
-	public void doLayoutBranching(int minX, int maxX) {
+	public void doLayoutBranching(int minX, int maxX, BarState currentState) {
 		root.setWidth(maxX - minX);
-		layoutChildren(root);
+		layoutChildren(root, currentState, (maxX-minX));
 		setColors(root);
 	}
 
-	public void layoutChildren(VisualConnection connectionNode) {		
+	public void layoutChildren(VisualConnection connectionNode, BarState currentState, int totalWidth) {		
 		for (VisualConnection child : connectionNode.getChildren())
 			if (child.getNode().isVisible()) {
-				child.layout(connectionNode.getWidth());
-				layoutChildren(child);
+				if(currentState == BarState.NORMAL){
+					child.layout(connectionNode.getWidth());
+					layoutChildren(child, currentState, totalWidth);
+				}
+				else{
+					child.layout(connectionNode.getWidth(), totalWidth);
+					layoutChildren(child, currentState, totalWidth);
+				}
 			}
 	}
 
@@ -166,7 +172,7 @@ public class VisualConnectionTree {
 	 * @param maxX
 	 *            The right bound of the display space.
 	 */
-	public void doLayoutBundled(int minX, int maxX) {
+	public void doLayoutBundled(int minX, int maxX, BarState currentState) {
 
 		root.setWidth(maxX - minX);
 
@@ -186,7 +192,7 @@ public class VisualConnectionTree {
 				for (VisualConnection invisible : root.getChildren()) {
 
 					if (!invisible.isComplete())
-						layoutBranch(invisible);
+						layoutBranch(invisible, currentState, (maxX-minX));
 
 					// If this node is complete and is the last of the root's
 					// children, then we're done.
@@ -203,7 +209,7 @@ public class VisualConnectionTree {
 	 * 
 	 * @param connectionNode
 	 */
-	public boolean layoutBranch(VisualConnection connectionNode) {
+	public boolean layoutBranch(VisualConnection connectionNode, BarState currentState, int totalWidth) {
 
 		// If this node isn't laid out already, lay it out.
 		if (!connectionNode.isLaidOut()) {
@@ -222,7 +228,7 @@ public class VisualConnectionTree {
 		// leftmost incomplete child.
 		for (VisualConnection child : connectionNode.getChildren())
 			if (!child.isComplete())
-				if (layoutBranch(child) == false)
+				if (layoutBranch(child, currentState, totalWidth) == false)
 					return false;
 
 		// If all of the children are complete, this node is

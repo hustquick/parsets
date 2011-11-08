@@ -48,7 +48,7 @@ public abstract class VisualAxis {
 	public abstract void paint(Graphics2D g, Font dimFont, FontMetrics dimFontMetrics,
 			Font catFont, FontMetrics catFontMetrics);
 
-	public abstract void layout(int y, int xOffset, int width, int gap, int barHeight, CategoryTree dataTree);
+	public abstract void layout(int y, int xOffset, int width, int gap, int barHeight, CategoryTree dataTree, BarState currentState);
 		
 	public abstract void setTopLevel(boolean isTopLevel);
 	

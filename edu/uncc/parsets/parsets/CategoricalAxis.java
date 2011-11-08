@@ -14,6 +14,7 @@ import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryTree;
 import edu.uncc.parsets.data.DimensionHandle;
 import edu.uncc.parsets.util.AnimatableProperty;
+import edu.uncc.parsets.parsets.BarState;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -215,7 +216,7 @@ public class CategoricalAxis extends VisualAxis {
 	}
 	
 	@Override
-	public void layout(int y, int xOffset, int width, int gap, int barHeight, CategoryTree dataTree) {
+	public void layout(int y, int xOffset, int width, int gap, int barHeight, CategoryTree dataTree, BarState currentState) {
 		if (isActive)
 			newBarY = y + barHeight;
 		else
@@ -234,7 +235,7 @@ public class CategoricalAxis extends VisualAxis {
 		float x = xOffset;
 		for (CategoryBar bar : bars) {
 			if (bar.isVisible()) {
-				x += bar.layout((int)x, width, dataTree);
+				x += bar.layout((int)x, width, dataTree, currentState);
 				x += gapPer;
 			}
 		}
@@ -398,5 +399,14 @@ public class CategoricalAxis extends VisualAxis {
 		visualConnectionTree.orderChildren(dimension, getCategoryOrder());
 	}
 
+	public int visibleBars(){
+		int count = 0;
+		for(CategoryBar  b : bars){
+			if(b.isVisible())
+				count++;
+		}
+		
+		return count;
+	}
 	
 }

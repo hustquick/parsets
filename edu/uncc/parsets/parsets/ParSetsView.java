@@ -34,6 +34,7 @@ import edu.uncc.parsets.gui.Controller;
 import edu.uncc.parsets.gui.DataSetListener;
 //import edu.uncc.parsets.gui.MainWindow;
 //import edu.uncc.parsets.gui.MainWindow.PDFFileNameFilter;
+import edu.uncc.parsets.util.AnimatableProperty;
 import edu.uncc.parsets.util.AnimationListener;
 import edu.uncc.parsets.util.PSLogging;
 import gnu.jpdf.PDFJob;
@@ -213,10 +214,10 @@ public class ParSetsView extends JPanel implements DataSetListener,
 			axisSpacing = ((float)(height - 52) / (float)(axes.size()-1));
 		
 		for (VisualAxis axis : axes) {
-			axis.layout((int)y, 10, width-20-40, 40, categoryFontMetrics.getHeight() + 2, dataTree);
+			axis.layout((int)y, 10, width-20-40, 40, categoryFontMetrics.getHeight() + 2, dataTree, currentState);
 			y += axisSpacing;
 		}
-		connectionTree.doLayout(10, width-20-30);
+		connectionTree.doLayout(10, width-20-30, currentState);
 		needsLayout = false;
 	}
 	
@@ -529,11 +530,14 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	public void componentShown(ComponentEvent e) {	}
 
 	public void changeState(){
-		if(currentState == BarState.NORMAL)
+		if(currentState == BarState.NORMAL){
 			currentState = BarState.OTHER;
-		else
+		}
+		else{
 			currentState = BarState.NORMAL;
-
+		}
+        needsLayout = true;
+        repaint();
 	}
 	
 

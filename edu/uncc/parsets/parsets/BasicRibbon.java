@@ -107,6 +107,22 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		}
 	}
 	
+	public void layout(float parentWidth, int totalWidth){
+		if (node == null || node.getCount() == 0) {
+			width.setValue(0);
+		} else {
+			
+			width.setValue((totalWidth/(node.getToCategory().getDimension().getCategories().size())) * node.getRatio());
+					
+			upperOffset.setValue(upperBar.getBottomIndexPoint());
+			upperBar.setBottomIndexPoint(upperOffset.getValue() + width.getValue());
+
+			lowerOffset.setValue(lowerBar.getTopIndexPoint());
+			lowerBar.setTopIndexPoint(lowerOffset.getValue() + width.getValue());
+		}
+
+	}
+	
 	public void paint(Graphics2D g, float alpha) {
 		
 		if (width.getValue() == 0 || isSelected)
