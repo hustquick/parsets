@@ -95,52 +95,52 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	public void layout(float parentWidth) {
 
 		if (node == null || node.getCount() == 0) {
-			width = 0;
+			width.setValue(0);
 		} else {
-			width = parentWidth * node.getRatio();
+			width.setValue(parentWidth * node.getRatio());
 			
 			upperOffset.setValue(upperBar.getBottomIndexPoint());
-			upperBar.setBottomIndexPoint(upperOffset.getValue() + width);
+			upperBar.setBottomIndexPoint(upperOffset.getValue() + width.getValue());
 
 			lowerOffset.setValue(lowerBar.getTopIndexPoint());
-			lowerBar.setTopIndexPoint(lowerOffset.getValue() + width);
+			lowerBar.setTopIndexPoint(lowerOffset.getValue() + width.getValue());
 		}
 	}
 	
 	public void paint(Graphics2D g, float alpha) {
 		
-		if (width == 0 || isSelected)
+		if (width.getValue() == 0 || isSelected)
 			return;
 
 		ColorBrewer.setColor(colorBrewerIndex, false, alpha, g);
-		if (width >= 1) {
+		if (width.getValue() >= 1) {
 			int xPoints[] = new int[4];
 			int yPoints[] = new int[4];
 			
 			xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); yPoints[0] = upperBar.getOutRibbonY();
-			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width); yPoints[1] = upperBar.getOutRibbonY();
-			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width); yPoints[2] = lowerBar.getInRibbonY();
+			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width.getValue()); yPoints[1] = upperBar.getOutRibbonY();
+			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width.getValue()); yPoints[2] = lowerBar.getInRibbonY();
 			xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); yPoints[3] = lowerBar.getInRibbonY();
 
 			g.fillPolygon(xPoints, yPoints, 4);
 		} else {
-			g.drawLine(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width, lowerBar.getInRibbonY());
+			g.drawLine(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width.getValue(), lowerBar.getInRibbonY());
 		}
 	}
 	
 	public void paintSelected(Graphics2D g) {
 		
-		if (width == 0)
+		if (width.getValue() == 0)
 			return;
 	
-		if (width >= 1) {
+		if (width.getValue() >= 1) {
 			ColorBrewer.setColor(colorBrewerIndex, false, g);
 			int xPoints[] = new int[4];
 			int yPoints[] = new int[4];
 
 			xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); yPoints[0] = upperBar.getOutRibbonY();
-			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width); yPoints[1] = upperBar.getOutRibbonY();
-			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width); yPoints[2] = lowerBar.getInRibbonY();
+			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width.getValue()); yPoints[1] = upperBar.getOutRibbonY();
+			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width.getValue()); yPoints[2] = lowerBar.getInRibbonY();
 			xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); yPoints[3] = lowerBar.getInRibbonY();
 			g.fillPolygon(xPoints, yPoints, 4);
 				
@@ -148,7 +148,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 			g.drawPolygon(xPoints, yPoints, 4);
 		} else {
 			ColorBrewer.setColor(colorBrewerIndex, true, g);
-			g.drawLine(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width, lowerBar.getInRibbonY());
+			g.drawLine(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width.getValue(), lowerBar.getInRibbonY());
 		}
 	}
 	
@@ -164,8 +164,8 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		Polygon poly = new Polygon();
 		
 		poly.addPoint((int)(upperBar.getLeftX() + upperOffset.getValue()), (int)upperBar.getOutRibbonY());
-		poly.addPoint((int)(upperBar.getLeftX() + upperOffset.getValue() + width), (int)upperBar.getOutRibbonY());
-		poly.addPoint((int)(lowerBar.getLeftX() + lowerOffset.getValue() + width), (int)lowerBar.getInRibbonY());
+		poly.addPoint((int)(upperBar.getLeftX() + upperOffset.getValue() + width.getValue()), (int)upperBar.getOutRibbonY());
+		poly.addPoint((int)(lowerBar.getLeftX() + lowerOffset.getValue() + width.getValue()), (int)lowerBar.getInRibbonY());
 		poly.addPoint((int)(lowerBar.getLeftX() + lowerOffset.getValue()), (int)lowerBar.getInRibbonY());
 
 		return poly.contains(x, y);

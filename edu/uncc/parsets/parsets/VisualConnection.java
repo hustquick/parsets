@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import edu.uncc.parsets.data.CategoryNode;
+import edu.uncc.parsets.util.AnimatableProperty;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -45,7 +46,8 @@ public class VisualConnection {
 	protected VisualConnection parent;
 	protected CategoryNode node;
 	
-	protected float width;
+//	protected float width;
+	protected AnimatableProperty width = new AnimatableProperty();
 	protected int colorBrewerIndex;	
 	protected boolean isSelected = false;
 	
@@ -116,7 +118,7 @@ public class VisualConnection {
 	 * @param width the width to set
 	 */
 	public void setWidth(float width) {
-		this.width = width;
+		this.width.setValue(width);
 	}
 
 
@@ -207,7 +209,7 @@ public class VisualConnection {
 	 * @return the width
 	 */
 	public float getWidth() {
-		return width;
+		return width.getValue();
 	}
 	
 	public VisualConnection addChild(VisualConnection child) {

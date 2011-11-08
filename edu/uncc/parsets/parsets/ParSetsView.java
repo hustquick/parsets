@@ -37,6 +37,7 @@ import edu.uncc.parsets.gui.DataSetListener;
 import edu.uncc.parsets.util.AnimationListener;
 import edu.uncc.parsets.util.PSLogging;
 import gnu.jpdf.PDFJob;
+import edu.uncc.parsets.parsets.BarState;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -103,8 +104,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	private boolean mouseInDisplay = false;
 	private BufferedImage logoImage;
 	
-	private enum barState { NORMAL, OTHER };
-	private barState currentState = barState.NORMAL;
+	private BarState currentState = BarState.NORMAL;
 	
 	
 	// new stuff
@@ -529,10 +529,10 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	public void componentShown(ComponentEvent e) {	}
 
 	public void changeState(){
-		if(currentState == barState.NORMAL)
-			currentState = barState.OTHER;
+		if(currentState == BarState.NORMAL)
+			currentState = BarState.OTHER;
 		else
-			currentState = barState.NORMAL;
+			currentState = BarState.NORMAL;
 
 	}
 	

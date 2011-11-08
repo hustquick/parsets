@@ -86,13 +86,12 @@ public class CategoryBar {
 		else
 			leftX.setValue(x);
 		width.setValue(dataTree.getFilteredFrequency(category) * (float) totalWidth);
-//		width.setValue(dataTree.getFilteredFrequency(category) * (float) totalWidth);
-
+	// this is what will need when state change is used
+	//	width.setValue(totalWidth/(category.getDimension().getCategories().size()));
 		topIndexPoint = 0;
 		bottomIndexPoint = 0;
 
 		return (float)width.getValue();
-	//	return width;
 	}
 
 	public void paint(Graphics2D g, Font catFont, FontMetrics catFontMetrics,
