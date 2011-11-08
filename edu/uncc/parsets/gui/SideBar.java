@@ -246,7 +246,7 @@ public class SideBar extends JPanel implements DataSetListener {
         Checkbox mode = new Checkbox("Change Mode");
         mode.addItemListener(new ItemListener(){
         	public void itemStateChanged(ItemEvent L) {
-        		// add code to change mode here
+        		controller.parSetsView.changeState();
         	}
         });
         p.add(mode, "center");
