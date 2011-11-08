@@ -11,6 +11,7 @@ import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryTree;
 import edu.uncc.parsets.util.AnimatableProperty;
 import edu.uncc.parsets.util.ColorBrewer;
+import edu.uncc.parsets.parsets.BarState;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -46,7 +47,6 @@ public class CategoryBar {
 	private CategoryHandle category;
 	private AnimatableProperty leftX = new AnimatableProperty();
 	private AnimatableProperty width = new AnimatableProperty();
-//	private float width;
 	private int color;
 	private boolean topLevel = false;
 	private boolean visible = true;
@@ -80,14 +80,19 @@ public class CategoryBar {
 		bottomIndexPoint = 0;
 	}
 
-	public float layout(int x, int totalWidth, CategoryTree dataTree) {
+	public float layout(int x, int totalWidth, CategoryTree dataTree, BarState currentState) {
 		if (active)
 			newLeftX = x;
 		else
 			leftX.setValue(x);
-		width.setValue(dataTree.getFilteredFrequency(category) * (float) totalWidth);
-	// this is what will need when state change is used
-	//	width.setValue(totalWidth/(category.getDimension().getCategories().size()));
+		
+		if(currentState == BarState.NORMAL){
+			width.setValue(dataTree.getFilteredFrequency(category) * (float) totalWidth);
+		}
+		else{
+			width.setValue(totalWidth/(axis.visibleBars()));
+		}
+
 		topIndexPoint = 0;
 		bottomIndexPoint = 0;
 

@@ -41,7 +41,9 @@ import net.miginfocom.swing.MigLayout;
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.DimensionHandle;
+import edu.uncc.parsets.util.AnimatableProperty;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
+import edu.uncc.parsets.util.AnimatableProperty;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -246,7 +248,7 @@ public class SideBar extends JPanel implements DataSetListener {
         Checkbox mode = new Checkbox("Change Mode");
         mode.addItemListener(new ItemListener(){
         	public void itemStateChanged(ItemEvent L) {
-        		controller.parSetsView.changeState();
+        	//	controller.parSetsView.changeState();
         	}
         });
         p.add(mode, "center");
