@@ -533,7 +533,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		if(currentState == BarState.NORMAL){
 			currentState = BarState.OTHER;
 		}
-		else{
+		else if(currentState == BarState.OTHER){
 			currentState = BarState.NORMAL;
 		}
         needsLayout = true;
