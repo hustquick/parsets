@@ -144,21 +144,17 @@ public class VisualConnectionTree {
 
 	public void doLayoutBranching(int minX, int maxX, BarState currentState) {
 		root.setWidth(maxX - minX);
-		layoutChildren(root, currentState, (maxX-minX));
+		layoutChildren(root, currentState);
 		setColors(root);
 	}
 
-	public void layoutChildren(VisualConnection connectionNode, BarState currentState, int totalWidth) {		
+	public void layoutChildren(VisualConnection connectionNode, BarState currentState) {		
 		for (VisualConnection child : connectionNode.getChildren())
 			if (child.getNode().isVisible()) {
-				if(currentState == BarState.NORMAL){
-					child.layout(connectionNode.getWidth());
-					layoutChildren(child, currentState, totalWidth);
-				}
-				else{
-					child.layout(connectionNode.getWidth(), totalWidth);
-					layoutChildren(child, currentState, totalWidth);
-				}
+				child.setState(currentState);
+				child.layout(connectionNode.getWidth());
+				layoutChildren(child, currentState);
+
 			}
 	}
 

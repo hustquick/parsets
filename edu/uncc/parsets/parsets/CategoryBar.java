@@ -50,6 +50,7 @@ public class CategoryBar {
 	private int color;
 	private boolean topLevel = false;
 	private boolean visible = true;
+	int filteredFrequency;
 
 	Stroke THICKSTROKE = new BasicStroke(2);
 	
@@ -95,7 +96,7 @@ public class CategoryBar {
 
 		topIndexPoint = 0;
 		bottomIndexPoint = 0;
-
+		filteredFrequency = dataTree.getFilteredCount(category);
 		return (float)width.getValue();
 	}
 
@@ -199,4 +200,9 @@ public class CategoryBar {
 	public void setLeftX(int newX) {
 		leftX.setValue(newX);
 	}
+	
+	public int getFrequency(){
+		return filteredFrequency;
+	}
+	
 }

@@ -49,6 +49,7 @@ public class VisualConnection {
 	protected AnimatableProperty width = new AnimatableProperty();
 	protected int colorBrewerIndex;	
 	protected boolean isSelected = false;
+	protected AnimatableProperty lowerWidth = new AnimatableProperty();
 	
 	// Flags for the bundled layout traversal.
 	
@@ -84,9 +85,6 @@ public class VisualConnection {
 		
 	}
 	
-	public void layout(float parentWidth, int totalWidth){
-		
-	}
 	
 	/**
 	 * Paints the element to screen.
@@ -250,4 +248,11 @@ public class VisualConnection {
 		return "";
 	}
 	
+	public void setState(BarState newState){
+		
+	}
+	
+	public float getLowerWidth(){
+		return lowerWidth.getValue();
+	}
 }

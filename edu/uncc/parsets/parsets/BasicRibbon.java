@@ -39,7 +39,7 @@ import edu.uncc.parsets.util.ColorBrewer;
 public class BasicRibbon extends VisualConnection implements Comparable<BasicRibbon> {
 	
 	private CategoryBar upperBar, lowerBar;
-	
+	private BarState currentState = BarState.NORMAL;
 	private AnimatableProperty upperOffset = new AnimatableProperty();
 	private AnimatableProperty lowerOffset = new AnimatableProperty();
 	
@@ -52,6 +52,8 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		
 		this.upperBar = upperAxis.getCategoryBar(node.getParent().getToCategory());
 		this.lowerBar = lowerAxis.getCategoryBar(node.getToCategory());
+		
+		lowerWidth.setValue(0);
 	}
 	
 	public BasicRibbon(CategoryNode categoryNode, CategoricalAxis upperAxis, CategoricalAxis lowerAxis) {
@@ -63,6 +65,8 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 
 		this.upperBar = upperAxis.getCategoryBar(node.getParent().getToCategory());
 		this.lowerBar = lowerAxis.getCategoryBar(node.getToCategory());
+		
+		lowerWidth.setValue(0);
 		
 	}
 
@@ -97,31 +101,36 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		if (node == null || node.getCount() == 0) {
 			width.setValue(0);
 		} else {
-			width.setValue(parentWidth * node.getRatio());
-			
-			upperOffset.setValue(upperBar.getBottomIndexPoint());
-			upperBar.setBottomIndexPoint(upperOffset.getValue() + width.getValue());
+			if(currentState == BarState.NORMAL){
+				width.setValue(parentWidth * node.getRatio());
+				upperOffset.setValue(upperBar.getBottomIndexPoint());
+				upperBar.setBottomIndexPoint(upperOffset.getValue() + width.getValue());
 
-			lowerOffset.setValue(lowerBar.getTopIndexPoint());
-			lowerBar.setTopIndexPoint(lowerOffset.getValue() + width.getValue());
+				lowerOffset.setValue(lowerBar.getTopIndexPoint());
+				lowerBar.setTopIndexPoint(lowerOffset.getValue() + width.getValue());
+			}
+			else if(currentState == BarState.OTHER){
+				if(parent.getLowerWidth() != 0){
+					width.setValue(parent.getLowerWidth() * node.getRatio());
+				}
+				else{
+					width.setValue(upperBar.getWidth() * node.getRatio());
+				}
+				upperOffset.setValue(upperBar.getBottomIndexPoint());
+				upperBar.setBottomIndexPoint(upperOffset.getValue() + width.getValue());
+
+				lowerOffset.setValue(lowerBar.getTopIndexPoint());
+				lowerBar.setTopIndexPoint(lowerOffset.getValue() + ((float)lowerBar.getWidth()*((float)node.getCount()/(float)lowerBar.getFrequency())));
+				
+				lowerWidth.setValue((float)lowerBar.getWidth()*((float)node.getCount()/(float)lowerBar.getFrequency()));
+			}
+			
+
 		}
+		
+		
 	}
 	
-	public void layout(float parentWidth, int totalWidth){
-		if (node == null || node.getCount() == 0) {
-			width.setValue(0);
-		} else {
-			
-			width.setValue((totalWidth/(node.getToCategory().getDimension().getCategories().size())) * node.getRatio());
-					
-			upperOffset.setValue(upperBar.getBottomIndexPoint());
-			upperBar.setBottomIndexPoint(upperOffset.getValue() + width.getValue());
-
-			lowerOffset.setValue(lowerBar.getTopIndexPoint());
-			lowerBar.setTopIndexPoint(lowerOffset.getValue() + width.getValue());
-		}
-
-	}
 	
 	public void paint(Graphics2D g, float alpha) {
 		
@@ -133,15 +142,34 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 			int xPoints[] = new int[4];
 			int yPoints[] = new int[4];
 			
-			xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); yPoints[0] = upperBar.getOutRibbonY();
-			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width.getValue()); yPoints[1] = upperBar.getOutRibbonY();
-			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width.getValue()); yPoints[2] = lowerBar.getInRibbonY();
-			xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); yPoints[3] = lowerBar.getInRibbonY();
-
+			if(currentState == BarState.NORMAL){
+				xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); 
+				yPoints[0] = upperBar.getOutRibbonY();
+				xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width.getValue()); 
+				yPoints[1] = upperBar.getOutRibbonY();
+				xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width.getValue()); 
+				yPoints[2] = lowerBar.getInRibbonY();
+				xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); 
+				yPoints[3] = lowerBar.getInRibbonY();
+			}
+			else if(currentState == BarState.OTHER){
+				xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); 
+				yPoints[0] = upperBar.getOutRibbonY();
+				xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width.getValue()); 
+				yPoints[1] = upperBar.getOutRibbonY();
+				xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round((float)lowerBar.getWidth()*((float)node.getCount()/(float)lowerBar.getFrequency()));
+				yPoints[2] = lowerBar.getInRibbonY();
+				xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue();
+				yPoints[3] = lowerBar.getInRibbonY();
+			}
+			
+			
 			g.fillPolygon(xPoints, yPoints, 4);
 		} else {
 			g.drawLine(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width.getValue(), lowerBar.getInRibbonY());
 		}
+		
+	
 	}
 	
 	public void paintSelected(Graphics2D g) {
@@ -153,11 +181,29 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 			ColorBrewer.setColor(colorBrewerIndex, false, g);
 			int xPoints[] = new int[4];
 			int yPoints[] = new int[4];
-
-			xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); yPoints[0] = upperBar.getOutRibbonY();
-			xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width.getValue()); yPoints[1] = upperBar.getOutRibbonY();
-			xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width.getValue()); yPoints[2] = lowerBar.getInRibbonY();
-			xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue(); yPoints[3] = lowerBar.getInRibbonY();
+			
+			if(currentState == BarState.NORMAL){
+				xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); 
+				yPoints[0] = upperBar.getOutRibbonY();
+				xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width.getValue());
+				yPoints[1] = upperBar.getOutRibbonY();
+				xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round(width.getValue());
+				yPoints[2] = lowerBar.getInRibbonY();
+				xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue();
+				yPoints[3] = lowerBar.getInRibbonY();
+			}
+			else if(currentState == BarState.OTHER){
+				xPoints[0] = upperBar.getLeftX() + (int)upperOffset.getValue(); 
+				yPoints[0] = upperBar.getOutRibbonY();
+				xPoints[1] = upperBar.getLeftX() + (int)upperOffset.getValue() + (int)Math.round(width.getValue()); 
+				yPoints[1] = upperBar.getOutRibbonY();
+				xPoints[2] = lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)Math.round((float)lowerBar.getWidth()*((float)node.getCount()/(float)lowerBar.getFrequency()));
+				yPoints[2] = lowerBar.getInRibbonY();
+				xPoints[3] = lowerBar.getLeftX() + (int)lowerOffset.getValue();
+				yPoints[3] = lowerBar.getInRibbonY();
+			}
+			
+			
 			g.fillPolygon(xPoints, yPoints, 4);
 				
 			ColorBrewer.setColor(colorBrewerIndex, true, .8f, g);
@@ -187,4 +233,9 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		return poly.contains(x, y);
 	}	
 	
+	public void setState(BarState newState){
+		currentState = newState;
+	}
+	
+
 }
