@@ -221,6 +221,10 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		needsLayout = false;
 	}
 	
+	
+	
+	
+	
 	public void setDataSet(DataSet data) {
 		clearScreen();
 	}
@@ -530,14 +534,22 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	public void componentShown(ComponentEvent e) {	}
 
 	public void changeState(){
+		
 		if(currentState == BarState.NORMAL){
 			currentState = BarState.OTHER;
 		}
 		else if(currentState == BarState.OTHER){
 			currentState = BarState.NORMAL;
 		}
-        needsLayout = true;
+
+    //    AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, this);
+        connectionTree.updateState(10, width-20-30, currentState);
+        layoutAxes();
         repaint();
+   //     AnimatableProperty.commitAnimations();
+        
+
+		
 	}
 	
 

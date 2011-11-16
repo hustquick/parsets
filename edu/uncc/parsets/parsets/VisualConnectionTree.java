@@ -151,12 +151,26 @@ public class VisualConnectionTree {
 	public void layoutChildren(VisualConnection connectionNode, BarState currentState) {		
 		for (VisualConnection child : connectionNode.getChildren())
 			if (child.getNode().isVisible()) {
-				child.setState(currentState);
+		//		child.setState(currentState);
 				child.layout(connectionNode.getWidth());
 				layoutChildren(child, currentState);
 
 			}
 	}
+	
+	public void updateState(int minX, int maxX, BarState currentState){
+		root.setWidth(maxX - minX);
+		updateChildren(root, currentState);
+	}
+	
+	public void updateChildren(VisualConnection connectionNode, BarState currentState){
+		for(VisualConnection child : connectionNode.getChildren())
+			if(child.getNode().isVisible()){
+				child.setState(currentState);
+				updateChildren(child,currentState);
+			}
+	}
+	
 
 	/**
 	 * Lays out the ribbons in a bundled style. Basically, this means doing a

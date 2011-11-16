@@ -108,6 +108,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 
 				lowerOffset.setValue(lowerBar.getTopIndexPoint());
 				lowerBar.setTopIndexPoint(lowerOffset.getValue() + width.getValue());
+				lowerWidth.setValue(0);
 			}
 			else if(currentState == BarState.OTHER){
 				if(parent.getLowerWidth() != 0){
