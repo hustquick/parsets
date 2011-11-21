@@ -97,7 +97,7 @@ public class CategoryBar {
 		topIndexPoint = 0;
 		bottomIndexPoint = 0;
 		filteredFrequency = dataTree.getFilteredCount(category);
-		return (float)width.getValue();
+		return (float)width.getFutureValue();
 	}
 
 	public void paint(Graphics2D g, Font catFont, FontMetrics catFontMetrics,
@@ -153,8 +153,16 @@ public class CategoryBar {
 		return (int)leftX.getValue();
 	}
 
+	public int getFutureLeftX(){
+		return (int)leftX.getFutureValue();
+	}
+	
 	public int getWidth() {
 		return (int)width.getValue();
+	}
+	
+	public int getFutureWidth(){
+		return (int)width.getFutureValue();
 	}
 	
 	public boolean containsX(int x) {

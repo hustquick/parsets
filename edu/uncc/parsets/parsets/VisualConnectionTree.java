@@ -151,8 +151,8 @@ public class VisualConnectionTree {
 	public void layoutChildren(VisualConnection connectionNode, BarState currentState) {		
 		for (VisualConnection child : connectionNode.getChildren())
 			if (child.getNode().isVisible()) {
-		//		child.setState(currentState);
-				child.layout(connectionNode.getWidth());
+				child.setState(currentState);
+				child.layout(connectionNode.getFutureWidth());
 				layoutChildren(child, currentState);
 
 			}

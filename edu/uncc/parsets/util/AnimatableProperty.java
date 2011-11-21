@@ -272,6 +272,18 @@ public class AnimatableProperty {
 	public float getValue() {
 		return currentValue;
 	}
+	
+	public float getFutureValue(){
+		
+		if(values != null){
+			return values[values.length-1];
+		}
+		else
+		{
+			return currentValue;
+		}
+		
+	}
 
 	/**
 	 * Set this property's new value. If called between

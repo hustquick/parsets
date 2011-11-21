@@ -43,6 +43,7 @@ import edu.uncc.parsets.parsets.BarState;
  */
 public class VisualConnection {
 	
+	protected BarState currentState = BarState.NORMAL;
 	protected ArrayList<VisualConnection> children;
 	protected VisualConnection parent;
 	protected CategoryNode node;
@@ -213,6 +214,17 @@ public class VisualConnection {
 		return width.getValue();
 	}
 	
+	public float getFutureWidth()
+	{
+		if(currentState == BarState.NORMAL){
+			return width.getFutureValue();
+		}
+		else
+			return parent.getFutureLowerWidth();
+		
+
+	}
+	
 	public VisualConnection addChild(VisualConnection child) {
 		children.add(child);
 		return child;
@@ -254,5 +266,9 @@ public class VisualConnection {
 	
 	public float getLowerWidth(){
 		return lowerWidth.getValue();
+	}
+	
+	public float getFutureLowerWidth(){
+		return lowerWidth.getFutureValue();
 	}
 }

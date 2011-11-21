@@ -541,12 +541,9 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		else if(currentState == BarState.OTHER){
 			currentState = BarState.NORMAL;
 		}
-
-    //    AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, this);
-        connectionTree.updateState(10, width-20-30, currentState);
+        AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, this);
         layoutAxes();
-        repaint();
-   //     AnimatableProperty.commitAnimations();
+        AnimatableProperty.commitAnimations();
         
 
 		
