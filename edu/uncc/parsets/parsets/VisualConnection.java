@@ -260,9 +260,6 @@ public class VisualConnection {
 		return "";
 	}
 	
-	public void setState(BarState newState){
-		
-	}
 	
 	public float getLowerWidth(){
 		return lowerWidth.getValue();
@@ -270,5 +267,9 @@ public class VisualConnection {
 	
 	public float getFutureLowerWidth(){
 		return lowerWidth.getFutureValue();
+	}
+	
+	public void setState(BarState newState){
+		currentState = newState;
 	}
 }

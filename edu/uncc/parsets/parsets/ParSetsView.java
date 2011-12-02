@@ -39,6 +39,7 @@ import edu.uncc.parsets.util.AnimationListener;
 import edu.uncc.parsets.util.PSLogging;
 import gnu.jpdf.PDFJob;
 import edu.uncc.parsets.parsets.BarState;
+import edu.uncc.parsets.parsets.RibbonState;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -106,6 +107,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	private BufferedImage logoImage;
 	
 	private BarState currentState = BarState.NORMAL;
+	private RibbonState currentRibbonState = RibbonState.BASIC;
 	
 	
 	// new stuff
@@ -538,7 +540,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		if(currentState == BarState.NORMAL){
 			currentState = BarState.OTHER;
 		}
-		else if(currentState == BarState.OTHER){
+		else{
 			currentState = BarState.NORMAL;
 		}
         AnimatableProperty.beginAnimations(.33f, 1, AnimatableProperty.SpeedProfile.linearInSlowOut, this);
@@ -546,6 +548,19 @@ public class ParSetsView extends JPanel implements DataSetListener,
         AnimatableProperty.commitAnimations();
         
 
+		
+	}
+	
+	public void changeBarState(){
+		
+		if(currentRibbonState == RibbonState.BASIC){
+			currentRibbonState = RibbonState.CURVED;
+		//	System.err.println("state changed to curved");
+		}
+		else{
+			currentRibbonState = RibbonState.BASIC;
+		//	System.err.println("state changed to basic");
+		}
 		
 	}
 	
