@@ -233,9 +233,7 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 		return poly.contains(x, y);
 	}	
 	
-	public void setState(BarState newState){
-		currentState = newState;
-	}
+
 	
 
 }

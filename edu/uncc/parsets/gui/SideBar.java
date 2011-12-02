@@ -41,9 +41,7 @@ import net.miginfocom.swing.MigLayout;
 import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.data.DimensionHandle;
-import edu.uncc.parsets.util.AnimatableProperty;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
-import edu.uncc.parsets.util.AnimatableProperty;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -252,6 +250,14 @@ public class SideBar extends JPanel implements DataSetListener {
         	}
         });
         p.add(mode, "center");
+        
+        Checkbox mode2 = new Checkbox("Basic/Curved Ribbons");
+        mode2.addItemListener(new ItemListener(){
+        	public void itemStateChanged(ItemEvent L){
+        		controller.parSetsView.changeBarState();
+        	}
+        });
+        p.add(mode2, "center");
         
         return p;
     }
