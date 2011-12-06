@@ -44,7 +44,7 @@ public class VisualConnectionTree {
 	private VisualConnection root; 
 	private VisualConnection test;
 	private RibbonLayoutStyle style = RibbonLayoutStyle.BRANCHING;
-	private RibbonState currentState;
+	private RibbonState currentRState;
 
 	public VisualConnectionTree() {
 		super();
@@ -91,16 +91,29 @@ public class VisualConnectionTree {
 		} else if (childLevel <= axes.size()){
 			
 			// The lower levels are ribbons.
-			
-			for (CategoryNode child : dataNode.getChildren()) {
-				VisualConnection newChild = parentNode.addChild(new BasicRibbon(parentNode, child, 
+			if(currentRState == RibbonState.BASIC){
+				for (CategoryNode child : dataNode.getChildren()) {
+					VisualConnection newChild = parentNode.addChild(new BasicRibbon(parentNode, child, 
 																(CategoricalAxis)axes.get(childLevel-2), 
 																(CategoricalAxis)axes.get(childLevel-1)));
 
-				addChildren(newChild, child, axes, childLevel+1);
-			}
+					addChildren(newChild, child, axes, childLevel+1);
+				}
 			
-			orderChildren(parentNode, ((CategoricalAxis)axes.get(childLevel-1)).getCategoryOrder());
+				orderChildren(parentNode, ((CategoricalAxis)axes.get(childLevel-1)).getCategoryOrder());
+			}
+			else if(currentRState == RibbonState.CURVED){
+				for (CategoryNode child : dataNode.getChildren()) {
+					VisualConnection newChild = parentNode.addChild(new CurvedRibbon(parentNode, child, 
+																(CategoricalAxis)axes.get(childLevel-2), 
+																(CategoricalAxis)axes.get(childLevel-1)));
+
+					addChildren(newChild, child, axes, childLevel+1);
+				}
+			
+				orderChildren(parentNode, ((CategoricalAxis)axes.get(childLevel-1)).getCategoryOrder());
+				
+			}
 		}
 	}
 	
@@ -455,8 +468,8 @@ public class VisualConnectionTree {
 		}		
 	}
 	
-	private void setRibbonState(RibbonState state){
-		currentState = state;
+	public void setRibbonState(RibbonState state){
+		currentRState = state;
 	}
 
 }
