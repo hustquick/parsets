@@ -8,6 +8,7 @@ import edu.uncc.parsets.data.CategoryHandle;
 import edu.uncc.parsets.data.CategoryNode;
 import edu.uncc.parsets.data.CategoryTree;
 import edu.uncc.parsets.data.DimensionHandle;
+import edu.uncc.parsets.parsets.RibbonState;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -43,10 +44,12 @@ public class VisualConnectionTree {
 	private VisualConnection root; 
 	private VisualConnection test;
 	private RibbonLayoutStyle style = RibbonLayoutStyle.BRANCHING;
+	private RibbonState currentState;
 
 	public VisualConnectionTree() {
 		super();
 		root = new VisualConnection();
+		setRibbonState(RibbonState.BASIC);
 	}
 	
 	public void print(VisualConnection node) {
@@ -450,6 +453,10 @@ public class VisualConnectionTree {
 				moveCategory(dimension, category, index, child);
 			}
 		}		
+	}
+	
+	private void setRibbonState(RibbonState state){
+		currentState = state;
 	}
 
 }

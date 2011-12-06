@@ -555,14 +555,15 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		
 		if(currentRibbonState == RibbonState.BASIC){
 			currentRibbonState = RibbonState.CURVED;
-		//	System.err.println("state changed to curved");
+			
 		}
 		else{
 			currentRibbonState = RibbonState.BASIC;
-		//	System.err.println("state changed to basic");
+
 		}
 		
 	}
+	
 	
 
 	
