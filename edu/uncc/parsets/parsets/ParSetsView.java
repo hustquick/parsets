@@ -555,12 +555,21 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		
 		if(currentRibbonState == RibbonState.BASIC){
 			currentRibbonState = RibbonState.CURVED;
+			connectionTree.setRibbonState(currentRibbonState);
+			connectionTree.buildConnectionTree(axes, dataTree);
+			needsLayout = true;
+			repaint();
 			
 		}
 		else{
 			currentRibbonState = RibbonState.BASIC;
-
+			connectionTree.setRibbonState(currentRibbonState);
+			connectionTree.buildConnectionTree(axes, dataTree);
+			needsLayout = true;
+			repaint();
 		}
+		
+		
 		
 	}
 	

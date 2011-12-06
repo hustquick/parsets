@@ -19,6 +19,7 @@ public class CurvedRibbon extends VisualConnection implements Comparable<BasicRi
 	private CategoryBar upperBar, lowerBar;
 	private AnimatableProperty upperOffset = new AnimatableProperty();
 	private AnimatableProperty lowerOffset = new AnimatableProperty();
+	private GeneralPath bounds;
 	
 	
 	public CurvedRibbon(VisualConnection parent, CategoryNode categoryNode, CategoricalAxis upperAxis, CategoricalAxis lowerAxis) {
@@ -145,21 +146,21 @@ public class CurvedRibbon extends VisualConnection implements Comparable<BasicRi
 			
 			Line2D.Float top = new Line2D.Float(xPoints[0], yPoints[0], xPoints[1], yPoints[1]);
 			CubicCurve2D.Float right = new CubicCurve2D.Float(xPoints[1], yPoints[1], xPoints[1], ((yPoints[1]+yPoints[2])/2), xPoints[2], ((yPoints[1]+yPoints[2])/2), xPoints[2], yPoints[2]);
-			Line2D.Float bottom = new Line2D.Float(xPoints[3], yPoints[3], xPoints[4], yPoints[4]);
-			CubicCurve2D.Float left = new CubicCurve2D.Float(xPoints[3], yPoints[3], xPoints[3], ((yPoints[3]+yPoints[4])/2), xPoints[4], ((yPoints[1]+yPoints[2])/2), xPoints[4], yPoints[4]);
+			Line2D.Float bottom = new Line2D.Float(xPoints[2], yPoints[2], xPoints[3], yPoints[3]);
+			CubicCurve2D.Float left = new CubicCurve2D.Float(xPoints[3], yPoints[3], xPoints[3], ((yPoints[3]+yPoints[0])/2), xPoints[0], ((yPoints[3]+yPoints[0])/2), xPoints[0], yPoints[0]);
 			GeneralPath ribb = new GeneralPath();
 			ribb.append(top,true);
 			ribb.append(right, true);
 			ribb.append(bottom, true);
 			ribb.append(left, true);
-			
+			bounds = ribb;
 			g.draw(ribb);
 			g.fill(ribb);
 		}
 		else{
-//			QuadCurve2D.Float lin = new QuadCurve2D.Float(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), upperBar.getLeftX() + (int)upperOffset.getValue(), ((upperBar.getOutRibbonY()+lowerBar.getInRibbonY())/2), 
-//					lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width.getValue(), lowerBar.getInRibbonY());
-//			g.draw(lin);
+			CubicCurve2D.Float lin = new CubicCurve2D.Float(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), upperBar.getLeftX()+(int)upperOffset.getValue(), ((upperBar.getOutRibbonY()+lowerBar.getInRibbonY())/2),
+					lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width.getValue(), ((upperBar.getOutRibbonY()+lowerBar.getInRibbonY())/2) , lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width.getValue(), lowerBar.getInRibbonY());
+			g.draw(lin);
 		}
 		
 		
@@ -201,29 +202,33 @@ public class CurvedRibbon extends VisualConnection implements Comparable<BasicRi
 			
 			Line2D.Float top = new Line2D.Float(xPoints[0], yPoints[0], xPoints[1], yPoints[1]);
 			CubicCurve2D.Float right = new CubicCurve2D.Float(xPoints[1], yPoints[1], xPoints[1], ((yPoints[1]+yPoints[2])/2), xPoints[2], ((yPoints[1]+yPoints[2])/2), xPoints[2], yPoints[2]);
-			Line2D.Float bottom = new Line2D.Float(xPoints[3], yPoints[3], xPoints[4], yPoints[4]);
-			CubicCurve2D.Float left = new CubicCurve2D.Float(xPoints[3], yPoints[3], xPoints[3], ((yPoints[3]+yPoints[4])/2), xPoints[4], ((yPoints[1]+yPoints[2])/2), xPoints[4], yPoints[4]);
+			Line2D.Float bottom = new Line2D.Float(xPoints[2], yPoints[2], xPoints[3], yPoints[3]);
+			CubicCurve2D.Float left = new CubicCurve2D.Float(xPoints[3], yPoints[3], xPoints[3], ((yPoints[3]+yPoints[0])/2), xPoints[0], ((yPoints[3]+yPoints[0])/2), xPoints[0], yPoints[0]);
 			GeneralPath ribb = new GeneralPath();
 			ribb.append(top,true);
 			ribb.append(right, true);
 			ribb.append(bottom, true);
 			ribb.append(left, true);
-			
-			g.draw(ribb);
+			bounds = ribb;
 				
 			ColorBrewer.setColor(colorBrewerIndex, true, .8f, g);
+			g.draw(ribb);
 			g.fill(ribb);
 		} else {
 			ColorBrewer.setColor(colorBrewerIndex, true, g);
-//			QuadCurve2D.Float lin = new QuadCurve2D.Float(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), upperBar.getLeftX() + (int)upperOffset.getValue(), ((upperBar.getOutRibbonY()+lowerBar.getInRibbonY())/2), 
-///					lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width.getValue(), lowerBar.getInRibbonY());
-//			g.draw(lin);
+			CubicCurve2D.Float lin = new CubicCurve2D.Float(upperBar.getLeftX() + (int)upperOffset.getValue(), upperBar.getOutRibbonY(), upperBar.getLeftX()+(int)upperOffset.getValue(), ((upperBar.getOutRibbonY()+lowerBar.getInRibbonY())/2),
+					lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width.getValue(), ((upperBar.getOutRibbonY()+lowerBar.getInRibbonY())/2) , lowerBar.getLeftX() + (int)lowerOffset.getValue() + (int)width.getValue(), lowerBar.getInRibbonY());
+			g.draw(lin);
 		}
 	}
 	
 	public boolean contains(int x, int y){
-		// think this part will need to be changed
-		return true;
+		if(bounds == null)
+			return false;
+		if(bounds.contains(x,y))
+			return true;
+		else 
+			return false;
 	}
 	
 	public void setColorBrewerIndex(int colorBrewerIndex) {

@@ -141,6 +141,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
                 view.moveCategory(activeAxis, activeCategoryBar.getCategory(), index);
                 view.layoutAxes();
 //				AnimatableProperty.commitAnimations();
+                System.err.println("active category movement");
             }
             view.repaint();
         } else if (activeAxis != null) {
@@ -150,10 +151,13 @@ public class ParSetsInteraction extends MouseInputAdapter {
             if (index != -1) {
                 view.moveAxis(index, activeAxis);
                 view.layoutAxes();
+
             }
 
             view.repaint();
         }
+        
+
     }
 
     @Override
