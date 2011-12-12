@@ -61,6 +61,9 @@ public class CategoryNode implements Iterable<CategoryNode>, Comparable<Category
 		visible = true;
 	}
 	
+        public void setCount(int count){
+            this.count = count;
+        }
 	public int getCount() {
 		return count;
 	}
