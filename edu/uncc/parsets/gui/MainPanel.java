@@ -41,8 +41,9 @@ public class MainPanel extends JPanel implements AbstractMainView {
     public MainPanel(DataSet dataset, Controller controller) {
         super();
         if (controller == null) {
-            this.controller = new Controller();
+            controller = new Controller();
         }
+        this.controller = new Controller();
         this.controller.setDataSet(dataset);
         sideBar = new SideBar(dataset, (AbstractMainView) this, controller);
 
