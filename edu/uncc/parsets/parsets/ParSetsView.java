@@ -91,6 +91,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	
 	private ArrayList<DimensionHandle> dimensionList;
 	private ArrayList<ArrayList<CategoryHandle>> categoryLists;
+        private ArrayList<CategoryHandle> filteredCategories;
 
 	private static final String LOGOFILENAME = "/support/parsets-logo-medium.png";
 	private Dimension logoDimensions;
@@ -137,6 +138,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		
 		dimensionList = new ArrayList<DimensionHandle>();
 		categoryLists = new ArrayList<ArrayList<CategoryHandle>>();
+                filteredCategories = new ArrayList<CategoryHandle>();
 
 		ParSetsInteraction interaction = new ParSetsInteraction(this);
 		addMouseListener(interaction);
@@ -268,6 +270,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		axes = new ArrayList<VisualAxis>();
 		dimensionList = new ArrayList<DimensionHandle>();
 		categoryLists = new ArrayList<ArrayList<CategoryHandle>>();
+                filteredCategories = new ArrayList<CategoryHandle>();
 		connectionTree.clearConnections();
 		dataTree = null;
 		needsLayout = true;
@@ -287,6 +290,9 @@ public class ParSetsView extends JPanel implements DataSetListener,
 		int i = dimensionList.indexOf(dimension);	
 		categoryLists.remove(i);
 		dimensionList.remove(dimension);
+                for (CategoryHandle cat : dimension.getCategories()) {
+                    filteredCategories.remove(cat);
+                }
 		
 		if (axes.size() > 0) {
 			axes.get(0).setTopLevel(true);
@@ -361,6 +367,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 
 		int i = dimensionList.indexOf(dimension);
 		categoryLists.get(i).remove(category);
+                filteredCategories.add(category);
 		
 		if (categoryLists.get(i).isEmpty()) {
 			removeAxis(dimension);
@@ -389,6 +396,7 @@ public class ParSetsView extends JPanel implements DataSetListener,
 
 			int i = dimensionList.indexOf(dimension);
 			categoryLists.get(i).add(category);
+                        filteredCategories.remove(category);
 
 			updateVisibility(dataTree.getRootNode(), -1);			
 			dataTree.getRootNode().updateValues();	
@@ -517,6 +525,10 @@ public class ParSetsView extends JPanel implements DataSetListener,
 	public Controller getController() {
 		return this.controller;
 	}
+        
+        public List<CategoryHandle> getFilteredCategories(){
+            return this.filteredCategories;
+        }
 
 	@Override
 	public void componentResized(ComponentEvent e) {

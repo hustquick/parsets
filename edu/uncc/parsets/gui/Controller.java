@@ -4,8 +4,11 @@ import java.util.ArrayList;
 
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.parsets.ParSetsView;
+import edu.uncc.parsets.parsets.PopupPresenter;
 import edu.uncc.parsets.parsets.SelectionChangeEvent;
 import edu.uncc.parsets.parsets.SelectionChangeListener;
+import java.util.Collections;
+import java.util.List;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * Copyright (c) 2009, Robert Kosara, Caroline Ziemkiewicz,
@@ -47,6 +50,7 @@ public class Controller {
     public ParSetsView parSetsView;
     private ArrayList<SelectionChangeListener> selectionListeners = new ArrayList<SelectionChangeListener>();
     public DBTab dbTab;
+    private ArrayList<PopupPresenter> popupPresenters = new ArrayList<PopupPresenter>();
 
     public Controller() {
     }
@@ -61,7 +65,7 @@ public class Controller {
 
     public void setDataSet(DataSet data) {
         for (DataSetListener l : dsListeners) {
-            l.setDataSet(data);
+            l.setDataSet(data); 
         }
         selectionListeners.add(data);
     }
@@ -70,5 +74,13 @@ public class Controller {
         for (SelectionChangeListener l : selectionListeners) {
             l.selectionChanged(event);
         }
+    }
+    
+    public void addPopupPresenter(PopupPresenter presenter){
+        popupPresenters.add(presenter);
+    }
+    
+    public List<? extends PopupPresenter> getPopupPresenters(){
+        return Collections.unmodifiableList(popupPresenters);
     }
 }

@@ -38,14 +38,14 @@ public class TableWindow extends JFrame{
 	 */
 	private static final long serialVersionUID = -5745673411488491851L;
 
-	private VisualConnection currentRibbon = null;
+	private CategoryNode currentNode;
 	private String query = "";	
 	private boolean isOnCategoryBar = false;
 		
 	
 	
-	public TableWindow(VisualConnection selectedRibbon, boolean isOnBar){
-		currentRibbon = selectedRibbon;
+	public TableWindow(CategoryNode selectedNode, boolean isOnBar){
+		this.currentNode = selectedNode;
 		isOnCategoryBar = isOnBar;
 		initialize();
 	}
@@ -59,8 +59,7 @@ public class TableWindow extends JFrame{
 		final String[] csvColumns;
 		final int[] rowCounts;
 		
-		if(currentRibbon != null){
-			CategoryNode currentNode = currentRibbon.getNode();
+		if(currentNode != null){
 			LocalDBDataSet currentDataSet = currentNode.getToCategory().getDimension().getLocalDataSet();
 			ArrayList<DimensionHandle> tempDims = currentDataSet.getDimensions();
 			ArrayList<DimensionHandle> dimensionList = new ArrayList<DimensionHandle>();

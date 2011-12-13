@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
 
+import java.util.List;
 import javax.swing.event.MouseInputAdapter;
 
 import edu.uncc.parsets.data.CategoryHandle;
@@ -59,21 +60,32 @@ public class ParSetsInteraction extends MouseInputAdapter {
     
     // new component
     private JPopupMenu popmenu = new JPopupMenu();
-    private JMenuItem tableOp1 = new JMenuItem("Create Table");
+//    JMenuItem tableOp1 = new JMenuItem("Table");
 
 
     public ParSetsInteraction(ParSetsView parSetsView) {
         view = parSetsView;
         
-        // don't know if this should go here, new stuff
-        tableOp1.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent a){
-            		TableWindow tab = new TableWindow(tableRibbon, isOnCategoryBar);
-            		isOnCategoryBar = false;
-
-        		
-        	}});       
-        popmenu.add(tableOp1);
+        for (final PopupPresenter popupPresenter : view.getController().getPopupPresenters()) {
+            JMenuItem item = popupPresenter.getJMenuItem();
+            item.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    popupPresenter.selectionChanged(new SelectionChangeEvent("MENU_ITEM", tableRibbon.getNode(), view.getFilteredCategories(), isOnCategoryBar));
+                    isOnCategoryBar = false;
+                }
+            });
+            popmenu.add(item);
+        }
+        
+//        // don't know if this should go here, new stuff
+//        tableOp1.addActionListener(new ActionListener() {
+//        	public void actionPerformed(ActionEvent a){
+//            		TableWindow tab = new TableWindow(tableRibbon.getNode(), isOnCategoryBar);
+//            		isOnCategoryBar = false;
+//
+//        		
+//        	}});       
+//        popmenu.add(tableOp1);
 
     }
 
@@ -231,11 +243,7 @@ public class ParSetsInteraction extends MouseInputAdapter {
             cats.add(0, node.getToCategory());
             node = node.getParent();
         }
-        view.getController().setSelected(new SelectionChangeEvent(selectionType, cats, null));
+        view.getController().setSelected(new SelectionChangeEvent(selectionType, selectedRibbon.getNode(), null, isOnCategoryBar));
     }
-    
-    
-   
-
 }
 

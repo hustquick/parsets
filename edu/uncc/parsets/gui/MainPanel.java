@@ -2,10 +2,7 @@
  * 
  * 
  */
-
 package edu.uncc.parsets.gui;
-
-
 
 import java.awt.BorderLayout;
 
@@ -15,6 +12,7 @@ import javax.swing.JPanel;
 import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.DataSet;
 import edu.uncc.parsets.parsets.ParSetsView;
+
 /**
  *
  * @author aacain
@@ -30,25 +28,30 @@ public class MainPanel extends JPanel implements AbstractMainView {
     private JMenuItem editDataSet;
     private JMenuItem deleteDataSet;
     private SideBar sideBar;
-	private ParSetsView parSetsView;
+    private ParSetsView parSetsView;
 
     public String getTitle() {
         return "";
     }
+    
+    public MainPanel(DataSet dataset){
+        this(dataset, null);
+    }
 
-
-    public MainPanel(DataSet dataset) {
+    public MainPanel(DataSet dataset, Controller controller) {
         super();
-        controller = new Controller();
-        controller.setDataSet(dataset);
-        sideBar = new SideBar(dataset, (AbstractMainView)this, controller);
+        if (controller == null) {
+            this.controller = new Controller();
+        }
+        this.controller.setDataSet(dataset);
+        sideBar = new SideBar(dataset, (AbstractMainView) this, controller);
 
         parSetsView = new ParSetsView(controller);
 
         initComponents();
     }
-    
-    private void initComponents(){
+
+    private void initComponents() {
         setLayout(new BorderLayout());
         add(sideBar, BorderLayout.WEST);
         add(parSetsView, BorderLayout.CENTER);
@@ -60,8 +63,6 @@ public class MainPanel extends JPanel implements AbstractMainView {
         super.addNotify();
         initComponents();
     }
-
-
 
     public void setDSMenuItemsEnabled(boolean enabled) {
         openDataSet.setEnabled(enabled);
