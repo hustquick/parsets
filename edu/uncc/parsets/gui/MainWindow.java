@@ -1,5 +1,6 @@
 package edu.uncc.parsets.gui;
 
+import edu.uncc.parsets.parsets.SelectionChangeEvent;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.FileDialog;
@@ -22,6 +23,7 @@ import javax.swing.KeyStroke;
 import edu.uncc.parsets.ParallelSets;
 import edu.uncc.parsets.data.LocalDB;
 import edu.uncc.parsets.parsets.ParSetsView;
+import edu.uncc.parsets.parsets.PopupPresenter;
 import edu.uncc.parsets.util.PSLogging;
 import edu.uncc.parsets.util.osabstraction.AbstractOS;
 
@@ -94,6 +96,9 @@ public class MainWindow extends JFrame implements AbstractMainView {
     }
     
     public MainWindow() {
+        this(null);
+    }
+    public MainWindow(Controller controller) {
         super(WINDOWTITLE);
 
         setSize(WINDOWWIDTH, WINDOWHEIGHT);
@@ -108,14 +113,29 @@ public class MainWindow extends JFrame implements AbstractMainView {
             }
         });
 
-        controller = new Controller();
+        if(controller == null){
+            this.controller = new Controller();
+            this.controller.addPopupPresenter(new PopupPresenter(){
 
-        setJMenuBar(makeMenu(controller));
+                @Override
+                public JMenuItem getJMenuItem() {
+                    return new JMenuItem("Create Table");
+                }
 
-        SideBar sideBar = new SideBar(this, controller);
+                @Override
+                public void selectionChanged(SelectionChangeEvent event) {
+                    TableWindow tab = new TableWindow(event.getSelectedCategory(), event.isOnCategoryBar());
+                }
+                
+            });
+        }
+
+        setJMenuBar(makeMenu(this.controller));
+        
+        SideBar sideBar = new SideBar(this, this.controller);
         add(sideBar, BorderLayout.WEST);
 
-        ParSetsView parSetsView = new ParSetsView(controller);
+        ParSetsView parSetsView = new ParSetsView(this.controller);
         add(parSetsView, BorderLayout.CENTER);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
