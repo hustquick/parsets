@@ -113,7 +113,8 @@ public class MainWindow extends JFrame implements AbstractMainView {
             }
         });
 
-        if(controller == null){
+        this.controller = controller;
+        if(this.controller == null){
             this.controller = new Controller();
             this.controller.addPopupPresenter(new PopupPresenter(){
 

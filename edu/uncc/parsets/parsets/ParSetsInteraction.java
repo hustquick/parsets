@@ -237,12 +237,6 @@ public class ParSetsInteraction extends MouseInputAdapter {
 
     private void fireSelectionChangeEvent(String selectionType) {
         CategoryNode node = selectedRibbon.getNode();
-        ArrayList<CategoryHandle> cats = new ArrayList<CategoryHandle>();
-
-        while (node.getParent() != null) {
-            cats.add(0, node.getToCategory());
-            node = node.getParent();
-        }
         view.getController().setSelected(new SelectionChangeEvent(selectionType, selectedRibbon.getNode(), null, isOnCategoryBar));
     }
 }
