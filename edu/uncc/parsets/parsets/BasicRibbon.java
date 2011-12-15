@@ -222,7 +222,10 @@ public class BasicRibbon extends VisualConnection implements Comparable<BasicRib
 	}
 	
 	public boolean contains(int x, int y) {
-		
+            //test to see if the node has been filtered from the display
+		if(!this.getNode().isVisible()){
+                    return false;
+                }
 		Polygon poly = new Polygon();
 		
 		poly.addPoint((int)(upperBar.getLeftX() + upperOffset.getValue()), (int)upperBar.getOutRibbonY());
